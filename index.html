@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EURODASH ELITE</title>
+    <title>EURODASH GOLD V21</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -20,7 +20,6 @@
             color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; 
         }
         
-        /* Efeito Vinheta */
         body::after { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 40%, #000 100%); pointer-events: none; z-index: -1; }
 
         /* --- LOADING MATRIX --- */
@@ -40,21 +39,31 @@
         .tab { display: none; padding: 20px; padding-top: 60px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
         
         /* --- CORE --- */
-        #balance-con { margin-top: 20px; margin-bottom: 20px; }
+        #balance-con { margin-top: 20px; margin-bottom: 10px; }
         #balance { font-size: 52px; font-weight: 700; color: #fff; text-shadow: 0 0 20px rgba(0,255,153,0.5); }
         .cy { color: #0f9; font-size: 24px; vertical-align: super; }
         
+        /* LEVEL BAR */
+        .lvl-con { width: 60%; margin: 0 auto 20px auto; background: #111; height: 6px; border-radius: 3px; position: relative; border: 1px solid #333; }
+        .lvl-fill { height: 100%; background: linear-gradient(90deg, #0f9, #00ffff); width: 0%; border-radius: 3px; transition: width 0.5s; box-shadow: 0 0 10px #0f9; }
+        .lvl-txt { font-size: 12px; color: #aaa; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px; }
+
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; transition: transform 0.05s; -webkit-user-drag: none; }
         .main-img:active { transform: scale(0.96); border-color: #0f9; box-shadow: 0 0 50px rgba(0,255,153,0.6); }
         
-        /* Partículas Multi-Touch */
+        /* Partículas Multi-Touch & CRITICAL */
         .float-text { position: absolute; color: #fff; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 5px #0f9; z-index: 20; }
+        .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
 
         /* --- CARDS & PANELS --- */
         .card { background: rgba(10,10,10,0.8); border: 1px solid #222; border-left: 3px solid #0f9; border-radius: 10px; padding: 15px; margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
+        /* --- POPUP OFFLINE --- */
+        #offline-pop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index: 200; align-items:center; justify-content:center; flex-direction:column; backdrop-filter: blur(5px); }
+        .pop-box { background: #111; border: 1px solid #0f9; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px rgba(0,255,153,0.2); width: 80%; }
+
         /* --- MARKET UI --- */
         .market-header { background: #111; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .w-btn { background: #f00; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); }
@@ -88,6 +97,15 @@
         </div>
     </div>
 
+    <div id="offline-pop">
+        <div class="pop-box">
+            <h2 style="color:#fff; border:none;">WELCOME BACK</h2>
+            <p style="color:#aaa;">Your miners worked while you were away!</p>
+            <h1 style="color:#0f9; font-size:40px; margin:10px 0;">+€<span id="off-val">0.00</span></h1>
+            <button class="buy-btn" onclick="document.getElementById('offline-pop').style.display='none'">COLLECT</button>
+        </div>
+    </div>
+
     <div class="lang-bar">
         <button class="t-btn active" id="btn-en" onclick="setL('en')">EN</button>
         <button class="t-btn" id="btn-pt" onclick="setL('pt')">PT</button>
@@ -101,7 +119,8 @@
         
         <div id="balance-con">
             <div id="balance"><span class="cy">€</span><span id="bal-val">0.00000</span></div>
-            <small style="color:#666; letter-spacing:1px;">AVAILABLE BALANCE</small>
+            <div class="lvl-con"><div class="lvl-fill" id="l-fill"></div></div>
+            <div class="lvl-txt" id="l-name">NOOB</div>
         </div>
 
         <div class="main-img-con">
@@ -122,7 +141,6 @@
 
     <div id="tab-shop" class="tab">
         <h2 id="txt-m">MARKETPLACE</h2>
-        
         <div class="market-header">
             <div style="text-align:left">
                 <small style="color:#888">WALLET</small><br>
@@ -130,7 +148,6 @@
             </div>
             <button class="w-btn" onclick="withdraw()" id="btn-wd">WITHDRAW</button>
         </div>
-
         <div id="shop-list"></div>
     </div>
 
@@ -152,7 +169,6 @@
 
     <div id="tab-friends" class="tab">
         <h2 id="txt-f">NETWORK</h2>
-        
         <div class="card" style="display:block; text-align:center; padding:30px;">
             <div style="font-size:40px;">💎</div>
             <h3 style="color:#fff; margin:10px 0;">INVITE & EARN</h3>
@@ -196,14 +212,13 @@
         tg.expand();
 
         // --- CONFIG ---
-        let L = 'en'; // DEFAULT ENGLISH
+        let L = 'en'; 
         const txt = {
             en: { m: "MARKETPLACE", f: "NETWORK", e: "MISSIONS", r: "LEADERBOARD", w: "WITHDRAW", names: ["Micro Node","Blade Rack","Turbo Server","Cyber Station","Quantum Rig","Neural Hub","Titan Core"], n: ["MINER","MARKET","RANK","FRIENDS","EARN"] },
             pt: { m: "MERCADO", f: "REDE", e: "MISSÕES", r: "RANKING", w: "LEVANTAR", names: ["Nó Micro","Rack Blade","Turbo Server","Cyber Station","Quantum Rig","Hub Neural","Núcleo Titan"], n: ["MINAR","MERCADO","RANK","AMIGOS","GANHAR"] },
             ru: { m: "РЫНОК", f: "СЕТЬ", e: "МИССИИ", r: "РЕЙТИНГ", w: "ВЫВОД", names: ["Микро Узел","Blade Стойка","Турбо Сервер","Кибер Станция","Квантовый Риг","Нейро Хаб","Ядро Титана"], n: ["МАЙНЕР","РЫНОК","ТОП","ДРУЗЬЯ","ЗАДАНИЯ"] }
         };
 
-        // Economia Hardcore V20
         const miners = [
             {p:0.05, g:0.00000012, img: "miner1.jpg"}, {p:1.00, g:0.00000096, img: "miner2.jpg"}, 
             {p:10.00, g:0.00000720, img: "miner3.jpg"}, {p:50.00, g:0.00002800, img: "miner4.jpg"}, 
@@ -211,7 +226,7 @@
             {p:3000.00, g:0.00099000, img: "miner7.jpg"}
         ];
 
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {} };
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now() };
         let loaded = false;
 
         firebase.initializeApp({
@@ -225,76 +240,88 @@
         const uid = tg.initDataUnsafe.user?.id || 22250; 
         const botName = "EuroDash_Bot"; 
 
-        // --- BOOT SYSTEM ---
         window.onload = function() {
             setTimeout(() => { document.getElementById('term').innerHTML += "<br>> ACCESS GRANTED."; }, 1500);
             
             db.ref('users/' + uid).once('value').then(s => {
                 if(s.exists()) {
                     let d = s.val();
-                    u = { ...u, ...d }; // Merge safe
+                    u = { ...u, ...d };
                     u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                    
+                    // OFFLINE PROFIT CALC
+                    if(d.lastT && u.pps > 0) {
+                        let sec = (Date.now() - d.lastT) / 1000;
+                        if(sec > 60) {
+                            let profit = sec * u.pps;
+                            u.bal += profit;
+                            document.getElementById('off-val').innerText = profit.toFixed(4);
+                            document.getElementById('offline-pop').style.display = 'flex';
+                        }
+                    }
                 }
                 loaded = true;
                 up(); renderShop(); checkTasks();
-                
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 3500);
             });
 
             document.getElementById('my-link').innerText = `https://t.me/${botName}?start=${uid}`;
-            
-            // MULTI-TOUCH HANDLER
             const btn = document.getElementById('click-btn');
             btn.addEventListener('touchstart', handleTouch, {passive: false});
         };
 
         function handleTouch(e) {
-            e.preventDefault(); // Impede zoom
+            e.preventDefault();
             if(u.eng < 1) return;
-            
-            // Para cada dedo
             for (let i = 0; i < e.changedTouches.length; i++) {
                 if(u.eng > 0) {
-                    u.bal += 0.00005;
-                    u.eng -= 1;
-                    spawnText(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                    processTap(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
                 }
             }
-            up(); tg.HapticFeedback.impactOccurred('heavy');
+            tg.HapticFeedback.impactOccurred('heavy');
         }
 
-        // Fallback Click (rato)
         document.getElementById('click-btn').addEventListener('click', (e) => {
-            if(u.eng > 0) { u.bal += 0.00005; u.eng -= 1; up(); spawnText(e.clientX, e.clientY); }
+            if(u.eng > 0) processTap(e.clientX, e.clientY);
         });
 
-        function spawnText(x, y) {
+        // --- CRITICAL HIT LOGIC ---
+        function processTap(x, y) {
+            u.eng -= 1;
+            let gain = 0.00005;
+            let isCrit = Math.random() < 0.03; // 3% Chance
+            
+            if(isCrit) {
+                gain *= 10;
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            
+            u.bal += gain;
+            up(); 
+            spawnText(x, y, gain, isCrit);
+        }
+
+        function spawnText(x, y, amount, isCrit) {
             const el = document.createElement('div');
-            el.innerText = '+0.00005';
-            el.className = 'float-text';
+            el.innerText = isCrit ? `CRITICAL! +${amount}` : `+${amount}`;
+            el.className = 'float-text ' + (isCrit ? 'crit' : '');
             el.style.left = x + 'px'; el.style.top = y + 'px';
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
         function withdraw() {
-            if(u.bal < 1.00) {
-                tg.showAlert("Minimum withdraw: €1.00");
-            } else {
-                tg.showAlert("Withdraw request sent to Admin! Processing time: 24h.");
-                // Aqui no futuro podes adicionar lógica para gravar o pedido na BD
-            }
+            if(u.bal < 1.00) tg.showAlert("Minimum: €1.00");
+            else tg.showAlert("Request sent! Wait 24h.");
         }
 
         function doTask(id, reward, url) {
             if(u.tasks[id]) return;
             if(url) tg.openLink(url);
-            
             setTimeout(() => {
                 if(!u.tasks[id]) {
                     u.tasks[id] = true; u.bal += reward;
-                    up(); checkTasks();
-                    tg.showAlert(`Reward: +€${reward}`);
+                    up(); checkTasks(); tg.showAlert(`Reward: +€${reward}`);
                 }
             }, 3000);
         }
@@ -324,9 +351,7 @@
             if(u.bal >= miners[i].p) {
                 u.bal -= miners[i].p; u.pps += miners[i].g; u.inv[i] = (u.inv[i]||0) + 1;
                 renderShop(); up(); tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                tg.HapticFeedback.notificationOccurred('error');
-            }
+            } else tg.HapticFeedback.notificationOccurred('error');
         }
 
         function setL(l) {
@@ -353,11 +378,23 @@
         }
 
         function up() {
+            // Update UI
             document.getElementById('bal-val').innerText = u.bal.toFixed(5);
             document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             document.getElementById('bal-rank').innerText = u.bal.toFixed(5);
             document.getElementById('eg').innerText = Math.floor(u.eng);
             document.getElementById('pps-disp').innerText = (u.pps * 100).toFixed(6);
+
+            // Level System
+            let lvl = "NOOB";
+            let pct = 0;
+            if(u.bal < 1) { pct = (u.bal/1)*100; }
+            else if(u.bal < 10) { lvl = "HACKER"; pct = (u.bal/10)*100; }
+            else if(u.bal < 50) { lvl = "CYBER LORD"; pct = (u.bal/50)*100; }
+            else { lvl = "TITAN"; pct = 100; }
+            
+            document.getElementById('l-name').innerText = lvl;
+            document.getElementById('l-fill').style.width = pct + "%";
         }
         
         function copyLink() {
@@ -366,7 +403,14 @@
         }
 
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng < 500) u.eng += 0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid) db.ref('users/' + uid).update(u); }, 5000);
+        
+        // Auto-Save + Last Active Time
+        setInterval(() => { 
+            if(loaded && uid) {
+                u.lastT = Date.now();
+                db.ref('users/' + uid).update(u); 
+            } 
+        }, 5000);
     </script>
 </body>
 </html>
