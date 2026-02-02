@@ -196,7 +196,7 @@
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
         let loaded = false;
         
-        // GLOBAL START (Para o botão de emergência funcionar)
+        // ESTA É A FUNÇÃO GLOBAL DE ARRANQUE
         window.finishLoad = function() {
             if(loaded) return;
             loaded = true;
@@ -238,7 +238,7 @@
                     console.log("DB Slow/Error. Playing anyway.");
                     finishLoad(); // ENTRA À FORÇA
                 }
-            }, 2500);
+            }, 3000);
 
             db.ref('users/' + uid).once('value')
                 .then(s => {
@@ -336,15 +336,21 @@
             }).catch(e => { document.getElementById('rank-list').innerHTML = '<div style="padding:20px; color:red">Offline</div>'; });
         }
 
+        // ESTA FOI A FUNÇÃO QUE EU TINHA ESQUECIDO (AGORA ESTÁ AQUI)
+        function checkTasks() {
+            if(u.tasks['group']) { 
+                let btn = document.getElementById('task-group');
+                if(btn) { btn.innerText = "DONE"; btn.style.opacity = 0.5; }
+            }
+        }
+
         function doTask(id, reward) {
             if(u.tasks[id]) return;
             tg.openLink(CONFIG.telegram_link);
             setTimeout(() => {
                 tg.showConfirm("Did you join the channel?", (ok) => {
                     if(ok) {
-                        u.tasks[id] = true; u.bal += reward; up();
-                        document.getElementById('task-group').innerText = "DONE";
-                        document.getElementById('task-group').style.opacity = 0.5;
+                        u.tasks[id] = true; u.bal += reward; up(); checkTasks();
                         tg.showAlert(`+€${reward} Received!`);
                     }
                 });
