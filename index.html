@@ -1,47 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>EuroDash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EuroDash Miner</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <style>
-        body { background: #000; color: #00ff9d; text-align: center; font-family: sans-serif; }
-        #btn-click { font-size: 100px; cursor: pointer; margin: 30px; user-select: none; }
-        #display { font-size: 40px; font-weight: bold; }
-        .boost { background: #00b0ff; color: white; padding: 15px; border-radius: 10px; border: none; font-weight: bold; }
+        body { 
+            background: #000; color: #00ff9d; text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 20px; overflow: hidden;
+        }
+        .container { border: 2px solid #00ff9d; border-radius: 20px; padding: 20px; background: #0a0a0a; margin-top: 20px; }
+        #display { font-size: 35px; font-weight: bold; margin: 20px 0; text-shadow: 0 0 10px #00ff9d; }
+        #btn-click { 
+            font-size: 80px; cursor: pointer; display: inline-block; 
+            transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        #btn-click:active { transform: scale(0.8); }
+        .boost-btn { 
+            background: #00b0ff; color: white; border: none; padding: 18px; 
+            width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; 
+            margin-top: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 176, 255, 0.3);
+        }
+        .footer { margin-top: 30px; color: #555; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <h1>EURODASH</h1>
-    <div id="display">€ 0.00000</div>
-    
-    <div id="btn-click">⚡</div>
+    <div class="container">
+        <h2 style="margin:0; color: #888; font-size: 14px;">SALDO EURODASH</h2>
+        <div id="display">€ 0.00000</div>
+        
+        <div id="btn-click">⚡</div>
+        <p style="color: #444;">Toca no raio para minerar</p>
 
-    <button class="boost" onclick="verAds()">📺 BOOST (+€0.10)</button>
+        <button class="boost-btn" onclick="verAnuncio()">📺 BOOST (+€0.10)</button>
+    </div>
+
+    <div class="footer">ID de Anúncios: 22244 | Sistema Ativo</div>
 
     <script>
-        let saldo = 0;
-        const visor = document.getElementById('display');
-        const botao = document.getElementById('btn-click');
+        const webapp = window.Telegram.WebApp;
+        webapp.expand();
 
-        // FUNÇÃO DE CLIQUE DIRETA
-        botao.addEventListener('click', function() {
-            saldo += 0.001;
-            visor.innerText = "€ " + saldo.toFixed(5);
-            console.log("Clicou! Saldo: " + saldo);
+        // Inicializa saldo do armazenamento local
+        let saldo = parseFloat(localStorage.getItem('eurodash_total')) || 0;
+        const display = document.getElementById('display');
+        
+        function atualizarVisor() {
+            display.innerText = "€ " + saldo.toFixed(5);
+            localStorage.setItem('eurodash_total', saldo);
+        }
+        atualizarVisor();
+
+        // Lógica do Clique (Minerar)
+        document.getElementById('btn-click').addEventListener('click', function() {
+            saldo += 0.00050; // Valor por clique
+            atualizarVisor();
+            if (webapp.HapticFeedback) webapp.HapticFeedback.impactOccurred('medium');
         });
 
-        // ADSGRAM
+        // Configuração Adsgram
         const AdController = window.Adsgram.init({ blockId: "22244" });
-        function verAds() {
-            AdController.show().then(() => {
+
+        function verAnuncio() {
+            // Alerta de diagnóstico para saberes que o botão foi premido
+            console.log("A iniciar processo de anúncio...");
+            
+            AdController.show().then((result) => {
+                // Sucesso total
                 saldo += 0.10;
-                visor.innerText = "€ " + saldo.toFixed(5);
-                alert("Ganhaste €0.10!");
-            }).catch(() => {
-                alert("Anúncio ainda a carregar no Adsgram...");
+                atualizarVisor();
+                webapp.showAlert("BOOST CONCLUÍDO! Recebeste €0.10");
+            }).catch((result) => {
+                // Erro ou Processamento
+                console.error("Erro Adsgram:", result);
+                let msg = "O anúncio ainda não está pronto.";
+                
+                if (result.description) {
+                    msg = "Adsgram diz: " + result.description;
+                } else {
+                    msg = "O teu ID 22244 ainda está em validação (Created) ou não há anúncios para a tua região agora.";
+                }
+                
+                webapp.showAlert(msg);
             });
         }
     </script>
