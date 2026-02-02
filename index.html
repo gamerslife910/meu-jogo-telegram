@@ -1,71 +1,37 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EuroDash Miner</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Teste EuroDash</title>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
-    <style>
-        body { background: #000; color: #fff; text-align: center; font-family: sans-serif; padding-top: 50px; }
-        .balance-container { background: #111; padding: 20px; border-radius: 15px; margin: 20px; border: 1px solid #00ff9d; }
-        #main-balance { font-size: 32px; color: #00ff9d; font-weight: bold; }
-        .btn { 
-            display: block; width: 80%; margin: 20px auto; padding: 20px; 
-            border-radius: 12px; border: none; font-weight: bold; font-size: 18px; cursor: pointer;
-        }
-        .btn-mine { background: #00ff9d; color: #000; }
-        .btn-ads { background: #00b0ff; color: #fff; }
-        .btn:active { transform: scale(0.95); }
-    </style>
 </head>
 <body>
-
-    <h1>EuroDash Miner 💶</h1>
-
-    <div class="balance-container">
-        <p style="margin:0; color: #888;">SALDO ATUAL</p>
-        <div id="main-balance">€ 0.00</div>
-    </div>
-
-    <button class="btn btn-mine" onclick="clicarEnergia()">⚡ MINERAR (CLICK)</button>
+    <h1>TESTE DE FUNCIONAMENTO</h1>
     
-    <button class="btn btn-ads" onclick="verAnuncio()">📺 BOOST (+€0.10)</button>
+    <p>Saldo: <span id="valor">0</span></p>
+    
+    <button style="padding: 20px;" onclick="clicar()">1. TESTAR CLIQUE (SOMAR)</button>
+    
+    <br><br>
+    
+    <button style="padding: 20px; background: orange;" onclick="anuncio()">2. TESTAR ANÚNCIO (ADSGRAM)</button>
 
     <script>
-        const webapp = window.Telegram.WebApp;
-        webapp.expand();
-
-        // Teu Unit ID do Adsgram
-        const AdController = window.Adsgram.init({ blockId: "22244" });
-
-        // Carregar saldo salvo ou começar em 0
-        let saldo = parseFloat(localStorage.getItem('eurodash_saldo')) || 0;
-        document.getElementById('main-balance').innerText = "€ " + saldo.toFixed(2);
-
-        // Função de clicar no botão de energia
-        function clicarEnergia() {
-            saldo += 0.01;
-            atualizarEcran();
-            webapp.HapticFeedback.impactOccurred('light');
+        // Teste de Clique
+        function clicar() {
+            let num = parseInt(document.getElementById('valor').innerText);
+            document.getElementById('valor').innerText = num + 1;
+            console.log("Clicou com sucesso");
         }
 
-        // Função do Anúncio
-        function verAnuncio() {
-            AdController.show().then((result) => {
-                saldo += 0.10;
-                atualizarEcran();
-                webapp.showAlert("BOOST! Ganhaste €0.10");
-            }).catch((result) => {
-                webapp.showAlert("Anúncio não carregou ou foi fechado.");
+        // Teste de Anúncio
+        const AdController = window.Adsgram.init({ blockId: "22244" });
+        function anuncio() {
+            AdController.show().then(() => {
+                alert("Anúncio Funcionou!");
+            }).catch(() => {
+                alert("Erro no anúncio");
             });
         }
-
-        function atualizarEcran() {
-            document.getElementById('main-balance').innerText = "€ " + saldo.toFixed(2);
-            localStorage.setItem('eurodash_saldo', saldo);
-        }
     </script>
-
 </body>
 </html>
