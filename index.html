@@ -59,8 +59,8 @@
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
-        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting to Europe-West1...</div>
-        <button id="force-btn" onclick="forceEnter()">⚠️ PLAY OFFLINE</button>
+        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
+        <button id="force-btn" onclick="finishLoad()">⚠️ JOGAR (OFFLINE)</button>
     </div>
 
     <div id="modal-offline" class="modal">
@@ -196,6 +196,14 @@
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
         let loaded = false;
         
+        // GLOBAL START (Para o botão de emergência funcionar)
+        window.finishLoad = function() {
+            if(loaded) return;
+            loaded = true;
+            up(); renderShop(); checkTasks(); loadRank();
+            document.getElementById('loader').style.display = 'none';
+        }
+
         let tg, uid, uName;
         try {
             tg = window.Telegram.WebApp;
@@ -206,12 +214,12 @@
             uid = 22250; uName = "Test User";
         }
 
-        // --- FIREBASE OFICIAL (AGORA SIM, O LINK CERTO!) ---
+        // --- FIREBASE OFICIAL (TUAS CHAVES) ---
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
                 authDomain: "eurodash-official.firebaseapp.com",
-                databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app/", 
+                databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app/",
                 projectId: "eurodash-official",
                 storageBucket: "eurodash-official.firebasestorage.app",
                 messagingSenderId: "633116941203",
@@ -224,13 +232,13 @@
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
             
-            // TIMEOUT DE SEGURANÇA (Para aparecer o botão se a net for lenta)
+            // TIMEOUT DE SEGURANÇA: Se a DB falhar, entra em 2s
             setTimeout(() => {
                 if(!loaded) {
-                    document.getElementById('force-btn').style.display = 'block';
-                    document.getElementById('load-status').innerHTML = "<span style='color:red'>SLOW CONNECTION</span>";
+                    console.log("DB Slow/Error. Playing anyway.");
+                    finishLoad(); // ENTRA À FORÇA
                 }
-            }, 4000);
+            }, 2500);
 
             db.ref('users/' + uid).once('value')
                 .then(s => {
@@ -249,26 +257,15 @@
                     finishLoad();
                 })
                 .catch(error => {
-                    document.getElementById('load-status').innerText = "DB Error: " + error.code;
-                    document.getElementById('force-btn').style.display = 'block';
+                    // SE DER ERRO, ENTRA NA MESMA E MOSTRA MENSAGEM
+                    document.getElementById('load-status').innerText = "Error: " + error.message;
+                    setTimeout(finishLoad, 2000); 
                 });
 
             document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
             document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
-
-        // Função global para entrar à força se necessário
-        window.forceEnter = function() {
-            finishLoad();
-        }
-
-        function finishLoad() {
-            if(loaded) return;
-            loaded = true;
-            up(); renderShop(); checkTasks(); loadRank();
-            document.getElementById('loader').style.display = 'none';
-        }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
