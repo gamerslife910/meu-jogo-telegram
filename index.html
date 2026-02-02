@@ -1,116 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EuroDash Miner</title>
+    <title>EuroDash</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00ff9d; --bg: #050505; --card: #121212; --text: #ffffff; --subtext: #888; --accent: #00b0ff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .header { padding: 25px 20px; text-align: center; background: linear-gradient(180deg, rgba(0,255,157,0.08) 0%, transparent 100%); border-bottom: 1px solid #1a1a1a; }
-        .balance-label { font-size: 0.7rem; color: var(--subtext); letter-spacing: 2px; font-weight: bold; }
-        .balance-amount { font-family: 'Orbitron', sans-serif; font-size: 2.4rem; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,157,0.3); margin: 10px 0; }
-        .progress-container { width: 100%; background: #111; height: 8px; border-radius: 10px; margin-top: 15px; border: 1px solid #222; }
-        .progress-bar { width: 0%; height: 100%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: width 0.4s ease; }
-        .content { flex-grow: 1; overflow-y: auto; padding: 20px; display: none; opacity: 0; transition: 0.3s; }
-        .content.active { display: block; opacity: 1; }
-        .item-card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #222; }
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-family: inherit; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: #000; }
-        .nav { display: flex; justify-content: space-around; padding: 15px 10px 25px; border-top: 1px solid #1a1a1a; background: #000; }
-        .nav-item { color: #555; font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold; }
-        .nav-item.active { color: var(--primary); }
-        #main-clicker { font-size: 8rem; cursor: pointer; display: inline-block; user-select: none; -webkit-tap-highlight-color: transparent; }
-        #main-clicker:active { transform: scale(0.9); }
+        body { background: #000; color: #00ff9d; text-align: center; font-family: sans-serif; }
+        #btn-click { font-size: 100px; cursor: pointer; margin: 30px; user-select: none; }
+        #display { font-size: 40px; font-weight: bold; }
+        .boost { background: #00b0ff; color: white; padding: 15px; border-radius: 10px; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="balance-label">EURODASH NETWORK ASSETS</div>
-        <div class="balance-amount">€ <span id="main-balance">0.00000</span></div>
-        <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
-    </div>
+    <h1>EURODASH</h1>
+    <div id="display">€ 0.00000</div>
+    
+    <div id="btn-click">⚡</div>
 
-    <div id="tab-mine" class="content active">
-        <div style="text-align: center; margin-top: 30px;">
-            <div id="main-clicker">⚡</div>
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #1a1a1a;">
-                <p style="color: var(--subtext); margin: 0; font-size: 0.8rem;">DASH SPEED</p>
-                <p style="color: var(--primary); font-family: 'Orbitron'; margin: 5px 0 0;">+ <span id="pps-display">0.00001</span> €/s</p>
-            </div>
-            <button class="btn btn-primary" style="margin-top: 20px;" onclick="showAd()">BOOST (VER ANÚNCIO +€0.10)</button>
-        </div>
-    </div>
-
-    <div id="tab-shop" class="content">
-        <div class="item-card">
-            <p>SHOP EM MANUTENÇÃO</p>
-        </div>
-    </div>
-
-    <div class="nav">
-        <div class="nav-item active" onclick="showTab('mine', this)">DASH</div>
-        <div class="nav-item" onclick="webapp.showAlert('Brevemente')">SHOP</div>
-        <div class="nav-item" onclick="withdraw()">CASH OUT</div>
-    </div>
+    <button class="boost" onclick="verAds()">📺 BOOST (+€0.10)</button>
 
     <script>
-        const webapp = window.Telegram.WebApp;
-        webapp.expand();
+        let saldo = 0;
+        const visor = document.getElementById('display');
+        const botao = document.getElementById('btn-click');
 
-        const AdController = window.Adsgram.init({ blockId: "22244" });
-
-        let state = JSON.parse(localStorage.getItem('eurodash_save')) || {
-            balance: 0,
-            pps: 0.00001,
-            lastUpdate: Date.now()
-        };
-
-        function save() {
-            localStorage.setItem('eurodash_save', JSON.stringify(state));
-        }
-
-        // FUNÇÃO DE CLIQUE REFEITA
-        document.getElementById('main-clicker').addEventListener('click', function() {
-            state.balance += 0.00010;
-            document.getElementById('main-balance').innerText = state.balance.toFixed(5);
-            webapp.HapticFeedback.impactOccurred('medium');
-            save();
+        // FUNÇÃO DE CLIQUE DIRETA
+        botao.addEventListener('click', function() {
+            saldo += 0.001;
+            visor.innerText = "€ " + saldo.toFixed(5);
+            console.log("Clicou! Saldo: " + saldo);
         });
 
-        function mainLoop() {
-            const now = Date.now();
-            const diff = (now - state.lastUpdate) / 1000;
-            state.balance += state.pps * diff;
-            state.lastUpdate = now;
-            document.getElementById('main-balance').innerText = state.balance.toFixed(5);
-            document.getElementById('pps-display').innerText = state.pps.toFixed(5);
-            save();
-            requestAnimationFrame(mainLoop);
-        }
-        mainLoop();
-
-        function showAd() {
+        // ADSGRAM
+        const AdController = window.Adsgram.init({ blockId: "22244" });
+        function verAds() {
             AdController.show().then(() => {
-                state.balance += 0.10;
-                save();
-                webapp.showAlert("BOOST ATIVO!");
+                saldo += 0.10;
+                visor.innerText = "€ " + saldo.toFixed(5);
+                alert("Ganhaste €0.10!");
             }).catch(() => {
-                webapp.showAlert("Anúncio ainda em validação pelo Adsgram (Created).");
+                alert("Anúncio ainda a carregar no Adsgram...");
             });
-        }
-
-        function showTab(id, el) {
-            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-        }
-
-        function withdraw() {
-            webapp.showAlert("Mínimo para levantar: €1.00");
         }
     </script>
 </body>
