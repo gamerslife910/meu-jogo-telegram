@@ -1,190 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EURODASH V7</title>
-    
+    <title>EURO V10</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
-    
     <style>
-        :root { --p: #00ff9d; --bg: #000; }
-        body { background: #000; color: white; font-family: 'Rajdhani', sans-serif; margin: 0; overflow: hidden; }
-
-        /* SELETOR DE LÍNGUAS - NOVO DESIGN */
-        .v7-lang-header { position: fixed; top: 10px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 10000; }
-        .v7-lbtn { background: #111; border: 1px solid #333; color: white; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
-        .v7-lbtn.active { border-color: var(--p); background: rgba(0,255,157,0.1); }
-
-        /* EFEITO DE CLIQUE DINÂMICO */
-        .v7-pop { position: absolute; pointer-events: none; color: var(--p); font-family: 'Orbitron'; font-weight: bold; animation: v7-anim 0.7s forwards; z-index: 999; }
-        @keyframes v7-anim { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5); } }
-
-        /* INTERFACE V7 */
-        .v7-container { height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 60px; }
-        .v7-balance { font-family: 'Orbitron'; font-size: 3.5rem; color: #fff; text-shadow: 0 0 20px rgba(0,255,157,0.3); }
-        
-        .v7-circle { width: 240px; height: 240px; border-radius: 60px; border: 4px solid #1a1a1a; position: relative; overflow: hidden; margin-top: 20px; transition: 0.1s; }
-        .v7-circle:active { transform: scale(0.95); border-color: var(--p); }
-        .v7-circle img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* MARKET V7 */
-        .v7-market-page { position: fixed; inset: 0; background: #000; z-index: 500; padding: 80px 20px; display: none; overflow-y: auto; }
-        .v7-market-page.open { display: block; }
-        .v7-card { display: flex; align-items: center; background: #0a0a0a; padding: 15px; border-radius: 20px; margin-bottom: 10px; border: 1px solid #1a1a1a; gap: 15px; }
-        .v7-card img { width: 45px; height: 45px; border-radius: 10px; border: 1px solid #333; }
-        .v7-card-info { flex: 1; }
-        .v7-btn { background: #ff5e00; border: none; color: white; padding: 10px; border-radius: 10px; font-family: 'Orbitron'; font-size: 9px; }
-
-        /* NAV V7 */
-        .v7-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #000; border-top: 1px solid #111; display: flex; z-index: 1000; padding-bottom: 20px; }
-        .v7-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
-        .v7-nav-item.active { color: #fff; border-top: 2px solid var(--p); }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
+        .tabs { display: flex; background: #111; padding: 10px; justify-content: center; gap: 10px; }
+        .t-btn { background: #222; color: #0f9; border: 1px solid #0f9; padding: 5px 10px; border-radius: 5px; font-size: 12px; }
+        .t-btn.active { background: #0f9; color: #000; }
+        #balance { font-size: 40px; margin: 20px 0; color: #fff; }
+        .circle { width: 200px; height: 200px; border-radius: 50%; border: 4px solid #0f9; margin: 20px auto; display: block; }
+        .shop-p { display: none; padding: 20px; padding-bottom: 100px; }
+        .item { background: #111; border: 1px solid #222; margin: 10px 0; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; border-top: 1px solid #222; }
+        .n-btn { flex: 1; padding: 20px; color: #555; font-weight: bold; }
+        .n-btn.active { color: #0f9; }
     </style>
 </head>
 <body>
 
-    <div class="v7-lang-header">
-        <button class="v7-lbtn active" id="l-pt" onclick="setV7Lang('pt')">PT</button>
-        <button class="v7-lbtn" id="l-en" onclick="setV7Lang('en')">EN</button>
-        <button class="v7-lbtn" id="l-ru" onclick="setV7Lang('ru')">RU</button>
+    <div class="tabs">
+        <button class="t-btn active" onclick="setL('pt')">PT</button>
+        <button class="t-btn" onclick="setL('en')">EN</button>
+        <button class="t-btn" onclick="setL('ru')">RU</button>
     </div>
 
-    <div class="v7-container" id="page-core">
-        <div class="v7-balance" id="v7-bal">0.00000</div>
-        <div id="v7-sub" style="color: var(--p); letter-spacing: 2px; font-size: 10px; font-family: Orbitron;">GLOBAL SYSTEM</div>
-        
-        <div class="v7-circle" id="v7-clicker">
-            <img src="image_3.jpg?v=700" alt="Core">
-        </div>
-
-        <div style="margin-top: 30px; text-align: center;">
-            <div id="v7-eng-lbl" style="font-size: 12px; color: #555;">ENERGY</div>
-            <div id="v7-eng-val" style="font-family: Orbitron; font-size: 20px; color: #ffdd00;">500</div>
-        </div>
+    <div id="core-p">
+        <div id="balance">0.00000</div>
+        <img src="image_3.jpg" class="circle" onclick="ck()">
+        <p>ENERGY: <span id="eg">500</span></p>
     </div>
 
-    <div class="v7-market-page" id="page-market">
-        <h2 id="v7-mkt-title" style="font-family: Orbitron; color: var(--p);">MARKET</h2>
-        <div id="v7-list"></div>
+    <div id="shop-p" class="shop-p">
+        <h2 id="m-tit">MERCADO</h2>
+        <div id="list"></div>
     </div>
 
-    <div class="v7-nav">
-        <div class="v7-nav-item active" id="btn-core" onclick="showV7('core')">CORE</div>
-        <div class="v7-nav-item" id="btn-mkt" onclick="showV7('mkt')">MARKET</div>
+    <div class="nav">
+        <div class="n-btn active" id="nb-c" onclick="sw('c')">CORE</div>
+        <div class="n-btn" id="nb-s" onclick="sw('s')">MARKET</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        let lang = 'pt';
-        const dict = {
-            pt: { sub: "SISTEMA GLOBAL", eng: "ENERGIA", mkt: "MERCADO", buy: "MELHORAR", miners: ["Nó Micro", "Rack Blade", "Turbo Server", "Estação Cyber", "Quantum Rig", "Hub Neural", "Núcleo Titan"] },
-            en: { sub: "GLOBAL SYSTEM", eng: "ENERGY", mkt: "MARKET", buy: "UPGRADE", miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"] },
-            ru: { sub: "ГЛОБАЛЬНАЯ СИСТЕМА", eng: "ЭНЕРГИЯ", mkt: "РЫНОК", buy: "КУПИТЬ", miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"] }
+        let L = 'pt';
+        const txt = {
+            pt: { m: "MERCADO", b: "UPGRADE", names: ["Nó 1","Nó 2","Nó 3","Nó 4","Nó 5","Nó 6","Nó 7"] },
+            en: { m: "MARKET", b: "UPGRADE", names: ["Node 1","Node 2","Node 3","Node 4","Node 5","Node 6","Node 7"] },
+            ru: { m: "РЫНОК", b: "КУПИТЬ", names: ["Узел 1","Узел 2","Узел 3","Узел 4","Узел 5","Узел 6","Узел 7"] }
         };
 
-        const config = {
+        firebase.initializeApp({
             apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
             authDomain: "eurodash-e466c.firebaseapp.com",
             databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "eurodash-e466c",
             appId: "1:99813963051:web:fe96761e990aee01ec016e"
-        };
-        firebase.initializeApp(config);
+        });
         const db = firebase.database();
-        const uid = tg.initDataUnsafe.user?.id || 22250;
+        const id = tg.initDataUnsafe.user?.id || 22250;
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0] };
 
-        let user = { balance: 0, pps: 0, energy: 500, inventory: [0,0,0,0,0,0,0], last: Date.now() };
+        const sk = [{p:0.05,g:0.0000001},{p:1,g:0.0000006},{p:10,g:0.0000075},{p:50,g:0.000045},{p:200,g:0.00021},{p:800,g:0.00095},{p:3000,g:0.0045}];
 
-        const items = [
-            { p: 0.05, g: 0.00000010, img: "https://cdn-icons-png.flaticon.com/512/2103/2103633.png" },
-            { p: 1.00, g: 0.00000060, img: "https://cdn-icons-png.flaticon.com/512/908/908905.png" },
-            { p: 10.00, g: 0.00000750, img: "https://cdn-icons-png.flaticon.com/512/2906/2906236.png" },
-            { p: 50.00, g: 0.00004500, img: "https://cdn-icons-png.flaticon.com/512/4342/4342657.png" },
-            { p: 200.00, g: 0.00021000, img: "https://cdn-icons-png.flaticon.com/512/6042/6042215.png" },
-            { p: 800.00, g: 0.00095000, img: "https://cdn-icons-png.flaticon.com/512/3665/3665879.png" },
-            { p: 3000.00, g: 0.00450000, img: "https://cdn-icons-png.flaticon.com/512/2592/2592271.png" }
-        ];
-
-        function setV7Lang(l) {
-            lang = l;
-            document.querySelectorAll('.v7-lbtn').forEach(b => b.classList.remove('active'));
-            document.getElementById('l-'+l).classList.add('active');
-            document.getElementById('v7-sub').innerText = dict[l].sub;
-            document.getElementById('v7-eng-lbl').innerText = dict[l].eng;
-            document.getElementById('v7-mkt-title').innerText = dict[l].mkt;
-            if(document.getElementById('page-market').classList.contains('open')) renderV7Shop();
+        function setL(l) {
+            L = l;
+            document.querySelectorAll('.t-btn').forEach((b, i) => b.classList.toggle('active', b.innerText.toLowerCase() === l));
+            document.getElementById('m-tit').innerText = txt[l].m;
+            if(document.getElementById('shop-p').style.display === 'block') rd();
         }
 
-        db.ref('users/' + uid).once('value', (s) => {
-            if(s.exists()) user = s.val();
-            if(!user.inventory) user.inventory = [0,0,0,0,0,0,0];
-            updateV7UI();
-        });
+        db.ref('users/'+id).once('value', s => { if(s.exists()) u = s.val(); up(); });
 
-        document.getElementById('v7-clicker').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if(user.energy < 1) return;
-            const t = e.touches[0];
-            const d = document.createElement('div');
-            d.className = 'v7-pop'; d.innerText = '+€0.00005';
-            d.style.left = t.pageX + 'px'; d.style.top = t.pageY + 'px';
-            document.body.appendChild(d);
-            setTimeout(() => d.remove(), 700);
-            user.balance += 0.00005; user.energy -= 1;
-            tg.HapticFeedback.impactOccurred('light');
-            updateV7UI();
-        });
+        function ck() {
+            if(u.eng < 1) return;
+            u.bal += 0.00005; u.eng -= 1;
+            up(); tg.HapticFeedback.impactOccurred('light');
+        }
 
-        function renderV7Shop() {
-            const l = dict[lang];
-            document.getElementById('v7-list').innerHTML = items.map((m, i) => `
-                <div class="v7-card">
-                    <img src="${m.img}">
-                    <div class="v7-card-info">
-                        <div style="font-family:Orbitron; font-size:13px">${l.miners[i]}</div>
-                        <div style="font-size:10px; color:#555">Price: €${m.p.toFixed(2)} • Lvl: ${user.inventory[i] || 0}</div>
-                    </div>
-                    <button class="v7-btn" onclick="buyV7(${i})">${l.buy}</button>
+        function rd() {
+            document.getElementById('list').innerHTML = sk.map((m,i) => `
+                <div class="item">
+                    <div style="text-align:left"><b>${txt[L].names[i]}</b><br><small>Lvl: ${u.inv[i]||0}</small></div>
+                    <button onclick="buy(${i})" style="background:#0f9; border:none; padding:8px; border-radius:5px; font-weight:bold">${txt[L].b} €${m.p}</button>
                 </div>
             `).join('');
         }
 
-        function buyV7(i) {
-            if(user.balance >= items[i].p) {
-                user.balance -= items[i].p; user.pps += items[i].g;
-                user.inventory[i]++; renderV7Shop(); updateV7UI();
-                tg.HapticFeedback.impactOccurred('success');
+        function buy(i) {
+            if(u.bal >= sk[i].p) {
+                u.bal -= sk[i].p; u.pps += sk[i].g;
+                u.inv[i] = (u.inv[i]||0)+1; rd(); up();
             }
         }
 
-        function updateV7UI() {
-            document.getElementById('v7-bal').innerText = user.balance.toFixed(5);
-            document.getElementById('v7-eng-val').innerText = Math.floor(user.energy);
+        function up() {
+            document.getElementById('balance').innerText = u.bal.toFixed(5);
+            document.getElementById('eg').innerText = Math.floor(u.eng);
         }
 
-        function showV7(p) {
-            document.querySelectorAll('.v7-nav-item').forEach(b => b.classList.remove('active'));
-            if(p === 'core') {
-                document.getElementById('page-market').classList.remove('open');
-                document.getElementById('btn-core').classList.add('active');
-            } else {
-                document.getElementById('page-market').classList.add('open');
-                document.getElementById('btn-mkt').classList.add('active');
-                renderV7Shop();
-            }
+        function sw(t) {
+            document.getElementById('core-p').style.display = t === 'c' ? 'block' : 'none';
+            document.getElementById('shop-p').style.display = t === 's' ? 'block' : 'none';
+            document.getElementById('nb-c').classList.toggle('active', t === 'c');
+            document.getElementById('nb-s').classList.toggle('active', t === 's');
+            if(t === 's') rd();
         }
 
-        setInterval(() => {
-            user.balance += user.pps;
-            if(user.energy < 500) user.energy += 0.8;
-            updateV7UI();
-        }, 1000);
-        setInterval(() => db.ref('users/'+uid).set(user), 5000);
+        setInterval(() => { u.bal += u.pps; if(u.eng < 500) u.eng += 0.5; up(); }, 1000);
+        setInterval(() => db.ref('users/'+id).set(u), 5000);
     </script>
 </body>
 </html>
