@@ -11,9 +11,9 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
         
-        /* LOADING SCREEN COM BARRA */
+        /* LOADING SCREEN */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .load-container { width: 70%; background: #111; height: 6px; border-radius: 10px; border: 1px solid #222; margin-top: 20px; position: relative; overflow: hidden; box-shadow: 0 0 15px rgba(0,255,157,0.1); }
+        .load-container { width: 70%; background: #111; height: 6px; border-radius: 10px; border: 1px solid #222; margin-top: 20px; position: relative; overflow: hidden; }
         #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.2s; }
         .load-text { font-family: 'Orbitron'; color: var(--p); font-size: 10px; margin-top: 10px; letter-spacing: 2px; }
 
@@ -33,6 +33,9 @@
         .miner-img { width: 100%; height: 160px; object-fit: cover; }
         .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 8px; }
         .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; }
+        
+        /* OCULTAR VIDEO BOOST */
+        .video-boost { display: none; }
     </style>
 </head>
 <body>
@@ -40,9 +43,7 @@
     <div id="loader">
         <img src="logo.jpg" style="width: 100px; margin-bottom: 10px; border-radius: 50%; border: 2px solid var(--p);">
         <div class="load-text" id="status-text">A INICIALIZAR...</div>
-        <div class="load-container">
-            <div id="load-bar"></div>
-        </div>
+        <div class="load-container"><div id="load-bar"></div></div>
     </div>
 
     <div class="header">
@@ -55,15 +56,18 @@
         <div id="click-area" style="padding:20px 0;"><div id="main-clicker">⚡</div></div>
         <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
         <div class="energy-container"><div id="energy-bar"></div></div>
-        <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
-        <button onclick="checkDaily()" class="btn-action">🎁 BÓNUS DIÁRIO</button>
+        
+        <button onclick="verAnuncio()" class="btn-action video-boost">📺 VIDEO BOOST (+€0.10)</button>
+        
+        <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p); margin-top: 20px;">🎁 BÓNUS DIÁRIO</button>
     </div>
 
     <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
+    
     <div id="tab-friends" class="tab-content" style="text-align: center;">
         <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR AMIGOS</h2>
-        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white;">🔗 ENVIAR CONVITE</button>
-        <p style="font-size: 12px; color: #555; margin-top: 30px;">UnitID: 22250</p>
+        <p style="color: #888;">Ganha bónus por cada amigo que convidares!</p>
+        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white; margin-top: 20px;">🔗 ENVIAR CONVITE</button>
     </div>
 
     <div class="nav">
@@ -76,7 +80,7 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'eurodash_v18_final';
+        const SAVE_KEY = 'eurodash_v19_clean';
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
 
         const miners = [
@@ -96,39 +100,28 @@
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
         }
 
-        // CARREGAMENTO COM BARRA DE PROGRESSO
         let progress = 0;
         const loadInterval = setInterval(() => {
             progress += 5;
             document.getElementById('load-bar').style.width = progress + "%";
-            
-            if(progress === 40) document.getElementById('status-text').innerText = "A LER MEMÓRIA...";
-            if(progress === 80) document.getElementById('status-text').innerText = "A SINCRONIZAR SALDO...";
-            
             if (progress >= 100) {
                 clearInterval(loadInterval);
-                document.getElementById('status-text').innerText = "CONCLUÍDO!";
-                
-                // Carregar dados reais antes de fechar o loader
                 const saved = localStorage.getItem(SAVE_KEY);
                 if(saved) state = JSON.parse(saved);
                 updateUI();
-
                 setTimeout(() => {
                     document.getElementById('loader').style.opacity = "0";
                     setTimeout(() => document.getElementById('loader').style.display = "none", 500);
                 }, 400);
             }
-        }, 100);
+        }, 80);
 
-        function saveGame() {
-            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-        }
+        function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
                 <div class="miner-card">
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160?text=Hardware+V${i+1}'">
+                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160'">
                     <div style="padding:15px;">
                         <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
                         <div style="color:var(--s); margin: 5px 0; font-weight:bold;">INVESTIMENTO: €${m.price.toFixed(2)}</div>
@@ -143,9 +136,7 @@
                 state.balance -= miners[i].price;
                 state.pps += miners[i].gain;
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
-                renderShop();
-                saveGame();
-                updateUI();
+                renderShop(); saveGame(); updateUI();
             } else { webapp.showAlert("Saldo insuficiente!"); }
         }
 
@@ -159,8 +150,7 @@
                     webapp.HapticFeedback.impactOccurred('light');
                 }
             }
-            updateUI();
-            saveGame();
+            updateUI(); saveGame();
         });
 
         function showTab(tab) {
@@ -177,27 +167,21 @@
             state.balance += state.pps * diff;
             if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.33));
             state.lastUpdate = now;
-            updateUI();
-            saveGame();
+            updateUI(); saveGame();
             requestAnimationFrame(updateLoop);
-        }
-
-        const AdController = window.Adsgram.init({ blockId: "22250" });
-        function verAnuncio() {
-            AdController.show().then(() => { state.balance += 0.10; saveGame(); updateUI(); });
         }
 
         function checkDaily() {
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
                 state.balance += 0.05; state.lastDaily = now; saveGame(); updateUI(); webapp.showAlert("Bónus coletado!");
-            } else { webapp.showAlert("Volta amanhã!"); }
+            } else { webapp.showAlert("Já coletaste o teu bónus hoje. Volta amanhã!"); }
         }
 
         function shareLink() {
             const uid = webapp.initDataUnsafe.user?.id || "22250";
             const link = `https://t.me/EuroDashMinerBot?startapp=${uid}`;
-            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem minerar no EuroDash Elite!`);
+            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem ganhar Euros comigo no EuroDash Elite! ⚡💰`);
         }
 
         updateLoop();
