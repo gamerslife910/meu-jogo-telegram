@@ -11,13 +11,11 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
         
-        /* LOADING SCREEN */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
         .load-container { width: 70%; background: #111; height: 6px; border-radius: 10px; border: 1px solid #222; margin-top: 20px; position: relative; overflow: hidden; }
         #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.2s; }
         .load-text { font-family: 'Orbitron'; color: var(--p); font-size: 10px; margin-top: 10px; letter-spacing: 2px; }
 
-        /* UI PRINCIPAL */
         .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
         .mini-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--p); margin-bottom: 5px; box-shadow: 0 0 15px var(--p); object-fit: cover; }
         .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
@@ -33,16 +31,13 @@
         .miner-img { width: 100%; height: 160px; object-fit: cover; }
         .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 8px; }
         .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; }
-        
-        /* OCULTAR VIDEO BOOST */
-        .video-boost { display: none; }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <img src="logo.jpg" style="width: 100px; margin-bottom: 10px; border-radius: 50%; border: 2px solid var(--p);">
-        <div class="load-text" id="status-text">A INICIALIZAR...</div>
+        <div class="load-text" id="status-text">A SINCRONIZAR...</div>
         <div class="load-container"><div id="load-bar"></div></div>
     </div>
 
@@ -57,8 +52,6 @@
         <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
         <div class="energy-container"><div id="energy-bar"></div></div>
         
-        <button onclick="verAnuncio()" class="btn-action video-boost">📺 VIDEO BOOST (+€0.10)</button>
-        
         <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p); margin-top: 20px;">🎁 BÓNUS DIÁRIO</button>
     </div>
 
@@ -66,7 +59,7 @@
     
     <div id="tab-friends" class="tab-content" style="text-align: center;">
         <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR AMIGOS</h2>
-        <p style="color: #888;">Ganha bónus por cada amigo que convidares!</p>
+        <p style="color: #888;">Expande a tua rede e ganha bónus!</p>
         <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white; margin-top: 20px;">🔗 ENVIAR CONVITE</button>
     </div>
 
@@ -80,7 +73,7 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'eurodash_v19_clean';
+        const SAVE_KEY = 'eurodash_v20_final';
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
 
         const miners = [
@@ -124,8 +117,8 @@
                     <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160'">
                     <div style="padding:15px;">
                         <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
-                        <div style="color:var(--s); margin: 5px 0; font-weight:bold;">INVESTIMENTO: €${m.price.toFixed(2)}</div>
-                        <button class="btn-buy" onclick="comprar(${i})">COMPRAR</button>
+                        <div style="color:var(--s); margin: 5px 0; font-weight:bold;">PREÇO: €${m.price.toFixed(2)}</div>
+                        <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
                     </div>
                 </div>
             `).join('');
@@ -175,7 +168,7 @@
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
                 state.balance += 0.05; state.lastDaily = now; saveGame(); updateUI(); webapp.showAlert("Bónus coletado!");
-            } else { webapp.showAlert("Já coletaste o teu bónus hoje. Volta amanhã!"); }
+            } else { webapp.showAlert("Volta amanhã para mais!"); }
         }
 
         function shareLink() {
