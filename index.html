@@ -191,13 +191,13 @@
 
     <script>
         // ==========================================
-        // CONFIGURAÇÕES DO DONO (VIKTOR) - OK
+        // CONFIGURAÇÕES
         // ==========================================
         const CONFIG = {
             telegram_link: "https://t.me/EuroDashOfficial", 
             admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", 
             min_withdraw: 1.00,
-            fee: 0.02 // 2%
+            fee: 0.02 
         };
 
         const miners = [
@@ -212,51 +212,85 @@
 
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
         let loaded = false;
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        
+        let tg, uid, uName;
+        try {
+            tg = window.Telegram.WebApp;
+            tg.expand();
+            uid = tg.initDataUnsafe.user?.id || 22250;
+            uName = tg.initDataUnsafe.user?.first_name || "Miner";
+        } catch (e) {
+            uid = 22250; uName = "Test User";
+        }
 
-        firebase.initializeApp({
-            apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
-            authDomain: "eurodash-e466c.firebaseapp.com",
-            databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "eurodash-e466c",
-            appId: "1:99813963051:web:fe96761e990aee01ec016e"
-        });
-        const db = firebase.database();
-        const uid = tg.initDataUnsafe.user?.id || 22250;
-        const uName = tg.initDataUnsafe.user?.first_name || "Miner";
-
-        // INIT
-        window.onload = function() {
-            document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            
-            db.ref('users/' + uid).once('value').then(s => {
-                if(s.exists()) {
-                    let d = s.val();
-                    u = { ...u, ...d };
-                    u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
-                    // Offline Profit
-                    let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
-                    if(sec > 60 && u.pps > 0) {
-                        let profit = sec * u.pps;
-                        u.bal += profit;
-                        document.getElementById('off-val').innerText = profit.toFixed(4);
-                        openModal('modal-offline');
-                    }
-                } else {
-                    u.name = uName; // Set name on first login
-                }
-                loaded = true;
-                up(); renderShop(); checkTasks(); loadRank();
-                document.getElementById('loader').style.display = 'none';
+        try {
+            firebase.initializeApp({
+                apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
+                authDomain: "eurodash-e466c.firebaseapp.com",
+                databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "eurodash-e466c",
+                appId: "1:99813963051:web:fe96761e990aee01ec016e"
             });
-            
-            document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
-            document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
-            document.getElementById('click-btn').addEventListener('click', handleClick);
+        } catch(err) {
+            console.log("Firebase Init Error");
+        }
+
+        const db = firebase.database();
+
+        window.onload = function() {
+            try {
+                document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
+                document.getElementById('loader').innerHTML += '<br><small style="color:yellow; font-size:10px;">Establishing Connection...</small>';
+
+                // FORCE TIMEOUT (Se demorar mais de 5s, entra na mesma)
+                setTimeout(() => {
+                    if(!loaded) {
+                        alert("Network Slow: Entering Offline Mode");
+                        finishLoad();
+                    }
+                }, 5000);
+
+                db.ref('users/' + uid).once('value')
+                    .then(s => {
+                        if(s.exists()) {
+                            let d = s.val();
+                            u = { ...u, ...d };
+                            u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                            
+                            let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
+                            if(sec > 60 && u.pps > 0) {
+                                let profit = sec * u.pps;
+                                u.bal += profit;
+                                document.getElementById('off-val').innerText = profit.toFixed(4);
+                                openModal('modal-offline');
+                            }
+                        } else {
+                            u.name = uName; 
+                        }
+                        finishLoad();
+                    })
+                    .catch(error => {
+                        alert("DB Connection Error. Playing Offline.");
+                        finishLoad(); 
+                    });
+
+                document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
+                document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
+                document.getElementById('click-btn').addEventListener('click', handleClick);
+
+            } catch (globalErr) {
+                alert("CRASH: " + globalErr.message);
+                finishLoad();
+            }
         };
 
-        // CORE GAMEPLAY
+        function finishLoad() {
+            if(loaded) return;
+            loaded = true;
+            up(); renderShop(); checkTasks(); loadRank();
+            document.getElementById('loader').style.display = 'none';
+        }
+
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
         
@@ -265,8 +299,6 @@
             u.eng--;
             let gain = 0.00005;
             let critChance = 0;
-            
-            // Level Bonus
             if(u.bal >= 10) critChance = 0.02;
             if(u.bal >= 50) critChance = 0.05;
             if(u.bal >= 200) critChance = 0.10;
@@ -289,7 +321,6 @@
             setTimeout(()=>el.remove(), 800);
         }
 
-        // WITHDRAW SYSTEM
         function calcFee() {
             let val = parseFloat(document.getElementById('wd-amount').value) || 0;
             let final = val - (val * CONFIG.fee);
@@ -299,67 +330,49 @@
         function submitWithdraw() {
             let addr = document.getElementById('wd-addr').value;
             let val = parseFloat(document.getElementById('wd-amount').value);
-            
             if(!addr.startsWith("T")) { tg.showAlert("Invalid TRC20 Address!"); return; }
             if(val < CONFIG.min_withdraw) { tg.showAlert(`Min withdraw is €${CONFIG.min_withdraw}`); return; }
             if(u.bal < val) { tg.showAlert("Insufficient Balance!"); return; }
 
             u.bal -= val;
             up();
-            // Save request to Firebase
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
-            tg.showAlert("Request Sent! Admin will verify.");
+            tg.showAlert("Request Sent!");
         }
 
-        // DEPOSIT SYSTEM
-        function copyWallet() {
-            navigator.clipboard.writeText(CONFIG.admin_wallet);
-            tg.showAlert("Address Copied!");
-        }
-
+        function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert("Address Copied!"); }
         function submitDeposit() {
             let hash = document.getElementById('dep-hash').value;
             if(hash.length < 10) { tg.showAlert("Invalid Hash"); return; }
-            
             db.ref('deposits/' + Date.now()).set({ uid: uid, hash: hash, status: "pending" });
             closeModal('modal-deposit');
-            tg.showAlert("Deposit Submitted! Wait for approval.");
+            tg.showAlert("Deposit Submitted!");
         }
 
-        // REAL RANKING
         function loadRank() {
             db.ref('users').orderByChild('bal').limitToLast(10).once('value').then(snap => {
                 let html = '';
                 let list = [];
                 snap.forEach(c => list.push(c.val()));
-                list.reverse(); // Highest first
-
+                list.reverse(); 
                 list.forEach((p, i) => {
                     let style = i===0 ? 'color:#ffd700' : 'color:#fff';
-                    html += `
-                        <div class="rank-row">
-                            <span style="width:30px; ${style}">#${i+1}</span>
-                            <span style="flex-grow:1; text-align:left;">${p.name || "User"}</span>
-                            <span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span>
-                        </div>`;
+                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span><span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
+            }).catch(e => {
+                document.getElementById('rank-list').innerHTML = '<div style="padding:20px; color:red">Offline (DB Error)</div>';
             });
         }
 
-        // TASK SYSTEM (FAKE VERIFY)
         function doTask(id, reward) {
             if(u.tasks[id]) return;
             tg.openLink(CONFIG.telegram_link);
-            
-            // Wait 10s then ask confirmation
             setTimeout(() => {
                 tg.showConfirm("Did you join the channel?", (ok) => {
                     if(ok) {
-                        u.tasks[id] = true;
-                        u.bal += reward;
-                        up();
+                        u.tasks[id] = true; u.bal += reward; up();
                         document.getElementById('task-group').innerText = "DONE";
                         document.getElementById('task-group').style.opacity = 0.5;
                         tg.showAlert(`+€${reward} Received!`);
@@ -368,14 +381,11 @@
             }, 8000);
         }
 
-        // UI HELPERS
         function up() {
             document.getElementById('bal-val').innerText = u.bal.toFixed(5);
             document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             document.getElementById('eg').innerText = Math.floor(u.eng);
             document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
-            
-            // Level Logic
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
@@ -390,10 +400,7 @@
                 <div class="card">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
-                        <div>
-                            <b>${m.n}</b><br>
-                            <small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small>
-                        </div>
+                        <div><b>${m.n}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                     </div>
                     <button class="buy-btn" onclick="buy(${i})">€${m.p}</button>
                 </div>
@@ -417,13 +424,10 @@
             document.getElementById('nb-'+t).classList.add('active');
         }
 
-        function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('my-link').innerText);
-            tg.showAlert("Copied!");
-        }
+        function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert("Copied!"); }
 
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
+        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
 
     </script>
 </body>
