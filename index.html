@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Euro Clicker Pro</title>
+    <title>Euro Tycoon Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-button-color: #0088cc; }
@@ -11,7 +11,7 @@
             background: radial-gradient(circle, #1a1a1a, #000);
             color: white;
             text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             overflow: hidden;
             height: 100vh;
@@ -21,7 +21,7 @@
         }
         #header { padding: 20px; }
         #score-container { font-size: 3.5rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        #level-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; }
+        #level-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
         
         #coin-container { position: relative; display: flex; justify-content: center; }
         #coin {
@@ -37,26 +37,29 @@
             cursor: pointer;
             transition: transform 0.05s;
             border: 10px solid #8b6508;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         #coin:active { transform: scale(0.92); }
 
         #controls { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
         .btn {
-            padding: 15px;
-            border-radius: 12px;
+            padding: 18px;
+            border-radius: 15px;
             border: none;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: 0.3s;
+            text-transform: uppercase;
         }
-        #share-btn { background: #28a745; color: white; }
-        #ads-btn { background: #0088cc; color: white; border: 2px solid #fff; }
+        #share-btn { background: #28a745; color: white; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
+        #ads-btn { background: #0088cc; color: white; border: 2px solid rgba(255,255,255,0.2); }
 
         .plus-one {
             position: absolute;
             color: #ffd700;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             animation: float 0.8s ease-out forwards;
             pointer-events: none;
@@ -70,7 +73,7 @@
 <body>
 
     <div id="header">
-        <div id="level-tag">NÍVEL: <span id="level-name">Iniciante</span></div>
+        <div id="level-tag">RANK: <span id="level-name">Rookie</span></div>
         <div id="score-container">€ <span id="balance">0</span></div>
     </div>
 
@@ -79,8 +82,8 @@
     </div>
 
     <div id="controls">
-        <button id="ads-btn" class="btn" onclick="showAd()">Ver Anúncio (+€500)</button>
-        <button id="share-btn" class="btn" onclick="shareGame()">Convidar Amigos 🚀</button>
+        <button id="ads-btn" class="btn" onclick="showAd()">Watch Ad (+€500)</button>
+        <button id="share-btn" class="btn" onclick="shareGame()">Invite Friends 🚀</button>
     </div>
 
     <script>
@@ -94,9 +97,11 @@
         
         function updateDisplay() {
             balanceEl.innerText = balance.toLocaleString();
-            if(balance > 10000) levelEl.innerText = "Magnata";
-            else if(balance > 1000) levelEl.innerText = "Investidor";
-            else levelEl.innerText = "Iniciante";
+            if(balance > 100000) levelEl.innerText = "Tycoon";
+            else if(balance > 50000) levelEl.innerText = "Millionaire";
+            else if(balance > 10000) levelEl.innerText = "Entrepreneur";
+            else if(balance > 1000) levelEl.innerText = "Investor";
+            else levelEl.innerText = "Rookie";
         }
 
         document.getElementById('coin').addEventListener('touchstart', (e) => {
@@ -105,7 +110,6 @@
             updateDisplay();
             localStorage.setItem('euro_balance', balance);
 
-            // Efeito visual
             const touch = e.touches[0];
             const anim = document.createElement('div');
             anim.innerText = "+1";
@@ -119,17 +123,16 @@
         });
 
         function shareGame() {
-            const botLink = "https://t.me/euro_ganhos_bot/play"; // <--- MUDA ISTO PELO TEU @BOT
-            const text = "Estou a ficar rico no Telegram! Consegues bater o meu recorde de € " + balance + "?";
+            const botLink = "https://t.me/euro_ganhos_bot/play"; // <--- REMEMBER TO CHANGE THIS!
+            const text = "I'm printing Euros on Telegram! Can you beat my €" + balance + " record?";
             const url = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(text)}`;
             webapp.openTelegramLink(url);
         }
 
         function showAd() {
-            // Aqui ligarás o AdsGram depois. Por agora, simula o ganho:
-            webapp.showConfirm("Queres ver um vídeo para ganhar €500?", (ok) => {
+            webapp.showConfirm("Watch a short video to earn €500?", (ok) => {
                 if(ok) {
-                    webapp.showAlert("Anúncio concluído! +€500 na conta.");
+                    webapp.showAlert("Reward granted! +€500 added.");
                     balance += 500;
                     updateDisplay();
                 }
@@ -140,4 +143,3 @@
     </script>
 </body>
 </html>
-
