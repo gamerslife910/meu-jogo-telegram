@@ -7,126 +7,239 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 90px; }
+        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding-bottom: 100px; 
+            overflow-x: hidden;
+            -webkit-user-select: none;
+        }
+
+        /* Top Bar fixo */
         .header { 
             background: linear-gradient(180deg, rgba(0,255,157,0.1) 0%, transparent 100%); 
-            padding: 25px; text-align: center; border-bottom: 1px solid #222; 
-            position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); 
+            padding: 25px 15px; 
+            text-align: center; 
+            border-bottom: 1px solid #222; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            backdrop-filter: blur(15px); 
         }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
-        .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .balance-val { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 2.4rem; 
+            color: var(--p); 
+            margin: 5px 0; 
+            text-shadow: 0 0 15px rgba(0,255,157,0.4); 
+        }
+
+        .pps-badge { 
+            background: rgba(0,255,157,0.1); 
+            color: var(--p); 
+            padding: 6px 15px; 
+            border-radius: 50px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            border: 1px solid rgba(0,255,157,0.3); 
+            display: inline-block; 
+        }
+
+        /* Tabs */
+        .tab-content { display: none; padding: 20px 15px; animation: slideUp 0.4s ease-out; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
 
-        .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .miner-img { width: 100%; height: 180px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
-        .miner-body { padding: 18px; }
-        .miner-title { font-family: 'Orbitron'; font-size: 18px; color: #fff; margin: 0; }
-        .miner-price { color: var(--s); font-weight: bold; font-size: 15px; display: block; margin-top: 5px; }
+        /* Loja de Mineradores */
+        .miner-card { 
+            background: var(--card); 
+            border-radius: 24px; 
+            border: 1px solid #282828; 
+            margin-bottom: 30px; 
+            overflow: hidden; 
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7); 
+        }
+
+        .miner-img { 
+            width: 100%; 
+            height: 250px; 
+            object-fit: cover; 
+            border-bottom: 3px solid var(--p); 
+        }
+
+        .miner-body { padding: 20px; }
         
-        .profit-table { width: 100%; margin: 15px 0; border-collapse: collapse; font-size: 11px; text-align: center; background: rgba(0,0,0,0.5); border-radius: 10px; }
-        .profit-table th { color: #888; padding: 8px 0; font-size: 9px; text-transform: uppercase; }
-        .profit-table td { color: var(--p); font-weight: bold; font-family: 'Orbitron'; padding-bottom: 8px; }
+        .miner-title { 
+            font-family: 'Orbitron'; 
+            font-size: 19px; 
+            color: #fff; 
+            margin: 0 0 10px 0; 
+        }
 
-        .buy-btn { width: 100%; background: var(--p); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s; }
-        .buy-btn:active { transform: scale(0.95); background: #fff; }
+        .profit-table { 
+            width: 100%; 
+            margin: 15px 0; 
+            border-collapse: collapse; 
+            font-size: 12px; 
+            text-align: center; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 12px; 
+        }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; backdrop-filter: blur(10px); }
-        .nav-item { color: #555; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; text-transform: uppercase; }
-        .nav-item.active { color: var(--p); }
+        .profit-table th { color: #666; padding: 10px 0; font-size: 9px; text-transform: uppercase; }
+        .profit-table td { color: var(--p); font-weight: bold; font-family: 'Orbitron'; padding: 12px 0; }
 
-        #main-clicker { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; margin: 40px 0; display: inline-block; filter: drop-shadow(0 0 15px var(--p)); }
-        #main-clicker:active { transform: scale(0.8); }
+        .buy-btn { 
+            width: 100%; 
+            background: linear-gradient(90deg, #00ff9d, #00b0ff); 
+            color: #000; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-weight: bold; 
+            font-family: 'Orbitron'; 
+            cursor: pointer; 
+            text-transform: uppercase;
+        }
+
+        .buy-btn:active { transform: scale(0.97); }
+
+        /* Clicker Principal */
+        #main-clicker { 
+            font-size: 140px; 
+            cursor: pointer; 
+            margin: 60px 0; 
+            display: inline-block; 
+            filter: drop-shadow(0 0 25px var(--p)); 
+            transition: transform 0.1s; 
+        }
+        #main-clicker:active { transform: scale(0.85); }
+
+        /* Menu Inferior */
+        .nav { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: rgba(10,10,10,0.95); 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 18px 0; 
+            border-top: 1px solid #222; 
+            backdrop-filter: blur(10px); 
+            z-index: 100; 
+        }
+
+        .nav-item { color: #444; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; }
+        .nav-item.active { color: var(--p); text-shadow: 0 0 8px var(--p); }
+
+        .btn-video { 
+            background: #1a1a1a; 
+            color: white; 
+            border: 1px solid var(--s); 
+            padding: 18px; 
+            border-radius: 16px; 
+            width: 90%; 
+            font-weight: bold; 
+            font-family: 'Orbitron'; 
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-size: 11px; color: #888; letter-spacing: 1px;">EURODASH CAPITAL</div>
+        <div style="font-size: 10px; color: #888; letter-spacing: 3px;">SALDO ATUAL</div>
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <span class="pps-badge">LUCRO POR HORA: +<span id="pph">0.0000</span> €</span>
+        <div class="pps-badge"> Rendimento/Hora: +<span id="pph">0.0000</span> €</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
         <div id="main-clicker">⚡</div>
-        <button onclick="verAnuncio()" style="background:var(--s); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; font-family:'Orbitron';">📺 VIDEO BOOST (+€0.10)</button>
+        <button onclick="verAnuncio()" class="btn-video">📺 VER ANÚNCIO (+€0.10)</button>
     </div>
 
     <div id="tab-store" class="tab-content">
-        <h3 style="font-family:'Orbitron'; color:var(--p); margin-bottom:20px; text-align: center;">HARDWARE STORE</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--p); margin-bottom:25px; text-align: center;">HARDWARE STORE</h3>
         <div id="shop-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ DASH</div>
-        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 STORE</div>
+        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINERAR</div>
+        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 MERCADO</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
+        // Carregar dados ou iniciar novo
         let state = JSON.parse(localStorage.getItem('eurodash_save')) || {
             balance: 0, pps: 0.0000001, lastUpdate: Date.now()
         };
 
-        // Mineradores com Imagens e ROI de ~20% semanal
+        // Lista de Mineradores configurada para .JPG
         const miners = [
-            { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&q=80" },
-            { name: "Home Rig 5", price: 5, gain: 0.00000165, img: "https://images.unsplash.com/photo-1547082299-de196ea013d6?w=500&q=80" },
-            { name: "Office Rig", price: 10, gain: 0.00000330, img: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&q=80" },
-            { name: "Industrial Box", price: 15, gain: 0.00000495, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=500&q=80" },
-            { name: "Turbo ASIC", price: 20, gain: 0.00000661, img: "https://images.unsplash.com/photo-1631482942717-d202450897e0?w=500&q=80" },
-            { name: "Server Rack 100", price: 40, gain: 0.00001322, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=500&q=80" },
-            { name: "Quantum Cluster", price: 100, gain: 0.00003306, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&q=80" }
+            { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "miner1.jpg" },
+            { name: "Pocket Miner V2", price: 5, gain: 0.00000165, img: "miner2.jpg" },
+            { name: "Pocket Miner V3", price: 15, gain: 0.00000495, img: "miner3.jpg" },
+            { name: "Server Rack V4", price: 40, gain: 0.00001322, img: "miner4.jpg" },
+            { name: "Quantum Cluster V5", price: 100, gain: 0.00003306, img: "miner5.jpg" },
+            { name: "Quantum Cluster V6", price: 250, gain: 0.00008264, img: "miner6.jpg" },
+            { name: "Quantum Cluster V7", price: 600, gain: 0.00019835, img: "miner7.jpg" }
         ];
 
+        // Mostrar a loja
         function renderShop() {
             const container = document.getElementById('shop-list');
             container.innerHTML = miners.map(m => {
-                const day = (m.gain * 86400).toFixed(2);
-                const week = (m.gain * 604800).toFixed(2);
-                const month = (m.gain * 2592000).toFixed(2);
+                const dayGain = (m.gain * 86400).toFixed(2);
+                const monthGain = (m.gain * 2592000).toFixed(2);
                 return `
                     <div class="miner-card">
-                        <img src="${m.img}" class="miner-img">
+                        <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/500x250/111/00ff9d?text=Imagem+JPG+em+falta'">
                         <div class="miner-body">
                             <h4 class="miner-title">${m.name}</h4>
-                            <span class="miner-price">Investimento: € ${m.price.toFixed(2)}</span>
+                            <span style="color:var(--s); font-family:Orbitron; font-size:14px;">Preço: € ${m.price.toFixed(2)}</span>
                             <table class="profit-table">
-                                <tr><th>Lucro 24h</th><th>Lucro 7 Dias</th><th>Lucro 30 Dias</th></tr>
-                                <tr><td>€ ${day}</td><td>€ ${week}</td><td>€ ${month}</td></tr>
+                                <tr><th>Lucro/Dia</th><th>Lucro/Mês</th></tr>
+                                <tr><td>€ ${dayGain}</td><td>€ ${monthGain}</td></tr>
                             </table>
-                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">INVESTIR</button>
+                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">ADQUIRIR</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
         }
         renderShop();
 
+        // Ciclo de atualização de saldo (Mining passivo)
         function updateLoop() {
             const now = Date.now();
             const diff = (now - state.lastUpdate) / 1000;
             state.balance += state.pps * diff;
             state.lastUpdate = now;
+            
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
+            
             localStorage.setItem('eurodash_save', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
         updateLoop();
 
+        // Clique manual
         document.getElementById('main-clicker').onclick = () => {
             state.balance += 0.00050;
-            webapp.HapticFeedback.impactOccurred('light');
+            webapp.HapticFeedback.impactOccurred('medium');
         };
 
+        // Trocar de aba
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -135,24 +248,25 @@
             webapp.HapticFeedback.selectionChanged();
         }
 
+        // Sistema de compra
         function comprar(preco, ganho) {
             if(state.balance >= preco) {
                 state.balance -= preco;
                 state.pps += ganho;
-                webapp.showAlert("HARDWARE ATIVADO!");
+                webapp.showAlert("Investimento concluído!");
             } else {
-                webapp.showAlert("Saldo insuficiente.");
+                webapp.showAlert("Saldo insuficiente para comprar este hardware.");
             }
         }
 
+        // Publicidade
         const AdController = window.Adsgram.init({ blockId: "22244" });
         function verAnuncio() {
-            alert("A carregar vídeo...");
             AdController.show().then(() => {
                 state.balance += 0.10;
-                webapp.showAlert("BOOST! +€0.10");
+                webapp.showAlert("Obrigado! Recebeste €0.10");
             }).catch(() => {
-                webapp.showAlert("Anúncio não disponível.");
+                webapp.showAlert("Sem anúncios disponíveis no momento.");
             });
         }
     </script>
