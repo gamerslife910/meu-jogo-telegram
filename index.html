@@ -9,18 +9,64 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #0d0d0d; --border: #1a1a1a; --accent: #ff5e00; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* LOADING */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #050505; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .progress-frame { width: 220px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 20px; border: 1px solid #222; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.3s; }
+        /* LOADER FUTURISTA V3 */
+        #loader { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: radial-gradient(circle at center, #0a1a14 0%, #000 100%); 
+            z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.8s ease-out;
+        }
 
-        /* HEADER */
+        .loader-visual {
+            position: relative; width: 150px; height: 150px; margin-bottom: 40px;
+        }
+
+        .circle-outer {
+            position: absolute; width: 100%; height: 100%;
+            border: 2px solid rgba(0, 255, 157, 0.1); border-radius: 50%;
+            border-top: 2px solid var(--p); animation: spin 2s linear infinite;
+        }
+
+        .circle-inner {
+            position: absolute; width: 70%; height: 70%; top: 15%; left: 15%;
+            border: 1px dashed var(--s); border-radius: 50%;
+            animation: spin-rev 4s linear infinite; opacity: 0.5;
+        }
+
+        .pulse-core {
+            position: absolute; width: 20%; height: 20%; top: 40%; left: 40%;
+            background: var(--p); border-radius: 50%;
+            box-shadow: 0 0 30px var(--p); animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .euro-glitch {
+            font-family: 'Orbitron'; font-size: 24px; font-weight: 700; color: white;
+            letter-spacing: 8px; text-shadow: 2px 2px var(--accent); margin-bottom: 10px;
+        }
+
+        .progress-container { width: 250px; position: relative; }
+        .progress-frame { 
+            width: 100%; height: 6px; background: rgba(0,0,0,0.5); 
+            border: 1px solid #333; border-radius: 10px; overflow: hidden; margin-top: 10px;
+        }
+        #load-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--s), var(--p)); box-shadow: 0 0 15px var(--p); transition: width 0.4s; }
+
+        #load-msg { 
+            font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--p); 
+            text-transform: uppercase; margin-top: 15px; height: 15px; letter-spacing: 1px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin-rev { to { transform: rotate(-360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.3); opacity: 1; } }
+
+        /* HEADER & UI */
         .header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
         .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: white; margin: 5px 0; }
         .stats-grid { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
@@ -30,7 +76,6 @@
         .tab-content { display: none; padding: 15px; height: 68vh; overflow-y: auto; }
         .tab-content.active { display: block; }
 
-        /* LISTA DE MINERADORES */
         .miner-row { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
         .icon-box { width: 48px; height: 48px; background: #151515; border-radius: 10px; border: 1px solid var(--p); overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .icon-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -38,19 +83,26 @@
         .btn-buy { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
         .btn-withdraw { background: #1ba085; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; width: 100%; max-width: 220px; }
 
-        /* NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; }
         .nav-item.active { color: white; border-top: 2px solid var(--accent); background: rgba(255, 94, 0, 0.05); }
 
-        #adm-log { font-family: monospace; font-size: 10px; color: #00ff00; background: #000; height: 180px; overflow-y: auto; margin-top: 10px; padding: 10px; border: 1px solid #333; }
+        #adm-log { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #00ff00; background: #000; height: 180px; overflow-y: auto; margin-top: 10px; padding: 10px; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div style="font-family: Orbitron; color: var(--p); letter-spacing: 5px;">EURODASH ELITE</div>
-        <div class="progress-frame"><div id="load-bar"></div></div>
+        <div class="loader-visual">
+            <div class="circle-outer"></div>
+            <div class="circle-inner"></div>
+            <div class="pulse-core"></div>
+        </div>
+        <div class="euro-glitch">EURODASH</div>
+        <div class="progress-container">
+            <div class="progress-frame"><div id="load-bar"></div></div>
+        </div>
+        <div id="load-msg">INITIALIZING SYSTEM...</div>
     </div>
 
     <div class="header">
@@ -74,17 +126,17 @@
 
     <div id="tab-friends" class="tab-content">
         <h3 style="font-family: Orbitron; color: var(--accent);">NETWORK</h3>
-        <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222; font-size: 12px; margin-bottom: 15px; word-break: break-all;" id="ref-url">
+        <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222; font-size: 12px; margin-bottom: 15px;" id="ref-url">
             https://t.me/EuroDashMinerBot?start=22250
         </div>
         <button class="btn-buy" style="width:100%" onclick="copyLink()">COPY LINK</button>
-        <div id="ref-list" style="margin-top:25px; font-size: 13px; color: #444; text-align: center;">No partners yet.</div>
+        <div id="ref-list" style="margin-top:25px; font-size: 13px; color: #444; text-align: center;">No active nodes found.</div>
     </div>
 
     <div id="tab-admin" class="tab-content">
-        <h3 style="font-family: Orbitron; color: var(--p);">ADMIN</h3>
+        <h3 style="font-family: Orbitron; color: var(--p);">ADMIN PANEL</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="stat-box"><div class="stat-label">USERS</div><div id="adm-users">0</div></div>
+            <div class="stat-box"><div class="stat-label">TOTAL USERS</div><div id="adm-users">0</div></div>
             <div class="stat-box"><div class="stat-label">TOTAL EUR</div><div id="adm-cash">0.00</div></div>
         </div>
         <div id="adm-log"></div>
@@ -124,20 +176,57 @@
             { name: "Industrial Rack", price: 150.00, gain: 0.00006500, img: "miner4.jpg" }
         ];
 
+        const bootMsgs = [
+            "CONNECTING TO SECURE SERVER...",
+            "DECRYPTING BLOCKCHAIN DATA...",
+            "SYNCING QUANTUM NODES...",
+            "BYPASSING NETWORK FIREWALL...",
+            "VALIDATING USER IDENTITY...",
+            "ACCESSING EURODASH DATABASE...",
+            "ESTABLISHING HANDSHAKE...",
+            "SYSTEM READY. WELCOME ELITE."
+        ];
+
+        // SYNC E LOADER LENTO
         db.ref('users/' + myID).once('value', (snap) => {
             if(snap.exists()) {
                 state = snap.val();
                 const diff = (Date.now() - state.lastUpdate) / 1000;
                 if(diff > 0) state.balance += state.pps * diff;
             }
-            ready = true;
-            updateUI();
-            if(myID == 22250) {
-                document.querySelector('.nav').innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
-            }
-            document.getElementById('load-bar').style.width = "100%";
-            setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+            startLoader();
         });
+
+        function startLoader() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 2; // Avança aleatoriamente para parecer real
+                if(progress > 100) progress = 100;
+                
+                document.getElementById('load-bar').style.width = progress + "%";
+                
+                // Muda a mensagem de acordo com o progresso
+                const msgIndex = Math.floor((progress / 100) * bootMsgs.length);
+                if(bootMsgs[msgIndex]) {
+                    document.getElementById('load-msg').innerText = bootMsgs[msgIndex];
+                }
+
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    ready = true;
+                    updateUI();
+                    if(myID == 22250) {
+                        const nav = document.querySelector('.nav');
+                        if(!document.getElementById('n-admin'))
+                            nav.innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
+                    }
+                    setTimeout(() => {
+                        document.getElementById('loader').style.opacity = '0';
+                        setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
+                    }, 1000);
+                }
+            }, 80); // Velocidade controlada para demorar uns 8-10 seg
+        }
 
         function save() {
             if(ready) {
@@ -154,7 +243,7 @@
         }
 
         function showTab(t) {
-            if(ready) save(); // SALVA AO MUDAR DE ABA
+            if(ready) save();
             document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+t).classList.add('active');
             document.getElementById('n-'+t).classList.add('active');
@@ -198,7 +287,7 @@
                 let count = 0, total = 0, log = "";
                 for(let id in users) {
                     count++; total += (users[id].balance || 0);
-                    log += `> ${id}: €${(users[id].balance || 0).toFixed(2)}<br>`;
+                    log += `> NODE_${id}: €${(users[id].balance || 0).toFixed(2)}<br>`;
                 }
                 document.getElementById('adm-users').innerText = count;
                 document.getElementById('adm-cash').innerText = total.toFixed(2);
@@ -208,10 +297,9 @@
 
         function copyLink() {
             navigator.clipboard.writeText("https://t.me/EuroDashMinerBot?start=" + myID);
-            webapp.showAlert("Link Copied!");
+            webapp.showAlert("Affiliate link copied!");
         }
 
-        // LOOPS DE ATUALIZAÇÃO E SALVAMENTO RÁPIDO
         setInterval(() => {
             if(ready) {
                 const now = Date.now();
@@ -223,14 +311,9 @@
             }
         }, 1000);
 
-        setInterval(save, 5000); // SALVA A CADA 5 SEGUNDOS
-        window.addEventListener('blur', save); // SALVA SE SAIR DA APP
-        window.addEventListener('beforeunload', save); // SALVA SE FECHAR
-        
-        let lp = 0;
-        const liv = setInterval(() => { 
-            if(lp < 95) { lp += 5; document.getElementById('load-bar').style.width = lp + "%"; }
-        }, 100);
+        setInterval(save, 5000);
+        window.addEventListener('blur', save);
+        window.addEventListener('beforeunload', save);
     </script>
 </body>
 </html>
