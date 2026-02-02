@@ -10,74 +10,74 @@
     <style>
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
+        
+        /* LOADING SCREEN COM BARRA */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .load-container { width: 70%; background: #111; height: 6px; border-radius: 10px; border: 1px solid #222; margin-top: 20px; position: relative; overflow: hidden; box-shadow: 0 0 15px rgba(0,255,157,0.1); }
+        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.2s; }
+        .load-text { font-family: 'Orbitron'; color: var(--p); font-size: 10px; margin-top: 10px; letter-spacing: 2px; }
+
+        /* UI PRINCIPAL */
         .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
         .mini-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--p); margin-bottom: 5px; box-shadow: 0 0 15px var(--p); object-fit: cover; }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; text-shadow: 0 0 10px rgba(0,255,157,0.5); }
-        .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 4px 12px; border-radius: 50px; font-size: 11px; border: 1px solid rgba(0,255,157,0.3); }
-        .energy-section { margin-top: 15px; }
+        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
         .energy-container { width: 70%; margin: 8px auto; background: #222; height: 12px; border-radius: 10px; border: 1px solid #333; overflow: hidden; }
-        #energy-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #ffdd00, #ff9500); transition: width 0.1s; }
-        .energy-text { font-family: 'Orbitron'; font-size: 12px; color: #ffdd00; }
+        #energy-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #ffdd00, #ff9500); }
         .tab-content { display: none; padding: 20px 15px; height: 62vh; overflow-y: auto; touch-action: pan-y; }
         .tab-content.active { display: block; }
-        #click-area { text-align: center; padding: 20px 0; position: relative; touch-action: none; }
-        #main-clicker { font-size: 130px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: transform 0.05s; z-index: 999; }
-        #main-clicker:active { transform: scale(0.95); }
-        #main-clicker.disabled { filter: grayscale(1) brightness(0.3); pointer-events: none; }
+        #main-clicker { font-size: 130px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: transform 0.05s; }
         .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 2000; }
         .nav-item { color: #555; font-size: 10px; text-align: center; cursor: pointer; font-family: 'Orbitron'; flex: 1; }
         .nav-item.active { color: var(--p); }
         .miner-card { background: var(--card); border-radius: 15px; border: 1px solid #222; margin-bottom: 25px; overflow: hidden; }
-        .miner-img { width: 100%; height: 160px; object-fit: cover; border-bottom: 2px solid var(--p); }
-        .miner-info { padding: 15px; }
+        .miner-img { width: 100%; height: 160px; object-fit: cover; }
         .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 8px; }
         .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; }
     </style>
 </head>
 <body>
 
+    <div id="loader">
+        <img src="logo.jpg" style="width: 100px; margin-bottom: 10px; border-radius: 50%; border: 2px solid var(--p);">
+        <div class="load-text" id="status-text">A INICIALIZAR...</div>
+        <div class="load-container">
+            <div id="load-bar"></div>
+        </div>
+    </div>
+
     <div class="header">
         <img src="logo.jpg" class="mini-logo" alt="Logo">
-        <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div class="pps-badge">LUCRO/H: +<span id="pph">0.0000</span> €</div>
+        <div class="balance-val">€ <span id="balance">...</span></div>
+        <div style="font-size: 11px; color: var(--p);">LUCRO/H: +<span id="pph">0.0000</span> €</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area"><div id="main-clicker">⚡</div></div>
-        <div class="energy-section">
-            <div class="energy-text">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
-            <div class="energy-container"><div id="energy-bar"></div></div>
-        </div>
-        <div style="margin-top: 15px;">
-            <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
-            <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 BÓNUS DIÁRIO</button>
-        </div>
+        <div id="click-area" style="padding:20px 0;"><div id="main-clicker">⚡</div></div>
+        <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
+        <div class="energy-container"><div id="energy-bar"></div></div>
+        <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
+        <button onclick="checkDaily()" class="btn-action">🎁 BÓNUS DIÁRIO</button>
     </div>
 
     <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
     <div id="tab-friends" class="tab-content" style="text-align: center;">
-        <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR</h2>
+        <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR AMIGOS</h2>
         <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white;">🔗 ENVIAR CONVITE</button>
+        <p style="font-size: 12px; color: #555; margin-top: 30px;">UnitID: 22250</p>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡<br>MINE</div>
-        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒<br>LOJA</div>
-        <div class="nav-item" id="nav-friends" onclick="showTab('friends')">🤝<br>AMIGOS</div>
+        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">⚡<br>MINE</div>
+        <div class="nav-item" id="n-store" onclick="showTab('store')">🛒<br>LOJA</div>
+        <div class="nav-item" id="n-friends" onclick="showTab('friends')">🤝<br>AMIGOS</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'eurodash_v15_final';
-        
-        // 1. CARREGAR OS DADOS LOGO NO INÍCIO
-        let saved = localStorage.getItem(SAVE_KEY);
-        let state = saved ? JSON.parse(saved) : {
-            balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], 
-            lastDaily: 0, energy: 500
-        };
+        const SAVE_KEY = 'eurodash_v18_final';
+        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
 
         const miners = [
             { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
@@ -89,42 +89,49 @@
             { name: "Quantum Cluster V7", price: 600.00, gain: 0.00019835, img: "miner7.jpg" }
         ];
 
+        function updateUI() {
+            document.getElementById('balance').innerText = state.balance.toFixed(5);
+            document.getElementById('energy-val').innerText = Math.floor(state.energy);
+            document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
+            document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
+        }
+
+        // CARREGAMENTO COM BARRA DE PROGRESSO
+        let progress = 0;
+        const loadInterval = setInterval(() => {
+            progress += 5;
+            document.getElementById('load-bar').style.width = progress + "%";
+            
+            if(progress === 40) document.getElementById('status-text').innerText = "A LER MEMÓRIA...";
+            if(progress === 80) document.getElementById('status-text').innerText = "A SINCRONIZAR SALDO...";
+            
+            if (progress >= 100) {
+                clearInterval(loadInterval);
+                document.getElementById('status-text').innerText = "CONCLUÍDO!";
+                
+                // Carregar dados reais antes de fechar o loader
+                const saved = localStorage.getItem(SAVE_KEY);
+                if(saved) state = JSON.parse(saved);
+                updateUI();
+
+                setTimeout(() => {
+                    document.getElementById('loader').style.opacity = "0";
+                    setTimeout(() => document.getElementById('loader').style.display = "none", 500);
+                }, 400);
+            }
+        }, 100);
+
         function saveGame() {
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
         }
 
-        // FUNÇÃO DE ATUALIZAÇÃO QUE ESCREVE NO HTML
-        function updateUI() {
-            if(document.getElementById('balance')) {
-                document.getElementById('balance').innerText = state.balance.toFixed(5);
-            }
-            if(document.getElementById('energy-val')) {
-                document.getElementById('energy-val').innerText = Math.floor(state.energy);
-            }
-            if(document.getElementById('energy-bar')) {
-                document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
-            }
-            if(document.getElementById('pph')) {
-                document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
-            }
-            
-            const clicker = document.getElementById('main-clicker');
-            if(clicker) {
-                if(state.energy < 1) clicker.classList.add('disabled');
-                else clicker.classList.remove('disabled');
-            }
-        }
-
-        // 2. EXECUTAR A ATUALIZAÇÃO LOGO AQUI (FORÇA O SALDO A APARECER)
-        updateUI();
-
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
                 <div class="miner-card">
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160'">
-                    <div class="miner-info">
+                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160?text=Hardware+V${i+1}'">
+                    <div style="padding:15px;">
                         <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
-                        <div style="color:var(--s); margin: 5px 0;">Custo: €${m.price.toFixed(2)}</div>
+                        <div style="color:var(--s); margin: 5px 0; font-weight:bold;">INVESTIMENTO: €${m.price.toFixed(2)}</div>
                         <button class="btn-buy" onclick="comprar(${i})">COMPRAR</button>
                     </div>
                 </div>
@@ -139,12 +146,10 @@
                 renderShop();
                 saveGame();
                 updateUI();
-                webapp.HapticFeedback.notificationOccurred('success');
             } else { webapp.showAlert("Saldo insuficiente!"); }
         }
 
-        const clicker = document.getElementById('main-clicker');
-        clicker.addEventListener('touchstart', (e) => {
+        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touches = e.changedTouches.length;
             for(let i=0; i < touches; i++) {
@@ -158,17 +163,11 @@
             saveGame();
         });
 
-        function shareLink() {
-            const uid = webapp.initDataUnsafe.user?.id || "22250";
-            const link = `https://t.me/EuroDashMinerBot?startapp=${uid}`;
-            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem minerar comigo!`);
-        }
-
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('nav-' + tab).classList.add('active');
+            document.getElementById('n-' + tab).classList.add('active');
             if(tab === 'store') renderShop();
         }
 
@@ -195,11 +194,13 @@
             } else { webapp.showAlert("Volta amanhã!"); }
         }
 
-        // 3. SEGUNDO REFORÇO DE INICIALIZAÇÃO
-        window.onload = () => {
-            updateUI();
-            updateLoop();
-        };
+        function shareLink() {
+            const uid = webapp.initDataUnsafe.user?.id || "22250";
+            const link = `https://t.me/EuroDashMinerBot?startapp=${uid}`;
+            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem minerar no EuroDash Elite!`);
+        }
+
+        updateLoop();
         renderShop();
     </script>
 </body>
