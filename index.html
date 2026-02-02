@@ -7,107 +7,139 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; --border: #1a1a1a; }
+        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; --border: #1a1a1a; --accent: #ff5e00; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* LOADING FUTURISTA */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, #0a1a14 0%, #050505 100%); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s; }
-        .hud-circle { width: 120px; height: 120px; border: 1px solid rgba(0, 255, 157, 0.1); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-        .hud-circle::before { content: ""; position: absolute; width: 100%; height: 100%; border-top: 3px solid var(--p); border-radius: 50%; animation: spin 2s linear infinite; }
-        .progress-frame { width: 200px; height: 4px; background: rgba(0,0,0,0.8); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.4s; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* LOADING */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #050505; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .progress-frame { width: 200px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        #load-bar { width: 0%; height: 100%; background: var(--p); transition: width 0.3s; }
 
         /* HEADER */
-        .header { background: rgba(0,0,0,0.9); padding: 20px; text-align: center; border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
-        .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
-        .pph-badge { font-family: 'Orbitron'; font-size: 10px; color: var(--s); letter-spacing: 1px; }
+        .header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
+        .balance-val { font-family: 'Orbitron'; font-size: 2rem; color: white; margin: 5px 0; }
+        .stats-grid { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+        .stat-box { background: #0d0d0d; border: 1px solid var(--border); padding: 8px; border-radius: 8px; flex: 1; max-width: 140px; }
+        .stat-label { font-size: 10px; color: var(--accent); font-family: 'Orbitron'; }
+        .stat-val { font-size: 13px; font-weight: bold; }
 
         /* TABS */
-        .tab-content { display: none; padding: 15px; height: 65vh; overflow-y: auto; }
+        .tab-content { display: none; padding: 15px; height: 68vh; overflow-y: auto; }
         .tab-content.active { display: block; }
 
-        /* LAYOUT DE MINERADORES (ESTILO LISTA) */
-        .miner-row { 
-            background: #0d0d0d; border: 1px solid var(--border); border-radius: 12px; 
-            padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
-        }
-        .miner-img-box { 
-            width: 50px; height: 50px; border-radius: 8px; border: 1px solid var(--p); 
-            background: #151515; overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
-        .miner-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        /* CARDS & LISTS */
+        .card { background: #0d0d0d; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .miner-row, .task-row { display: flex; align-items: center; gap: 12px; background: #0d0d0d; border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+        .icon-box { width: 45px; height: 45px; background: #151515; border-radius: 10px; border: 1px solid var(--p); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .icon-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        .miner-info { flex-grow: 1; }
-        .miner-name { font-family: 'Orbitron'; font-size: 13px; color: white; margin-bottom: 2px; }
-        .miner-stats { font-size: 11px; color: #666; text-transform: uppercase; }
-        .miner-cost { color: var(--s); font-weight: bold; font-size: 12px; }
+        /* REFERRALS STYLE (Baseado na tua foto) */
+        .ref-info-box { border: 1px solid var(--accent); border-radius: 10px; padding: 15px; background: rgba(255, 94, 0, 0.05); font-size: 13px; line-height: 1.5; color: #ccc; margin-top: 15px; }
+        .ref-link-container { display: flex; gap: 10px; margin-top: 15px; }
+        .ref-input { background: #000; border: 1px solid #333; color: #999; padding: 10px; border-radius: 8px; flex-grow: 1; font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .copy-btn { background: #1a1a1a; border: 1px solid #333; padding: 10px; border-radius: 8px; cursor: pointer; }
 
-        .btn-upgrade { 
-            background: var(--p); color: black; border: none; padding: 8px 12px; 
-            border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
-            cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
-        }
-
-        /* CLICKER PRINCIPAL */
-        #main-clicker { font-size: 120px; cursor: pointer; padding: 40px 0; }
-        .energy-bar-bg { width: 80%; height: 6px; background: #111; border: 1px solid #222; border-radius: 10px; margin: 10px auto; overflow: hidden; }
-        #energy-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff9500, #ffdd00); }
+        /* BUTTONS */
+        .btn-buy, .btn-claim { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
+        .btn-withdraw { background: #1ba085; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-family: 'Orbitron'; margin-bottom: 15px; width: 60%; }
 
         /* NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; }
-        .nav-item.active { color: var(--p); border-top: 2px solid var(--p); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); }
+        .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: white; background: rgba(255, 94, 0, 0.1); border-top: 2px solid var(--accent); }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="hud-circle"></div>
+        <div class="euro-title" style="font-family: Orbitron; color: var(--p);">EURODASH ELITE</div>
         <div class="progress-frame"><div id="load-bar"></div></div>
-        <div style="font-family: Orbitron; font-size: 9px; color: var(--p); margin-top: 10px;">SYNCING ELITE NETWORK...</div>
     </div>
 
     <div class="header">
-        <div class="pph-badge">AUTO-MINING RATE</div>
-        <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div class="pph-badge" style="color: #666;">+<span id="pph">0.0000</span> / HOUR</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">PROFIT / CLICK</div>
+                <div class="stat-val">€ +0.0005</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" style="color: var(--p);">PROFIT / HOUR</div>
+                <div class="stat-val">€ +<span id="pph">0.0000</span></div>
+            </div>
+        </div>
+        <div class="balance-val"><span id="balance">0.00000</span> EUR</div>
+        <button class="btn-withdraw">WITHDRAW</button>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="main-clicker">⚡</div>
+        <div id="click-area" style="padding: 30px 0; font-size: 120px; cursor: pointer;">⚡</div>
         <div style="font-family: Orbitron; font-size: 11px; color: #ffdd00;">ENERGY: <span id="energy-val">500</span>/500</div>
-        <div class="energy-bar-bg"><div id="energy-fill"></div></div>
-        <button onclick="checkDaily()" style="background:transparent; color:white; border:1px solid #333; padding:10px 20px; border-radius:8px; margin-top:20px; font-family: Orbitron; font-size:10px;">DAILY BONUS</button>
+        <div style="width: 70%; height: 5px; background: #111; margin: 10px auto; border-radius: 10px;"><div id="energy-fill" style="height:100%; background: orange; width: 100%;"></div></div>
     </div>
 
-    <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
-    
-    <div id="tab-friends" class="tab-content" style="text-align: center;">
-        <h2 style="font-family:'Orbitron'; color:var(--s); margin-top: 50px;">NETWORK</h2>
-        <button onclick="shareLink()" style="background:var(--s); color:white; border:none; padding:15px 30px; border-radius:10px; font-family:Orbitron;">INVITE PARTNERS</button>
+    <div id="tab-market" class="tab-content"><div id="shop-list"></div></div>
+
+    <div id="tab-friends" class="tab-content">
+        <div style="text-align: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/9187/9187532.png" style="width: 80px; margin-bottom: 10px;">
+            <div style="font-family: Orbitron; font-size: 18px;">YOUR INVITER: <span style="color: var(--accent);">Unit_22250</span></div>
+        </div>
+        
+        <div class="ref-link-container">
+            <div class="ref-input" id="ref-url">https://t.me/EuroDashMinerBot?start=22250</div>
+            <div class="copy-btn" onclick="copyLink()">📋</div>
+        </div>
+
+        <div class="ref-info-box">
+            Get <b>0.01 EUR</b> for each friend you invite + earn from 10 referral levels: 
+            Level 1 - 10%, Level 2 - 5%, Level 3 - 3%... Total potential earnings up to 29% from your network.
+        </div>
+
+        <h3 style="font-family: Orbitron; font-size: 14px; margin-top: 25px;">YOUR REFERRALS</h3>
+        <div id="ref-list" class="card" style="text-align: center; color: #444; font-size: 13px;">
+            No friends found yet
+        </div>
+    </div>
+
+    <div id="tab-earn" class="tab-content">
+        <h3 style="font-family: Orbitron; font-size: 14px;">GET MORE REWARDS</h3>
+        <div class="task-row">
+            <div class="icon-box">🎁</div>
+            <div style="flex-grow:1;">
+                <div style="font-size:14px; font-weight:bold;">Welcome Bonus</div>
+                <div style="font-size:11px; color:var(--p);">+ 0.50 EUR</div>
+            </div>
+            <button class="btn-claim" onclick="claimTask(0.50)">CLAIM</button>
+        </div>
+        <div class="task-row">
+            <div class="icon-box">📢</div>
+            <div style="flex-grow:1;">
+                <div style="font-size:14px; font-weight:bold;">Subscribe Channel</div>
+                <div style="font-size:11px; color:var(--p);">+ 0.10 EUR</div>
+            </div>
+            <button class="btn-claim" onclick="window.open('https://t.me/vosso_canal')">JOIN</button>
+        </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">CORE</div>
-        <div class="nav-item" id="n-store" onclick="showTab('store')">MARKET</div>
-        <div class="nav-item" id="n-friends" onclick="showTab('friends')">NETWORK</div>
+        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">HOME</div>
+        <div class="nav-item" id="n-market" onclick="showTab('market')">MINE</div>
+        <div class="nav-item" id="n-friends" onclick="showTab('friends')">FRIENDS</div>
+        <div class="nav-item" id="n-earn" onclick="showTab('earn')">EARN</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'EURODASH_STABLE_V27';
-        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
+        const SAVE_KEY = 'EURODASH_V30_STABLE';
+        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], energy: 500 };
         let ready = false;
 
         const miners = [
-            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
-            { name: "Irocket Miner", price: 5.00, gain: 0.00000165, img: "miner2.jpg" },
-            { name: "Doket Miner V1", price: 15.00, gain: 0.00000495, img: "miner3.jpg" },
-            { name: "Industrial Rack", price: 50.00, gain: 0.00001850, img: "miner4.jpg" },
-            { name: "Quantum Node", price: 150.00, gain: 0.00005500, img: "miner5.jpg" }
+            { name: "Starter Miner", price: 10.00, gain: 0.0001, img: "miner1.jpg" },
+            { name: "Green Miner", price: 25.00, gain: 0.0003, img: "miner2.jpg" },
+            { name: "Turbo Lite", price: 50.00, gain: 0.0008, img: "miner3.jpg" }
         ];
 
         window.addEventListener('load', () => {
@@ -115,14 +147,8 @@
             if(saved) state = JSON.parse(saved);
             let p = 0;
             const iv = setInterval(() => {
-                p += 2;
-                document.getElementById('load-bar').style.width = p + "%";
-                if(p >= 100) {
-                    clearInterval(iv);
-                    ready = true;
-                    updateUI();
-                    setTimeout(() => { document.getElementById('loader').style.display = "none"; }, 500);
-                }
+                p += 5; document.getElementById('load-bar').style.width = p + "%";
+                if(p >= 100) { clearInterval(iv); ready = true; updateUI(); document.getElementById('loader').style.display = "none"; }
             }, 50);
         });
 
@@ -135,32 +161,36 @@
 
         function save() { if(ready) localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
+        function showTab(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-'+t).classList.add('active');
+            document.getElementById('n-'+t).classList.add('active');
+            if(t === 'market') renderShop();
+        }
+
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
                 <div class="miner-row">
-                    <div class="miner-img-box">
-                        <img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2972/2972185.png'">
-                    </div>
-                    <div class="miner-info">
+                    <div class="icon-box"><img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2972/2972185.png'"></div>
+                    <div style="flex-grow:1;">
                         <div class="miner-name">${m.name}</div>
-                        <div class="miner-stats">LEVEL ${state.inventory[i] || 0} • <span class="miner-cost">€${m.price.toFixed(2)}</span></div>
+                        <div style="font-size:11px; color:#666;">Price: <span style="color:var(--p)">€${m.price}</span></div>
+                        <div style="font-size:11px; color:#666;">Profit: <span style="color:var(--p)">€${(m.gain*3600).toFixed(2)}/h</span></div>
                     </div>
-                    <button class="btn-upgrade" onclick="comprar(${i})">UPGRADE</button>
+                    <button class="btn-buy" onclick="comprar(${i})">BUY</button>
                 </div>
             `).join('');
         }
 
         function comprar(i) {
             if(state.balance >= miners[i].price) {
-                state.balance -= miners[i].price;
-                state.pps += miners[i].gain;
+                state.balance -= miners[i].price; state.pps += miners[i].gain;
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
                 renderShop(); save(); updateUI();
-                webapp.HapticFeedback.impactOccurred('medium');
-            } else { webapp.showAlert("LACK OF FUNDS"); }
+            } else { webapp.showAlert("NOT ENOUGH BALANCE"); }
         }
 
-        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
+        document.getElementById('click-area').addEventListener('touchstart', (e) => {
             e.preventDefault();
             if(!ready || state.energy < 1) return;
             state.balance += 0.0005; state.energy -= 1;
@@ -168,11 +198,16 @@
             webapp.HapticFeedback.impactOccurred('light');
         });
 
-        function showTab(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.getElementById('n-'+t).classList.add('active');
-            if(t === 'store') renderShop();
+        function copyLink() {
+            const url = document.getElementById('ref-url').innerText;
+            navigator.clipboard.writeText(url);
+            webapp.showAlert("Link Copied!");
+        }
+
+        function claimTask(val) {
+            state.balance += val;
+            updateUI(); save();
+            webapp.showAlert("Reward Claimed!");
         }
 
         setInterval(() => {
@@ -185,18 +220,6 @@
                 updateUI();
             }
         }, 1000);
-
-        function checkDaily() {
-            const now = Date.now();
-            if (now - state.lastDaily > 86400000) {
-                state.balance += 0.05; state.lastDaily = now; save(); updateUI(); webapp.showAlert("REWARD: €0.05");
-            } else { webapp.showAlert("RETRY IN 24H"); }
-        }
-
-        function shareLink() {
-            const uid = webapp.initDataUnsafe.user?.id || "22250";
-            webapp.openTelegramLink(`https://t.me/share/url?url=https://t.me/EuroDashMinerBot?startapp=${uid}&text=Join the network!`);
-        }
     </script>
 </body>
 </html>
