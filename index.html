@@ -3,143 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Euro Tycoon Mini App</title>
+    <title>EuroPulse Crypto Tycoon</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --tg-theme-button-color: #0088cc; }
+        :root {
+            --primary: #00ff9d;
+            --bg: #0a0a0a;
+            --card: #151515;
+            --text: #ffffff;
+            --subtext: #888;
+            --accent: #00b0ff;
+        }
+
         body {
-            background: radial-gradient(circle, #1a1a1a, #000);
-            color: white;
-            text-align: center;
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            overflow: hidden;
         }
-        #header { padding: 20px; }
-        #score-container { font-size: 3.5rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        #level-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        
-        #coin-container { position: relative; display: flex; justify-content: center; }
-        #coin {
-            width: 240px;
-            height: 240px;
-            background: linear-gradient(145deg, #ffd700, #b8860b);
-            border-radius: 50%;
-            box-shadow: 0 0 50px rgba(255,215,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 6rem;
-            cursor: pointer;
-            transition: transform 0.05s;
-            border: 10px solid #8b6508;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #coin:active { transform: scale(0.92); }
 
-        #controls { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
+        /* --- Header --- */
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+        }
+        .balance-label { font-size: 0.7rem; color: var(--subtext); letter-spacing: 2px; }
+        .balance-amount { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 2.2rem; 
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        /* --- Tabs Content --- */
+        .content { flex-grow: 1; overflow-y: auto; padding: 20px; display: none; }
+        .content.active { display: block; }
+
+        /* --- Cards & Items --- */
+        .item-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #222;
+        }
+        .item-header { display: flex; justify-content: space-between; align-items: center; }
+        .item-title { font-weight: 600; font-size: 1rem; }
+        .item-price { color: var(--primary); font-weight: bold; }
+        .item-desc { font-size: 0.8rem; color: var(--subtext); margin-top: 5px; }
+
         .btn {
-            padding: 18px;
-            border-radius: 15px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
             border: none;
             font-weight: bold;
-            font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
+            margin-top: 10px;
+            font-family: inherit;
         }
-        #share-btn { background: #28a745; color: white; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
-        #ads-btn { background: #0088cc; color: white; border: 2px solid rgba(255,255,255,0.2); }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
 
-        .plus-one {
-            position: absolute;
-            color: #ffd700;
-            font-size: 2.2rem;
-            font-weight: bold;
-            animation: float 0.8s ease-out forwards;
-            pointer-events: none;
+        /* --- Crypto Payment Modal --- */
+        #crypto-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none; z-index: 2000;
+            padding: 20px; box-sizing: border-box;
+            flex-direction: column; justify-content: center;
         }
-        @keyframes float {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-150px); }
+        .wallet-box {
+            background: #222; padding: 20px; border-radius: 12px; text-align: center;
+            border: 1px solid var(--accent);
         }
+        .address-text { 
+            background: #000; padding: 10px; border-radius: 5px; 
+            font-size: 0.8rem; color: var(--accent); word-break: break-all;
+            margin: 15px 0; border: 1px dashed #444;
+        }
+
+        /* --- Footer Nav --- */
+        .nav {
+            display: flex; justify-content: space-around;
+            padding: 15px; border-top: 1px solid #222; background: #000;
+        }
+        .nav-item { color: var(--subtext); font-size: 0.7rem; text-align: center; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+
     </style>
 </head>
 <body>
 
-    <div id="header">
-        <div id="level-tag">RANK: <span id="level-name">Rookie</span></div>
-        <div id="score-container">€ <span id="balance">0</span></div>
+    <div class="header">
+        <div class="balance-label">CURRENT ASSETS</div>
+        <div class="balance-amount">€ <span id="main-balance">0.00000</span></div>
     </div>
 
-    <div id="coin-container">
-        <div id="coin">💶</div>
+    <div id="tab-mine" class="content active">
+        <div style="text-align: center; margin-top: 40px;">
+            <div id="main-clicker" style="font-size: 8rem; cursor: pointer; filter: drop-shadow(0 0 20px var(--primary));">💎</div>
+            <p style="color: var(--subtext); margin-top: 20px;">Mining active: <span id="pps-display">0.00001</span> €/s</p>
+        </div>
     </div>
 
-    <div id="controls">
-        <button id="ads-btn" class="btn" onclick="showAd()">Watch Ad (+€500)</button>
-        <button id="share-btn" class="btn" onclick="shareGame()">Invite Friends 🚀</button>
+    <div id="tab-shop" class="content">
+        <h2 style="font-size: 1rem; letter-spacing: 1px;">MINING RIGS</h2>
+        
+        <div class="item-card">
+            <div class="item-header">
+                <span class="item-title">GPU RTX 4090</span>
+                <span class="item-price">€ 5.00</span>
+            </div>
+            <p class="item-desc">Increases income by € 0.15 per day.</p>
+            <button class="btn btn-primary" onclick="openPayment(5, 'GPU RTX 4090')">UPGRADE NOW</button>
+        </div>
+
+        <div class="item-card">
+            <div class="item-header">
+                <span class="item-title">ASIC ANTMINER</span>
+                <span class="item-price">€ 20.00</span>
+            </div>
+            <p class="item-desc">Increases income by € 0.80 per day.</p>
+            <button class="btn btn-primary" onclick="openPayment(20, 'ASIC ANTMINER')">UPGRADE NOW</button>
+        </div>
+    </div>
+
+    <div id="tab-tasks" class="content">
+        <h2 style="font-size: 1rem; letter-spacing: 1px;">EARN BONUS</h2>
+        <div class="item-card">
+            <div class="item-header">
+                <span class="item-title">Join News Channel</span>
+                <span class="item-price">+€ 0.10</span>
+            </div>
+            <p class="item-desc">Subscribe to our official channel to claim.</p>
+            <button class="btn btn-outline" onclick="doTask('channel')">JOIN CHANNEL</button>
+        </div>
+    </div>
+
+    <div id="crypto-modal">
+        <div class="wallet-box">
+            <h3 style="margin-top:0">CRYPTO PAYMENT</h3>
+            <p style="font-size: 0.8rem;">Send exactly <b><span id="pay-amount">5</span> USDT</b></p>
+            <p style="font-size: 0.7rem; color: #ffa500;">NETWORK: TRC-20 (TRON)</p>
+            
+            <div class="address-text" id="wallet-address">O_TEU_ENDERECO_USDT_AQUI</div>
+            
+            <button class="btn btn-primary" onclick="copyWallet()">COPY ADDRESS</button>
+            <p style="font-size: 0.6rem; margin-top: 15px;">After sending, click below to send proof to Admin.</p>
+            <button class="btn btn-outline" onclick="confirmPayment()">I HAVE SENT THE PAYMENT</button>
+            <button class="btn" style="color: #ff4444;" onclick="closePayment()">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="showTab('mine', this)">MINE</div>
+        <div class="nav-item" onclick="showTab('shop', this)">SHOP</div>
+        <div class="nav-item" onclick="showTab('tasks', this)">TASKS</div>
+        <div class="nav-item" onclick="invite()">INVITE</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
-        webapp.ready();
 
-        let balance = parseInt(localStorage.getItem('euro_balance')) || 0;
-        const balanceEl = document.getElementById('balance');
-        const levelEl = document.getElementById('level-name');
-        
-        function updateDisplay() {
-            balanceEl.innerText = balance.toLocaleString();
-            if(balance > 100000) levelEl.innerText = "Tycoon";
-            else if(balance > 50000) levelEl.innerText = "Millionaire";
-            else if(balance > 10000) levelEl.innerText = "Entrepreneur";
-            else if(balance > 1000) levelEl.innerText = "Investor";
-            else levelEl.innerText = "Rookie";
+        // --- CONFIGURAÇÃO (Muda isto!) ---
+        const MEU_USER_TELEGRAM = "O_TEU_USER_AQUI"; // Sem o @
+        const MEU_CANAL_LINK = "https://t.me/O_TEU_CANAL"; 
+        const MINHA_CARTEIRA_USDT = "TU_CARTEIRA_TRC20_REAL_AQUI"; 
+
+        let state = JSON.parse(localStorage.getItem('ep_save')) || {
+            balance: 0,
+            pps: 0.000001,
+            lastUpdate: Date.now(),
+            tasks: []
+        };
+
+        function save() {
+            state.lastUpdate = Date.now();
+            localStorage.setItem('ep_save', JSON.stringify(state));
         }
 
-        document.getElementById('coin').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            balance += 1;
-            updateDisplay();
-            localStorage.setItem('euro_balance', balance);
+        // Loop de ganhos
+        setInterval(() => {
+            const now = Date.now();
+            const diff = (now - state.lastUpdate) / 1000;
+            state.balance += state.pps * diff;
+            document.getElementById('main-balance').innerText = state.balance.toFixed(5);
+            document.getElementById('pps-display').innerText = state.pps.toFixed(5);
+            save();
+        }, 1000);
 
-            const touch = e.touches[0];
-            const anim = document.createElement('div');
-            anim.innerText = "+1";
-            anim.className = 'plus-one';
-            anim.style.left = touch.pageX + 'px';
-            anim.style.top = touch.pageY + 'px';
-            document.body.appendChild(anim);
-            setTimeout(() => anim.remove(), 800);
-            
-            webapp.HapticFeedback.impactOccurred('medium');
-        });
+        // Clicker Manual
+        document.getElementById('main-clicker').onclick = (e) => {
+            state.balance += 0.00001;
+            webapp.HapticFeedback.impactOccurred('light');
+        };
 
-        function shareGame() {
-            const botLink = "https://t.me/euro_ganhos_bot/play"; // <--- REMEMBER TO CHANGE THIS!
-            const text = "I'm printing Euros on Telegram! Can you beat my €" + balance + " record?";
-            const url = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(text)}`;
-            webapp.openTelegramLink(url);
+        // Navegação
+        function showTab(id, el) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            el.classList.add('active');
         }
 
-        function showAd() {
-            webapp.showConfirm("Watch a short video to earn €500?", (ok) => {
-                if(ok) {
-                    webapp.showAlert("Reward granted! +€500 added.");
-                    balance += 500;
-                    updateDisplay();
-                }
-            });
+        // Sistema de Pagamento
+        function openPayment(val, item) {
+            document.getElementById('pay-amount').innerText = val;
+            document.getElementById('wallet-address').innerText = MINHA_CARTEIRA_USDT;
+            document.getElementById('crypto-modal').style.display = 'flex';
         }
 
-        updateDisplay();
+        function closePayment() { document.getElementById('crypto-modal').style.display = 'none'; }
+
+        function copyWallet() {
+            navigator.clipboard.writeText(MINHA_CARTEIRA_USDT);
+            webapp.showAlert("Address copied to clipboard!");
+        }
+
+        function confirmPayment() {
+            const val = document.getElementById('pay-amount').innerText;
+            const text = `Hi Admin, I just sent ${val} USDT for the upgrade. Please verify my account.`;
+            webapp.openTelegramLink(`https://t.me/${MEU_USER_TELEGRAM}?text=${encodeURIComponent(text)}`);
+            closePayment();
+        }
+
+        // Tarefas
+        function doTask(type) {
+            if(state.tasks.includes(type)) {
+                webapp.showAlert("Task already completed!");
+                return;
+            }
+            if(type === 'channel') {
+                webapp.openTelegramLink(MEU_CANAL_LINK);
+                setTimeout(() => {
+                    state.balance += 0.10;
+                    state.tasks.push('channel');
+                    webapp.showAlert("Congratulations! €0.10 added to balance.");
+                    save();
+                }, 2000);
+            }
+        }
+
+        function invite() {
+            const link = `https://t.me/O_TEU_BOT_USER`;
+            const text = "Join EuroPulse and mine real Euros! 🚀";
+            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+        }
+
     </script>
 </body>
 </html>
