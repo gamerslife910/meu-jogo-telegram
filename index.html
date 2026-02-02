@@ -23,40 +23,38 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Miner Cards */
         .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .miner-img { width: 100%; height: 160px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
+        .miner-img { width: 100%; height: 180px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
         .miner-body { padding: 18px; }
         .miner-title { font-family: 'Orbitron'; font-size: 18px; color: #fff; margin: 0; }
         .miner-price { color: var(--s); font-weight: bold; font-size: 15px; display: block; margin-top: 5px; }
         
-        /* Profit Table */
-        .profit-table { width: 100%; margin: 15px 0; border-collapse: collapse; font-size: 12px; text-align: center; background: rgba(0,0,0,0.3); border-radius: 10px; }
-        .profit-table th { color: #888; font-weight: normal; padding: 8px 0; font-size: 10px; text-transform: uppercase; }
+        .profit-table { width: 100%; margin: 15px 0; border-collapse: collapse; font-size: 11px; text-align: center; background: rgba(0,0,0,0.5); border-radius: 10px; }
+        .profit-table th { color: #888; padding: 8px 0; font-size: 9px; text-transform: uppercase; }
         .profit-table td { color: var(--p); font-weight: bold; font-family: 'Orbitron'; padding-bottom: 8px; }
 
         .buy-btn { width: 100%; background: var(--p); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s; }
         .buy-btn:active { transform: scale(0.95); background: #fff; }
 
         .nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; backdrop-filter: blur(10px); }
-        .nav-item { color: #555; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { color: #555; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
 
-        #main-clicker { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; margin: 40px 0; display: inline-block; }
+        #main-clicker { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; margin: 40px 0; display: inline-block; filter: drop-shadow(0 0 15px var(--p)); }
         #main-clicker:active { transform: scale(0.8); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-size: 11px; color: #888; letter-spacing: 1px;">TOTAL ASSETS</div>
+        <div style="font-size: 11px; color: #888; letter-spacing: 1px;">EURODASH CAPITAL</div>
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <span class="pps-badge">LUCRO: +<span id="pps">0.00001</span>/s</span>
+        <span class="pps-badge">LUCRO POR HORA: +<span id="pph">0.0000</span> €</span>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
         <div id="main-clicker">⚡</div>
-        <button onclick="verAnuncio()" style="background:var(--s); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; font-family:'Orbitron'; box-shadow: 0 0 20px rgba(0,176,255,0.3);">📺 VIDEO BOOST (+€0.10)</button>
+        <button onclick="verAnuncio()" style="background:var(--s); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; font-family:'Orbitron';">📺 VIDEO BOOST (+€0.10)</button>
     </div>
 
     <div id="tab-store" class="tab-content">
@@ -74,18 +72,18 @@
         webapp.expand();
 
         let state = JSON.parse(localStorage.getItem('eurodash_save')) || {
-            balance: 0, pps: 0.00001, lastUpdate: Date.now()
+            balance: 0, pps: 0.0000001, lastUpdate: Date.now()
         };
 
-        // Configuração dos Mineradores com Previsão
+        // Mineradores com Imagens e ROI de ~20% semanal
         const miners = [
-            { name: "Pocket Miner V1", price: 1, gain: 0.00002, img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" },
-            { name: "Home Rig", price: 5, gain: 0.00012, img: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400" },
-            { name: "Office Miner", price: 10, gain: 0.00025, img: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400" },
-            { name: "Industrial Box", price: 15, gain: 0.00040, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=400" },
-            { name: "Turbo ASIC", price: 20, gain: 0.00055, img: "https://images.unsplash.com/photo-1624321834499-e46335537563?w=400" },
-            { name: "Server Rack", price: 40, gain: 0.00120, img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400" },
-            { name: "Quantum Cluster", price: 100, gain: 0.00350, img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" }
+            { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&q=80" },
+            { name: "Home Rig 5", price: 5, gain: 0.00000165, img: "https://images.unsplash.com/photo-1547082299-de196ea013d6?w=500&q=80" },
+            { name: "Office Rig", price: 10, gain: 0.00000330, img: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&q=80" },
+            { name: "Industrial Box", price: 15, gain: 0.00000495, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=500&q=80" },
+            { name: "Turbo ASIC", price: 20, gain: 0.00000661, img: "https://images.unsplash.com/photo-1631482942717-d202450897e0?w=500&q=80" },
+            { name: "Server Rack 100", price: 40, gain: 0.00001322, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=500&q=80" },
+            { name: "Quantum Cluster", price: 100, gain: 0.00003306, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&q=80" }
         ];
 
         function renderShop() {
@@ -101,10 +99,10 @@
                             <h4 class="miner-title">${m.name}</h4>
                             <span class="miner-price">Investimento: € ${m.price.toFixed(2)}</span>
                             <table class="profit-table">
-                                <tr><th>24 Horas</th><th>7 Dias</th><th>30 Dias</th></tr>
+                                <tr><th>Lucro 24h</th><th>Lucro 7 Dias</th><th>Lucro 30 Dias</th></tr>
                                 <tr><td>€ ${day}</td><td>€ ${week}</td><td>€ ${month}</td></tr>
                             </table>
-                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">ADQUIRIR AGORA</button>
+                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">INVESTIR</button>
                         </div>
                     </div>
                 `;
@@ -118,7 +116,7 @@
             state.balance += state.pps * diff;
             state.lastUpdate = now;
             document.getElementById('balance').innerText = state.balance.toFixed(5);
-            document.getElementById('pps').innerText = state.pps.toFixed(5);
+            document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
             localStorage.setItem('eurodash_save', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
@@ -141,20 +139,20 @@
             if(state.balance >= preco) {
                 state.balance -= preco;
                 state.pps += ganho;
-                webapp.showAlert("SISTEMA ATIVADO! O teu hardware já está a minerar.");
+                webapp.showAlert("HARDWARE ATIVADO!");
             } else {
-                webapp.showAlert("Saldo insuficiente. Continua a clicar no raio!");
+                webapp.showAlert("Saldo insuficiente.");
             }
         }
 
         const AdController = window.Adsgram.init({ blockId: "22244" });
         function verAnuncio() {
-            alert("A carregar vídeo de recompensa...");
+            alert("A carregar vídeo...");
             AdController.show().then(() => {
                 state.balance += 0.10;
-                webapp.showAlert("BOOST! +€0.10 creditados.");
+                webapp.showAlert("BOOST! +€0.10");
             }).catch(() => {
-                webapp.showAlert("O anúncio ainda não está pronto para o teu ID (Created).");
+                webapp.showAlert("Anúncio não disponível.");
             });
         }
     </script>
