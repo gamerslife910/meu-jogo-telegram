@@ -9,202 +9,218 @@
     <style>
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
-        
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .load-container { width: 70%; background: #111; height: 6px; border-radius: 10px; border: 1px solid #222; margin-top: 20px; position: relative; overflow: hidden; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.1s; }
-        .load-text { font-family: 'Orbitron'; color: var(--p); font-size: 10px; margin-top: 10px; letter-spacing: 2px; }
 
-        .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
-        .mini-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--p); margin-bottom: 5px; box-shadow: 0 0 15px var(--p); object-fit: cover; }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
-        .energy-container { width: 70%; margin: 8px auto; background: #222; height: 12px; border-radius: 10px; border: 1px solid #333; overflow: hidden; }
-        #energy-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #ffdd00, #ff9500); }
-        .tab-content { display: none; padding: 20px 15px; height: 62vh; overflow-y: auto; touch-action: pan-y; }
+        /* EFEITO DE MONITOR ANTIGO */
+        body::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10000; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        /* ECRÃ FUTURISTA DE LOADING */
+        #loader { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: radial-gradient(circle, #0a1a14 0%, #050505 100%); 
+            z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .hud-circle {
+            width: 140px; height: 140px; border: 1px solid rgba(0, 255, 157, 0.1);
+            border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px;
+        }
+        .hud-circle::before {
+            content: ""; position: absolute; width: 100%; height: 100%;
+            border-top: 4px solid var(--p); border-radius: 50%;
+            animation: spin 2s linear infinite; box-shadow: 0 -5px 15px var(--p);
+        }
+        .hud-inner {
+            width: 60%; height: 60%; border: 2px dashed var(--s);
+            border-radius: 50%; animation: spin-rev 4s linear infinite; opacity: 0.5;
+        }
+
+        .euro-title { font-family: 'Orbitron'; font-size: 22px; letter-spacing: 6px; color: white; margin-bottom: 25px; text-shadow: 0 0 20px var(--p); }
+        
+        .progress-frame { 
+            width: 250px; height: 8px; background: rgba(0,0,0,0.8); 
+            border: 1px solid #333; border-radius: 20px; position: relative; overflow: hidden;
+        }
+        #load-bar { 
+            width: 0%; height: 100%; background: linear-gradient(90deg, var(--s), var(--p)); 
+            box-shadow: 0 0 20px var(--p); transition: width 0.4s ease;
+        }
+        .status-msg { font-family: 'Orbitron'; font-size: 10px; color: var(--p); margin-top: 15px; letter-spacing: 1px; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin-rev { to { transform: rotate(-360deg); } }
+
+        /* UI PRINCIPAL */
+        .header { background: rgba(0,0,0,0.8); padding: 20px; text-align: center; border-bottom: 1px solid #222; backdrop-filter: blur(10px); }
+        .mini-logo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--p); background: #111; margin-bottom: 5px; }
+        .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--p); }
+        
+        .tab-content { display: none; padding: 20px; height: 60vh; overflow-y: auto; }
         .tab-content.active { display: block; }
-        #main-clicker { font-size: 130px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: transform 0.05s; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 2000; }
-        .nav-item { color: #555; font-size: 10px; text-align: center; cursor: pointer; font-family: 'Orbitron'; flex: 1; }
-        .nav-item.active { color: var(--p); }
-        .miner-card { background: var(--card); border-radius: 15px; border: 1px solid #222; margin-bottom: 25px; overflow: hidden; }
-        .miner-img { width: 100%; height: 160px; object-fit: cover; }
-        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 8px; }
-        .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; }
+        
+        #main-clicker { font-size: 120px; cursor: pointer; transition: transform 0.05s; }
+        #main-clicker:active { transform: scale(0.9); }
+
+        .btn-action { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 15px; border-radius: 8px; width: 100%; font-family: 'Orbitron'; text-transform: uppercase; font-size: 12px; }
+        
+        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid #222; }
+        .nav-item { padding: 15px 0; color: #444; font-size: 10px; text-align: center; font-family: 'Orbitron'; flex: 1; text-transform: uppercase; }
+        .nav-item.active { color: var(--p); border-top: 2px solid var(--p); }
+
+        .miner-card { background: #0f0f0f; padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
+        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <img src="logo.jpg" style="width: 100px; margin-bottom: 10px; border-radius: 50%; border: 2px solid var(--p);">
-        <div class="load-text">A SINCRONIZAR CARTEIRA...</div>
-        <div class="load-container"><div id="load-bar"></div></div>
+        <div class="hud-circle"><div class="hud-inner"></div></div>
+        <div class="euro-title">EURODASH</div>
+        <div class="progress-frame"><div id="load-bar"></div></div>
+        <div class="status-msg" id="status-msg">CONNECTING TO NODE...</div>
     </div>
 
     <div class="header">
-        <img src="logo.jpg" class="mini-logo" alt="Logo">
+        <img src="logo.jpg" class="mini-logo" onerror="this.style.display='none'">
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div style="font-size: 11px; color: var(--p);">LUCRO/H: +<span id="pph">0.0000</span> €</div>
+        <div style="font-size: 11px; color: var(--s); font-family: 'Orbitron';">AUTO-MINING: +<span id="pph">0.0000</span>/H</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area" style="padding:20px 0;"><div id="main-clicker">⚡</div></div>
-        <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
-        <div class="energy-container"><div id="energy-bar"></div></div>
-        <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p); margin-top: 20px;">🎁 BÓNUS DIÁRIO</button>
+        <div id="click-area" style="padding:40px 0;"><div id="main-clicker">⚡</div></div>
+        <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00; margin-bottom: 15px;">ENERGY CORE: <span id="energy-val">500</span>/500</div>
+        <button onclick="checkDaily()" class="btn-action">CLAIM DAILY REWARD</button>
     </div>
 
     <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
+    
     <div id="tab-friends" class="tab-content" style="text-align: center;">
-        <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR AMIGOS</h2>
-        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white; margin-top: 20px;">🔗 ENVIAR CONVITE</button>
+        <h2 style="font-family:'Orbitron'; color:var(--s); margin-top: 40px;">NETWORK EXPANSION</h2>
+        <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Invite partners to increase your yield.</p>
+        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white;">SEND INVITE LINK</button>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">⚡<br>MINE</div>
-        <div class="nav-item" id="n-store" onclick="showTab('store')">🛒<br>LOJA</div>
-        <div class="nav-item" id="n-friends" onclick="showTab('friends')">🤝<br>AMIGOS</div>
+        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">CORE</div>
+        <div class="nav-item" id="n-store" onclick="showTab('store')">MARKET</div>
+        <div class="nav-item" id="n-friends" onclick="showTab('friends')">NETWORK</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        // Chave única para evitar conflitos
-        const SAVE_KEY = 'EURODASH_CORE_STABLE';
+        const SAVE_KEY = 'EURODASH_V26_FINAL';
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
-        let canSave = false;
+        let ready = false;
 
         const miners = [
-            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
-            { name: "Pocket Miner V2", price: 5.00, gain: 0.00000165, img: "miner2.jpg" },
-            { name: "Pocket Miner V3", price: 15.00, gain: 0.00000495, img: "miner3.jpg" },
-            { name: "Server Rack V4", price: 40.00, gain: 0.00001322, img: "miner4.jpg" },
-            { name: "Quantum Cluster V5", price: 100.00, gain: 0.00003306, img: "miner5.jpg" },
-            { name: "Quantum Cluster V6", price: 250.00, gain: 0.00008264, img: "miner6.jpg" },
-            { name: "Quantum Cluster V7", price: 600.00, gain: 0.00019835, img: "miner7.jpg" }
+            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033 },
+            { name: "Pocket Miner V2", price: 5.00, gain: 0.00000165 },
+            { name: "Pocket Miner V3", price: 15.00, gain: 0.00000495 },
+            { name: "Industrial Rack", price: 50.00, gain: 0.00001850 },
+            { name: "Quantum Node", price: 150.00, gain: 0.00005500 }
         ];
 
-        function forceSave() {
-            if(canSave) {
-                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-            }
-        }
+        const steps = ["SCANNING HARDWARE...", "AUTHORIZING ID...", "SYNCING DATABASE...", "DECRYPTING WALLET...", "ACCESS GRANTED"];
 
-        // SALVAR QUANDO A APP É MINIMIZADA OU FECHADA
-        document.addEventListener('visibilitychange', () => { if(document.hidden) forceSave(); });
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem(SAVE_KEY);
+            if(saved) state = JSON.parse(saved);
+            
+            let p = 0;
+            const iv = setInterval(() => {
+                p += 1;
+                document.getElementById('load-bar').style.width = p + "%";
+                if(p % 20 === 0) document.getElementById('status-msg').innerText = steps[Math.floor(p/21)];
+
+                if(p >= 100) {
+                    clearInterval(iv);
+                    ready = true;
+                    updateUI();
+                    setTimeout(() => {
+                        document.getElementById('loader').style.opacity = "0";
+                        setTimeout(() => document.getElementById('loader').style.display = "none", 1000);
+                    }, 500);
+                }
+            }, 50); // 5 segundos de loading total
+        });
 
         function updateUI() {
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('energy-val').innerText = Math.floor(state.energy);
-            document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
         }
 
-        // CARREGAMENTO CRÍTICO
-        (function initialLoad() {
-            const saved = localStorage.getItem(SAVE_KEY);
-            if(saved) {
-                const data = JSON.parse(saved);
-                state = data;
-                // Cálculo de ganho offline imediato
-                const now = Date.now();
-                const diff = (now - state.lastUpdate) / 1000;
-                if(diff > 0) {
-                    state.balance += state.pps * diff;
-                    state.energy = Math.min(500, state.energy + (diff * 0.33));
-                }
-                state.lastUpdate = now;
-            }
-            canSave = true;
-            updateUI();
-        })();
+        function save() { if(ready) localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
-        // BARRA DE LOADING APENAS VISUAL
-        let prog = 0;
-        const loadIv = setInterval(() => {
-            prog += 10;
-            document.getElementById('load-bar').style.width = prog + "%";
-            if(prog >= 100) {
-                clearInterval(loadIv);
-                document.getElementById('loader').style.opacity = "0";
-                setTimeout(() => document.getElementById('loader').style.display = "none", 500);
-            }
-        }, 30);
+        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(!ready || state.energy < 1) return;
+            state.balance += 0.0005;
+            state.energy -= 1;
+            webapp.HapticFeedback.impactOccurred('medium');
+            updateUI();
+            save();
+        });
+
+        function renderShop() {
+            document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
+                <div class="miner-card">
+                    <div style="font-family:Orbitron; font-size:14px; margin-bottom:5px;">${m.name}</div>
+                    <div style="color:var(--s); font-size:12px; margin-bottom:12px;">LEVEL: ${state.inventory[i] || 0} | COST: €${m.price.toFixed(2)}</div>
+                    <button class="btn-buy" onclick="comprar(${i})">UPGRADE</button>
+                </div>
+            `).join('');
+        }
 
         function comprar(i) {
             if(state.balance >= miners[i].price) {
                 state.balance -= miners[i].price;
                 state.pps += miners[i].gain;
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
-                renderShop();
-                forceSave();
+                renderShop(); save(); updateUI();
+            } else { webapp.showAlert("INSUFFICIENT CREDITS"); }
+        }
+
+        function showTab(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-'+t).classList.add('active');
+            document.getElementById('n-'+t).classList.add('active');
+            if(t === 'store') renderShop();
+        }
+
+        function loop() {
+            if(ready) {
+                const now = Date.now();
+                const diff = (now - state.lastUpdate) / 1000;
+                state.balance += state.pps * diff;
+                if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.4));
+                state.lastUpdate = now;
                 updateUI();
-            } else { webapp.showAlert("Saldo insuficiente!"); }
-        }
-
-        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touches = e.changedTouches.length;
-            for(let i=0; i < touches; i++) {
-                if(state.energy >= 1) {
-                    state.balance += 0.0005;
-                    state.energy -= 1;
-                    webapp.HapticFeedback.impactOccurred('light');
-                }
+                if(Math.random() > 0.98) save(); // Auto-save aleatório para performance
             }
-            updateUI();
-            forceSave(); // Salva a cada clique para segurança máxima
-        });
-
-        function renderShop() {
-            document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
-                <div class="miner-card">
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160'">
-                    <div style="padding:15px;">
-                        <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
-                        <div style="color:var(--s); margin: 5px 0;">CUSTO: €${m.price.toFixed(2)}</div>
-                        <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
-                    </div>
-                </div>
-            `).join('');
+            requestAnimationFrame(loop);
         }
-
-        function showTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('n-' + tab).classList.add('active');
-            if(tab === 'store') renderShop();
-        }
-
-        function updateLoop() {
-            const now = Date.now();
-            const diff = (now - state.lastUpdate) / 1000;
-            state.balance += state.pps * diff;
-            if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.33));
-            state.lastUpdate = now;
-            updateUI();
-            requestAnimationFrame(updateLoop);
-        }
-
-        // AUTO-SAVE PERIÓDICO (CADA 5 SEGUNDOS)
-        setInterval(forceSave, 5000);
 
         function checkDaily() {
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
-                state.balance += 0.05; state.lastDaily = now; forceSave(); updateUI(); webapp.showAlert("Bónus coletado!");
-            } else { webapp.showAlert("Volta amanhã!"); }
+                state.balance += 0.05; state.lastDaily = now; save(); updateUI(); webapp.showAlert("REWARD SECURED: €0.05");
+            } else { webapp.showAlert("REBOOT DAILY SYSTEM IN 24H"); }
         }
 
         function shareLink() {
             const uid = webapp.initDataUnsafe.user?.id || "22250";
-            const link = `https://t.me/EuroDashMinerBot?startapp=${uid}`;
-            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem minerar comigo!`);
+            webapp.openTelegramLink(`https://t.me/share/url?url=https://t.me/EuroDashMinerBot?startapp=${uid}&text=Join the Elite Mining Network!`);
         }
 
-        updateLoop();
-        renderShop();
+        loop();
     </script>
 </body>
 </html>
