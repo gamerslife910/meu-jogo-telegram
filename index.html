@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euro Clicker Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #0088cc, #004466);
+            color: white;
+            text-align: center;
+            font-family: sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #score-container { font-size: 3rem; margin-bottom: 20px; font-weight: bold; }
+        #coin {
+            width: 200px;
+            height: 200px;
+            background: gold;
+            border-radius: 50%;
+            border: 8px solid #b8860b;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        #coin:active { transform: scale(0.95); }
+        .plus-one {
+            position: absolute;
+            color: #adff2f;
+            font-weight: bold;
+            animation: float 0.7s ease-out forwards;
+        }
+        @keyframes float {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="score-container">€ <span id="balance">0</span></div>
+    <div id="coin">💰</div>
+
+    <script>
+        const webapp = window.Telegram.WebApp;
+        webapp.expand(); // Abre o jogo em tela cheia
+
+        let balance = parseInt(localStorage.getItem('euro_balance')) || 0;
+        const balanceEl = document.getElementById('balance');
+        const coin = document.getElementById('coin');
+
+        balanceEl.innerText = balance;
+
+        coin.addEventListener('click', (e) => {
+            balance++;
+            balanceEl.innerText = balance;
+            localStorage.setItem('euro_balance', balance);
+
+            // Efeito visual de +1
+            const clickAnim = document.createElement('div');
+            clickAnim.innerText = "+1";
+            clickAnim.className = 'plus-one';
+            clickAnim.style.left = e.pageX + 'px';
+            clickAnim.style.top = e.pageY + 'px';
+            document.body.appendChild(clickAnim);
+            
+            setTimeout(() => clickAnim.remove(), 700);
+        });
+    </script>
+</body>
+</html>
