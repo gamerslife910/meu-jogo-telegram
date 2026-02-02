@@ -7,102 +7,85 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
+        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; --border: #1a1a1a; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* EFEITO DE MONITOR ANTIGO */
-        body::before {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 10000; background-size: 100% 2px, 3px 100%; pointer-events: none;
-        }
-
-        /* ECRÃ FUTURISTA DE LOADING */
-        #loader { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: radial-gradient(circle, #0a1a14 0%, #050505 100%); 
-            z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: opacity 1s ease-in-out;
-        }
-        
-        .hud-circle {
-            width: 140px; height: 140px; border: 1px solid rgba(0, 255, 157, 0.1);
-            border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 30px;
-        }
-        .hud-circle::before {
-            content: ""; position: absolute; width: 100%; height: 100%;
-            border-top: 4px solid var(--p); border-radius: 50%;
-            animation: spin 2s linear infinite; box-shadow: 0 -5px 15px var(--p);
-        }
-        .hud-inner {
-            width: 60%; height: 60%; border: 2px dashed var(--s);
-            border-radius: 50%; animation: spin-rev 4s linear infinite; opacity: 0.5;
-        }
-
-        .euro-title { font-family: 'Orbitron'; font-size: 22px; letter-spacing: 6px; color: white; margin-bottom: 25px; text-shadow: 0 0 20px var(--p); }
-        
-        .progress-frame { 
-            width: 250px; height: 8px; background: rgba(0,0,0,0.8); 
-            border: 1px solid #333; border-radius: 20px; position: relative; overflow: hidden;
-        }
-        #load-bar { 
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--s), var(--p)); 
-            box-shadow: 0 0 20px var(--p); transition: width 0.4s ease;
-        }
-        .status-msg { font-family: 'Orbitron'; font-size: 10px; color: var(--p); margin-top: 15px; letter-spacing: 1px; }
-
+        /* LOADING FUTURISTA */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, #0a1a14 0%, #050505 100%); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s; }
+        .hud-circle { width: 120px; height: 120px; border: 1px solid rgba(0, 255, 157, 0.1); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .hud-circle::before { content: ""; position: absolute; width: 100%; height: 100%; border-top: 3px solid var(--p); border-radius: 50%; animation: spin 2s linear infinite; }
+        .progress-frame { width: 200px; height: 4px; background: rgba(0,0,0,0.8); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
+        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.4s; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes spin-rev { to { transform: rotate(-360deg); } }
 
-        /* UI PRINCIPAL */
-        .header { background: rgba(0,0,0,0.8); padding: 20px; text-align: center; border-bottom: 1px solid #222; backdrop-filter: blur(10px); }
-        .mini-logo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--p); background: #111; margin-bottom: 5px; }
-        .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--p); }
-        
-        .tab-content { display: none; padding: 20px; height: 60vh; overflow-y: auto; }
+        /* HEADER */
+        .header { background: rgba(0,0,0,0.9); padding: 20px; text-align: center; border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
+        .pph-badge { font-family: 'Orbitron'; font-size: 10px; color: var(--s); letter-spacing: 1px; }
+
+        /* TABS */
+        .tab-content { display: none; padding: 15px; height: 65vh; overflow-y: auto; }
         .tab-content.active { display: block; }
-        
-        #main-clicker { font-size: 120px; cursor: pointer; transition: transform 0.05s; }
-        #main-clicker:active { transform: scale(0.9); }
 
-        .btn-action { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 15px; border-radius: 8px; width: 100%; font-family: 'Orbitron'; text-transform: uppercase; font-size: 12px; }
+        /* LAYOUT DE MINERADORES (ESTILO LISTA) */
+        .miner-row { 
+            background: #0d0d0d; border: 1px solid var(--border); border-radius: 12px; 
+            padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+        }
+        .miner-img-box { 
+            width: 50px; height: 50px; border-radius: 8px; border: 1px solid var(--p); 
+            background: #151515; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .miner-img-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid #222; }
-        .nav-item { padding: 15px 0; color: #444; font-size: 10px; text-align: center; font-family: 'Orbitron'; flex: 1; text-transform: uppercase; }
+        .miner-info { flex-grow: 1; }
+        .miner-name { font-family: 'Orbitron'; font-size: 13px; color: white; margin-bottom: 2px; }
+        .miner-stats { font-size: 11px; color: #666; text-transform: uppercase; }
+        .miner-cost { color: var(--s); font-weight: bold; font-size: 12px; }
+
+        .btn-upgrade { 
+            background: var(--p); color: black; border: none; padding: 8px 12px; 
+            border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+        }
+
+        /* CLICKER PRINCIPAL */
+        #main-clicker { font-size: 120px; cursor: pointer; padding: 40px 0; }
+        .energy-bar-bg { width: 80%; height: 6px; background: #111; border: 1px solid #222; border-radius: 10px; margin: 10px auto; overflow: hidden; }
+        #energy-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff9500, #ffdd00); }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; }
         .nav-item.active { color: var(--p); border-top: 2px solid var(--p); }
-
-        .miner-card { background: #0f0f0f; padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
-        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="hud-circle"><div class="hud-inner"></div></div>
-        <div class="euro-title">EURODASH</div>
+        <div class="hud-circle"></div>
         <div class="progress-frame"><div id="load-bar"></div></div>
-        <div class="status-msg" id="status-msg">CONNECTING TO NODE...</div>
+        <div style="font-family: Orbitron; font-size: 9px; color: var(--p); margin-top: 10px;">SYNCING ELITE NETWORK...</div>
     </div>
 
     <div class="header">
-        <img src="logo.jpg" class="mini-logo" onerror="this.style.display='none'">
+        <div class="pph-badge">AUTO-MINING RATE</div>
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div style="font-size: 11px; color: var(--s); font-family: 'Orbitron';">AUTO-MINING: +<span id="pph">0.0000</span>/H</div>
+        <div class="pph-badge" style="color: #666;">+<span id="pph">0.0000</span> / HOUR</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area" style="padding:40px 0;"><div id="main-clicker">⚡</div></div>
-        <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00; margin-bottom: 15px;">ENERGY CORE: <span id="energy-val">500</span>/500</div>
-        <button onclick="checkDaily()" class="btn-action">CLAIM DAILY REWARD</button>
+        <div id="main-clicker">⚡</div>
+        <div style="font-family: Orbitron; font-size: 11px; color: #ffdd00;">ENERGY: <span id="energy-val">500</span>/500</div>
+        <div class="energy-bar-bg"><div id="energy-fill"></div></div>
+        <button onclick="checkDaily()" style="background:transparent; color:white; border:1px solid #333; padding:10px 20px; border-radius:8px; margin-top:20px; font-family: Orbitron; font-size:10px;">DAILY BONUS</button>
     </div>
 
     <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
     
     <div id="tab-friends" class="tab-content" style="text-align: center;">
-        <h2 style="font-family:'Orbitron'; color:var(--s); margin-top: 40px;">NETWORK EXPANSION</h2>
-        <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Invite partners to increase your yield.</p>
-        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white;">SEND INVITE LINK</button>
+        <h2 style="font-family:'Orbitron'; color:var(--s); margin-top: 50px;">NETWORK</h2>
+        <button onclick="shareLink()" style="background:var(--s); color:white; border:none; padding:15px 30px; border-radius:10px; font-family:Orbitron;">INVITE PARTNERS</button>
     </div>
 
     <div class="nav">
@@ -115,66 +98,54 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'EURODASH_V26_FINAL';
+        const SAVE_KEY = 'EURODASH_STABLE_V27';
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
         let ready = false;
 
         const miners = [
-            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033 },
-            { name: "Pocket Miner V2", price: 5.00, gain: 0.00000165 },
-            { name: "Pocket Miner V3", price: 15.00, gain: 0.00000495 },
-            { name: "Industrial Rack", price: 50.00, gain: 0.00001850 },
-            { name: "Quantum Node", price: 150.00, gain: 0.00005500 }
+            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
+            { name: "Irocket Miner", price: 5.00, gain: 0.00000165, img: "miner2.jpg" },
+            { name: "Doket Miner V1", price: 15.00, gain: 0.00000495, img: "miner3.jpg" },
+            { name: "Industrial Rack", price: 50.00, gain: 0.00001850, img: "miner4.jpg" },
+            { name: "Quantum Node", price: 150.00, gain: 0.00005500, img: "miner5.jpg" }
         ];
-
-        const steps = ["SCANNING HARDWARE...", "AUTHORIZING ID...", "SYNCING DATABASE...", "DECRYPTING WALLET...", "ACCESS GRANTED"];
 
         window.addEventListener('load', () => {
             const saved = localStorage.getItem(SAVE_KEY);
             if(saved) state = JSON.parse(saved);
-            
             let p = 0;
             const iv = setInterval(() => {
-                p += 1;
+                p += 2;
                 document.getElementById('load-bar').style.width = p + "%";
-                if(p % 20 === 0) document.getElementById('status-msg').innerText = steps[Math.floor(p/21)];
-
                 if(p >= 100) {
                     clearInterval(iv);
                     ready = true;
                     updateUI();
-                    setTimeout(() => {
-                        document.getElementById('loader').style.opacity = "0";
-                        setTimeout(() => document.getElementById('loader').style.display = "none", 1000);
-                    }, 500);
+                    setTimeout(() => { document.getElementById('loader').style.display = "none"; }, 500);
                 }
-            }, 50); // 5 segundos de loading total
+            }, 50);
         });
 
         function updateUI() {
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('energy-val').innerText = Math.floor(state.energy);
+            document.getElementById('energy-fill').style.width = (state.energy/500*100) + "%";
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
         }
 
         function save() { if(ready) localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
-        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if(!ready || state.energy < 1) return;
-            state.balance += 0.0005;
-            state.energy -= 1;
-            webapp.HapticFeedback.impactOccurred('medium');
-            updateUI();
-            save();
-        });
-
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
-                <div class="miner-card">
-                    <div style="font-family:Orbitron; font-size:14px; margin-bottom:5px;">${m.name}</div>
-                    <div style="color:var(--s); font-size:12px; margin-bottom:12px;">LEVEL: ${state.inventory[i] || 0} | COST: €${m.price.toFixed(2)}</div>
-                    <button class="btn-buy" onclick="comprar(${i})">UPGRADE</button>
+                <div class="miner-row">
+                    <div class="miner-img-box">
+                        <img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2972/2972185.png'">
+                    </div>
+                    <div class="miner-info">
+                        <div class="miner-name">${m.name}</div>
+                        <div class="miner-stats">LEVEL ${state.inventory[i] || 0} • <span class="miner-cost">€${m.price.toFixed(2)}</span></div>
+                    </div>
+                    <button class="btn-upgrade" onclick="comprar(${i})">UPGRADE</button>
                 </div>
             `).join('');
         }
@@ -185,8 +156,17 @@
                 state.pps += miners[i].gain;
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
                 renderShop(); save(); updateUI();
-            } else { webapp.showAlert("INSUFFICIENT CREDITS"); }
+                webapp.HapticFeedback.impactOccurred('medium');
+            } else { webapp.showAlert("LACK OF FUNDS"); }
         }
+
+        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(!ready || state.energy < 1) return;
+            state.balance += 0.0005; state.energy -= 1;
+            updateUI(); save();
+            webapp.HapticFeedback.impactOccurred('light');
+        });
 
         function showTab(t) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
@@ -195,7 +175,7 @@
             if(t === 'store') renderShop();
         }
 
-        function loop() {
+        setInterval(() => {
             if(ready) {
                 const now = Date.now();
                 const diff = (now - state.lastUpdate) / 1000;
@@ -203,24 +183,20 @@
                 if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.4));
                 state.lastUpdate = now;
                 updateUI();
-                if(Math.random() > 0.98) save(); // Auto-save aleatório para performance
             }
-            requestAnimationFrame(loop);
-        }
+        }, 1000);
 
         function checkDaily() {
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
-                state.balance += 0.05; state.lastDaily = now; save(); updateUI(); webapp.showAlert("REWARD SECURED: €0.05");
-            } else { webapp.showAlert("REBOOT DAILY SYSTEM IN 24H"); }
+                state.balance += 0.05; state.lastDaily = now; save(); updateUI(); webapp.showAlert("REWARD: €0.05");
+            } else { webapp.showAlert("RETRY IN 24H"); }
         }
 
         function shareLink() {
             const uid = webapp.initDataUnsafe.user?.id || "22250";
-            webapp.openTelegramLink(`https://t.me/share/url?url=https://t.me/EuroDashMinerBot?startapp=${uid}&text=Join the Elite Mining Network!`);
+            webapp.openTelegramLink(`https://t.me/share/url?url=https://t.me/EuroDashMinerBot?startapp=${uid}&text=Join the network!`);
         }
-
-        loop();
     </script>
 </body>
 </html>
