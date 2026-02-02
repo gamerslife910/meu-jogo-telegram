@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EuroDash Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
@@ -59,7 +58,6 @@
     
     <div id="tab-friends" class="tab-content" style="text-align: center;">
         <h2 style="font-family:'Orbitron'; color:var(--s);">CONVIDAR AMIGOS</h2>
-        <p style="color: #888;">Expande a tua rede e ganha bónus!</p>
         <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white; margin-top: 20px;">🔗 ENVIAR CONVITE</button>
     </div>
 
@@ -73,7 +71,8 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'eurodash_v20_final';
+        // CHAVE NOVA PARA LIMPAR CACHE
+        const SAVE_KEY = 'eurodash_v21_FORCED_CLEAN';
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
 
         const miners = [
@@ -107,7 +106,7 @@
                     setTimeout(() => document.getElementById('loader').style.display = "none", 500);
                 }, 400);
             }
-        }, 80);
+        }, 60);
 
         function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
@@ -117,8 +116,8 @@
                     <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160'">
                     <div style="padding:15px;">
                         <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
-                        <div style="color:var(--s); margin: 5px 0; font-weight:bold;">PREÇO: €${m.price.toFixed(2)}</div>
-                        <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
+                        <div style="color:var(--s); margin: 5px 0; font-weight:bold;">INVESTIR: €${m.price.toFixed(2)}</div>
+                        <button class="btn-buy" onclick="comprar(${i})">COMPRAR</button>
                     </div>
                 </div>
             `).join('');
@@ -168,7 +167,7 @@
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
                 state.balance += 0.05; state.lastDaily = now; saveGame(); updateUI(); webapp.showAlert("Bónus coletado!");
-            } else { webapp.showAlert("Volta amanhã para mais!"); }
+            } else { webapp.showAlert("Volta amanhã!"); }
         }
 
         function shareLink() {
