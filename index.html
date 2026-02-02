@@ -1,37 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-    <title>Teste EuroDash</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EuroDash Miner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .card { background: #121212; border: 1px solid #00ff9d; border-radius: 20px; padding: 30px; margin-top: 50px; box-shadow: 0 0 20px rgba(0,255,157,0.2); }
+        h1 { font-family: 'Orbitron', sans-serif; color: #00ff9d; font-size: 24px; }
+        #balance { font-size: 40px; margin: 20px 0; color: #fff; font-family: 'Orbitron', sans-serif; }
+        .btn { width: 100%; padding: 20px; border-radius: 15px; border: none; font-weight: bold; font-size: 18px; cursor: pointer; margin-bottom: 15px; }
+        .btn-mine { background: #00ff9d; color: #000; }
+        .btn-boost { background: #00b0ff; color: #fff; }
+    </style>
 </head>
 <body>
-    <h1>TESTE DE FUNCIONAMENTO</h1>
-    
-    <p>Saldo: <span id="valor">0</span></p>
-    
-    <button style="padding: 20px;" onclick="clicar()">1. TESTAR CLIQUE (SOMAR)</button>
-    
-    <br><br>
-    
-    <button style="padding: 20px; background: orange;" onclick="anuncio()">2. TESTAR ANÚNCIO (ADSGRAM)</button>
+
+    <div class="card">
+        <h1>EURODASH MINER</h1>
+        <div id="balance">€ 0.00</div>
+        
+        <button class="btn btn-mine" onclick="mine()">⚡ MINERAR (CLICK)</button>
+        <button class="btn btn-boost" onclick="showAds()">📺 BOOST (+€0.10)</button>
+    </div>
 
     <script>
-        // Teste de Clique
-        function clicar() {
-            let num = parseInt(document.getElementById('valor').innerText);
-            document.getElementById('valor').innerText = num + 1;
-            console.log("Clicou com sucesso");
+        const webapp = window.Telegram.WebApp;
+        webapp.expand();
+
+        let saldo = parseFloat(localStorage.getItem('euro_balance')) || 0;
+        const balDisplay = document.getElementById('balance');
+        
+        function updateDisplay() {
+            balDisplay.innerText = "€ " + saldo.toFixed(2);
+            localStorage.setItem('euro_balance', saldo);
         }
 
-        // Teste de Anúncio
+        function mine() {
+            saldo += 0.01;
+            updateDisplay();
+            if (window.Telegram.WebApp.HapticFeedback) {
+                webapp.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        // ADSGRAM CONFIG
         const AdController = window.Adsgram.init({ blockId: "22244" });
-        function anuncio() {
+
+        function showAds() {
             AdController.show().then(() => {
-                alert("Anúncio Funcionou!");
+                saldo += 0.10;
+                updateDisplay();
+                webapp.showAlert("BOOST RECEBIDO! +€0.10");
             }).catch(() => {
-                alert("Erro no anúncio");
+                webapp.showAlert("Anúncio não disponível no momento.");
             });
         }
+
+        updateDisplay();
     </script>
 </body>
 </html>
