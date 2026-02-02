@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EURODASH V14</title>
+    <title>EURODASH V15 FINAL</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; overflow-x: hidden; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; overflow-x: hidden; user-select: none; }
         .lang-bar { display: flex; justify-content: center; gap: 8px; padding: 15px; background: #111; border-bottom: 2px solid #0f9; }
         .t-btn { background: #222; color: #0f9; border: 1px solid #0f9; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
         .t-btn.active { background: #0f9; color: #000; }
         #balance { font-size: 40px; margin: 20px 0; font-weight: bold; color: #0f9; text-shadow: 0 0 10px rgba(0,255,153,0.3); }
         .main-img { width: 170px; height: 170px; border-radius: 50%; border: 4px solid #0f9; box-shadow: 0 0 15px #0f9; cursor: pointer; transition: transform 0.1s; }
-        .main-img:active { transform: scale(0.92); }
+        .main-img:active { transform: scale(0.95); }
         .tab { display: none; padding: 20px; padding-bottom: 120px; height: 75vh; overflow-y: auto; }
         .item { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 12px; border-radius: 12px; display: flex; align-items: center; margin-bottom: 12px; gap: 15px; }
         .m-img { width: 65px; height: 65px; border-radius: 12px; border: 1px solid #0f9; object-fit: cover; background: #111; }
@@ -60,14 +60,15 @@
             ru: { m: "РЫНОК", b: "КУПИТЬ", names: ["Микро Узел","Blade Стойка","Турбо Сервер","Кибер Станция","Квантовый Риг","Нейро Хаб","Ядро Титана"] }
         };
 
-        firebase.initializeApp({
+        const firebaseConfig = {
             apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
             authDomain: "eurodash-e466c.firebaseapp.com",
             databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "eurodash-e466c",
             appId: "1:99813963051:web:fe96761e990aee01ec016e"
-        });
+        };
         
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const id = tg.initDataUnsafe.user?.id || 22250;
         
@@ -115,7 +116,7 @@
                         <b style="color:#0f9">${txt[L].names[i]}</b><br>
                         <small>Lvl: ${u.inv[i]||0} | +${(m.g*3600).toFixed(4)}/h</small>
                     </div>
-                    <button onclick="buy(${i})" style="background:#0f9; border:none; padding:10px; border-radius:8px; font-weight:bold; color:#000;">
+                    <button onclick="buy(${i})" style="background:#0f9; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; color:#000;">
                         €${m.p}
                     </button>
                 </div>
@@ -146,11 +147,7 @@
             if(t === 's') rd();
         }
 
-        setInterval(() => { 
-            u.bal += u.pps; 
-            if(u.eng < 500) u.eng += 0.5; 
-            up(); 
-        }, 1000);
+        setInterval(() => { u.bal += u.pps; if(u.eng < 500) u.eng += 0.5; up(); }, 1000);
         setInterval(() => db.ref('users/'+id).set(u), 5000);
     </script>
 </body>
