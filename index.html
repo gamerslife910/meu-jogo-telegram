@@ -3,105 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EuroDash Elite</title>
+    <title>EuroDash Elite Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #161616; }
+        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 90px; }
         
-        /* Header */
-        .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 30px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
-        .balance-label { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.8rem; color: var(--p); text-shadow: 0 0 15px rgba(0,255,157,0.4); margin: 5px 0; }
-        
-        /* Navigation */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 100; }
-        .nav-item { color: #555; font-size: 12px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--p); transform: translateY(-3px); }
-        .nav-item i { display: block; font-size: 20px; margin-bottom: 4px; }
+        .header { 
+            background: linear-gradient(180deg, rgba(0,255,157,0.1) 0%, transparent 100%); 
+            padding: 25px; text-align: center; border-bottom: 1px solid #222; 
+            position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); 
+        }
+        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
+        .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
-        /* Tabs Content */
-        .tab-content { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+        .tab-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Cards & Buttons */
-        .card { background: var(--card); border-radius: 16px; padding: 20px; border: 1px solid #222; margin-bottom: 15px; position: relative; overflow: hidden; }
-        .btn-boost { background: var(--s); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; font-family: 'Orbitron'; font-size: 14px; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,176,255,0.3); }
+        /* Miner Cards */
+        .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .miner-img { width: 100%; height: 160px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
+        .miner-body { padding: 18px; }
+        .miner-title { font-family: 'Orbitron'; font-size: 18px; color: #fff; margin: 0; }
+        .miner-price { color: var(--s); font-weight: bold; font-size: 15px; display: block; margin-top: 5px; }
         
-        /* Clicker Area */
-        .click-zone { text-align: center; padding: 40px 0; }
-        #main-clicker { font-size: 120px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px rgba(0,255,157,0.2)); user-select: none; -webkit-tap-highlight-color: transparent; }
-        #main-clicker:active { transform: scale(0.85); }
+        /* Profit Table */
+        .profit-table { width: 100%; margin: 15px 0; border-collapse: collapse; font-size: 12px; text-align: center; background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .profit-table th { color: #888; font-weight: normal; padding: 8px 0; font-size: 10px; text-transform: uppercase; }
+        .profit-table td { color: var(--p); font-weight: bold; font-family: 'Orbitron'; padding-bottom: 8px; }
 
-        /* Store Items */
-        .shop-item { display: flex; justify-content: space-between; align-items: center; }
-        .shop-info h4 { margin: 0; color: var(--p); font-size: 18px; }
-        .shop-info p { margin: 5px 0 0; color: #888; font-size: 13px; }
-        .buy-btn { background: #222; color: var(--p); border: 1px solid var(--p); padding: 8px 15px; border-radius: 8px; font-weight: bold; font-family: 'Orbitron'; }
-        
-        /* Rank/Friends */
-        .list-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
-        .rank-num { color: var(--p); font-weight: bold; margin-right: 10px; }
+        .buy-btn { width: 100%; background: var(--p); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s; }
+        .buy-btn:active { transform: scale(0.95); background: #fff; }
+
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; backdrop-filter: blur(10px); }
+        .nav-item { color: #555; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item.active { color: var(--p); }
+
+        #main-clicker { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; margin: 40px 0; display: inline-block; }
+        #main-clicker:active { transform: scale(0.8); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="balance-label">Network Assets</div>
+        <div style="font-size: 11px; color: #888; letter-spacing: 1px;">TOTAL ASSETS</div>
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div style="color: var(--p); font-size: 14px;">+ <span id="pps">0.00001</span> €/s</div>
+        <span class="pps-badge">LUCRO: +<span id="pps">0.00001</span>/s</span>
     </div>
 
-    <div id="tab-mine" class="tab-content active">
-        <div class="click-zone">
-            <div id="main-clicker">⚡</div>
-        </div>
-        <button class="btn-boost" onclick="verAnuncio()">📺 BOOST AD (+€0.10)</button>
-        <div class="card" style="margin-top: 20px; text-align: center; border-color: #333;">
-            <p style="margin:0; color: #888;">Dica: Compra Rigs na Store para ganhar dinheiro enquanto dormes!</p>
-        </div>
+    <div id="tab-mine" class="tab-content active" style="text-align: center;">
+        <div id="main-clicker">⚡</div>
+        <button onclick="verAnuncio()" style="background:var(--s); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; font-family:'Orbitron'; box-shadow: 0 0 20px rgba(0,176,255,0.3);">📺 VIDEO BOOST (+€0.10)</button>
     </div>
 
     <div id="tab-store" class="tab-content">
-        <h2 style="font-family: 'Orbitron'; color: var(--p);">HARDWARE</h2>
-        <div class="card shop-item">
-            <div class="shop-info">
-                <h4>Dash Rig V1</h4>
-                <p>+ €0.00005/s de lucro</p>
-                <p style="color: var(--s);">Preço: €5.00</p>
-            </div>
-            <button class="buy-btn" onclick="comprarUpgrade(5, 0.00005)">BUY</button>
-        </div>
-        <div class="card shop-item">
-            <div class="shop-info">
-                <h4>Dash Turbo ASIC</h4>
-                <p>+ €0.00020/s de lucro</p>
-                <p style="color: var(--s);">Preço: €20.00</p>
-            </div>
-            <button class="buy-btn" onclick="comprarUpgrade(20, 0.00020)">BUY</button>
-        </div>
-    </div>
-
-    <div id="tab-social" class="tab-content">
-        <h2 style="font-family: 'Orbitron'; color: var(--p);">RANKING GLOBAL</h2>
-        <div class="card">
-            <div class="list-row"><span class="rank-num">#1</span> RussianMafia76 <span>€ 142.50</span></div>
-            <div class="list-row"><span class="rank-num">#2</span> DashMaster <span>€ 89.20</span></div>
-            <div class="list-row"><span class="rank-num">#3</span> CryptoKing <span>€ 45.12</span></div>
-            <div class="list-row"><span class="rank-num">#4</span> (Tu) <span>€ <span id="my-rank-val">0.00</span></span></div>
-        </div>
-        
-        <h2 style="font-family: 'Orbitron'; color: var(--s); margin-top: 30px;">FRIENDS</h2>
-        <button class="btn-boost" style="background: #222; border: 1px solid var(--s);" onclick="convidar()">INVITE FRIENDS</button>
+        <h3 style="font-family:'Orbitron'; color:var(--p); margin-bottom:20px; text-align: center;">HARDWARE STORE</h3>
+        <div id="shop-list"></div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ DASH</div>
         <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 STORE</div>
-        <div class="nav-item" id="nav-social" onclick="showTab('social')">🏆 RANK</div>
     </div>
 
     <script>
@@ -109,38 +74,61 @@
         webapp.expand();
 
         let state = JSON.parse(localStorage.getItem('eurodash_save')) || {
-            balance: 0,
-            pps: 0.00001,
-            lastUpdate: Date.now()
+            balance: 0, pps: 0.00001, lastUpdate: Date.now()
         };
 
-        function save() {
-            localStorage.setItem('eurodash_save', JSON.stringify(state));
-        }
+        // Configuração dos Mineradores com Previsão
+        const miners = [
+            { name: "Pocket Miner V1", price: 1, gain: 0.00002, img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" },
+            { name: "Home Rig", price: 5, gain: 0.00012, img: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400" },
+            { name: "Office Miner", price: 10, gain: 0.00025, img: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400" },
+            { name: "Industrial Box", price: 15, gain: 0.00040, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc4b?w=400" },
+            { name: "Turbo ASIC", price: 20, gain: 0.00055, img: "https://images.unsplash.com/photo-1624321834499-e46335537563?w=400" },
+            { name: "Server Rack", price: 40, gain: 0.00120, img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400" },
+            { name: "Quantum Cluster", price: 100, gain: 0.00350, img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" }
+        ];
 
-        // Loop de Mineração Automática
+        function renderShop() {
+            const container = document.getElementById('shop-list');
+            container.innerHTML = miners.map(m => {
+                const day = (m.gain * 86400).toFixed(2);
+                const week = (m.gain * 604800).toFixed(2);
+                const month = (m.gain * 2592000).toFixed(2);
+                return `
+                    <div class="miner-card">
+                        <img src="${m.img}" class="miner-img">
+                        <div class="miner-body">
+                            <h4 class="miner-title">${m.name}</h4>
+                            <span class="miner-price">Investimento: € ${m.price.toFixed(2)}</span>
+                            <table class="profit-table">
+                                <tr><th>24 Horas</th><th>7 Dias</th><th>30 Dias</th></tr>
+                                <tr><td>€ ${day}</td><td>€ ${week}</td><td>€ ${month}</td></tr>
+                            </table>
+                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">ADQUIRIR AGORA</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        renderShop();
+
         function updateLoop() {
             const now = Date.now();
             const diff = (now - state.lastUpdate) / 1000;
             state.balance += state.pps * diff;
             state.lastUpdate = now;
-            
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('pps').innerText = state.pps.toFixed(5);
-            document.getElementById('my-rank-val').innerText = state.balance.toFixed(2);
-            
-            save();
+            localStorage.setItem('eurodash_save', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
         updateLoop();
 
-        // Clique Manual
-        document.getElementById('main-clicker').addEventListener('click', () => {
+        document.getElementById('main-clicker').onclick = () => {
             state.balance += 0.00050;
             webapp.HapticFeedback.impactOccurred('light');
-        });
+        };
 
-        // Troca de Abas
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -149,32 +137,25 @@
             webapp.HapticFeedback.selectionChanged();
         }
 
-        // Compra de Upgrades
-        function comprarUpgrade(preco, ganho) {
+        function comprar(preco, ganho) {
             if(state.balance >= preco) {
                 state.balance -= preco;
                 state.pps += ganho;
-                webapp.showAlert("UPGRADE CONCLUÍDO! O teu lucro passivo aumentou.");
+                webapp.showAlert("SISTEMA ATIVADO! O teu hardware já está a minerar.");
             } else {
-                webapp.showAlert("Saldo insuficiente em Euros.");
+                webapp.showAlert("Saldo insuficiente. Continua a clicar no raio!");
             }
         }
 
-        // Adsgram
         const AdController = window.Adsgram.init({ blockId: "22244" });
         function verAnuncio() {
-            alert("A carregar anúncio de Boost...");
+            alert("A carregar vídeo de recompensa...");
             AdController.show().then(() => {
                 state.balance += 0.10;
-                webapp.showAlert("BOOST ATIVO! +€0.10 adicionados.");
+                webapp.showAlert("BOOST! +€0.10 creditados.");
             }).catch(() => {
-                webapp.showAlert("O anúncio ainda não está pronto ou o ID está em validação.");
+                webapp.showAlert("O anúncio ainda não está pronto para o teu ID (Created).");
             });
-        }
-
-        function convidar() {
-            const link = "https://t.me/EuroDashMinerBot"; // Muda para o teu bot real
-            webapp.openTelegramLink(`https://t.me/share/url?url=${link}&text=Vem%20minerar%20Euros%20comigo!`);
         }
     </script>
 </body>
