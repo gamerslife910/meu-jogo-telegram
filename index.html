@@ -7,63 +7,55 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    
     <style>
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: manipulation; }
-        
         .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
         .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; }
         .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 4px 12px; border-radius: 50px; font-size: 11px; border: 1px solid rgba(0,255,157,0.3); }
-
-        .tab-content { display: none; padding: 20px 15px; height: 70vh; overflow-y: auto; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        #click-area { text-align: center; padding: 40px 0; position: relative; min-height: 200px; }
-        #main-clicker { font-size: 130px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: transform 0.05s; position: relative; z-index: 999; }
-        #main-clicker:active { transform: scale(0.9); }
         
-        .particle { position: absolute; color: var(--p); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.7s forwards; z-index: 1000; }
-        @keyframes floatUp { to { opacity: 0; transform: translateY(-100px); } }
+        /* BARRA DE ENERGIA */
+        .energy-container { width: 80%; margin: 10px auto; background: #222; height: 12px; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        #energy-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #ff9d00, #ffeb3b); transition: width 0.2s; }
+        .energy-text { font-family: 'Orbitron'; font-size: 12px; color: #ffeb3b; margin-top: 5px; }
 
+        .tab-content { display: none; padding: 20px 15px; height: 65vh; overflow-y: auto; }
+        .tab-content.active { display: block; }
+        #click-area { text-align: center; padding: 20px 0; position: relative; }
+        #main-clicker { font-size: 120px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: transform 0.05s; z-index: 999; }
+        #main-clicker.disabled { filter: grayscale(1) opacity(0.5); cursor: not-allowed; transform: scale(0.9) !important; }
+        
         .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 2000; }
         .nav-item { color: #555; font-size: 10px; text-align: center; cursor: pointer; font-family: 'Orbitron'; flex: 1; }
         .nav-item.active { color: var(--p); }
-
-        .miner-card { background: var(--card); border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; overflow: hidden; }
-        .miner-img { width: 100%; height: 160px; object-fit: cover; border-bottom: 1px solid var(--p); }
-        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; cursor: pointer; }
-        
+        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; font-family: 'Orbitron'; cursor: pointer; border-radius: 10px; }
         .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; }
     </style>
 </head>
 <body>
-
     <div class="header">
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
         <div class="pps-badge">LUCRO/H: +<span id="pph">0.0000</span> €</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area"><div id="main-clicker">⚡</div></div>
+        <div id="click-area">
+            <div id="main-clicker">⚡</div>
+        </div>
+        
+        <div class="energy-container"><div id="energy-bar"></div></div>
+        <div class="energy-text">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
+
         <div style="margin-top: 20px;">
             <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
             <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 BÓNUS DIÁRIO</button>
         </div>
     </div>
 
-    <div id="tab-store" class="tab-content">
-        <div id="shop-list"></div>
-    </div>
-
+    <div id="tab-store" class="tab-content"><div id="shop-list"></div></div>
     <div id="tab-friends" class="tab-content" style="text-align: center;">
         <h2 style="font-family:'Orbitron'; color:var(--s);">AMIGOS</h2>
-        <p>Ganha 10% do valor das compras dos teus amigos!</p>
-        <div style="background:#111; padding:25px; border-radius:15px; border:1px dashed var(--s); margin:20px 0;">
-            <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white;">🔗 CONVIDAR AMIGOS</button>
-        </div>
-        <p style="font-size: 11px; color: #555;">O teu ID Único: <span id="my-id" style="color:var(--p);">---</span></p>
+        <button onclick="shareLink()" class="btn-buy" style="background:var(--s); color:white; margin-top:20px;">🔗 CONVIDAR</button>
     </div>
 
     <div class="nav">
@@ -76,30 +68,23 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        let state = JSON.parse(localStorage.getItem('eurodash_v7')) || {
-            balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0
+        let state = JSON.parse(localStorage.getItem('eurodash_v9')) || {
+            balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], 
+            lastDaily: 0, energy: 500
         };
 
         const miners = [
-            { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "miner1.jpg" },
-            { name: "Pocket Miner V2", price: 5, gain: 0.00000165, img: "miner2.jpg" },
-            { name: "Pocket Miner V3", price: 15, gain: 0.00000495, img: "miner3.jpg" },
-            { name: "Server Rack V4", price: 40, gain: 0.00001322, img: "miner4.jpg" },
-            { name: "Quantum Cluster V5", price: 100, gain: 0.00003306, img: "miner5.jpg" },
-            { name: "Quantum Cluster V6", price: 250, gain: 0.00008264, img: "miner6.jpg" },
-            { name: "Quantum Cluster V7", price: 600, gain: 0.00019835, img: "miner7.jpg" }
+            { name: "Pocket Miner V1", price: 1.00, gain: 0.00000033 },
+            { name: "Pocket Miner V2", price: 5.00, gain: 0.00000165 },
+            { name: "Pocket Miner V3", price: 15.00, gain: 0.00000495 }
         ];
 
         function renderShop() {
-            const container = document.getElementById('shop-list');
-            container.innerHTML = miners.map((m, i) => `
-                <div class="miner-card">
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x160?text=Hardware'">
-                    <div style="padding:15px;">
-                        <div style="font-family:Orbitron; font-size:16px;">${m.name} [x${state.inventory[i]}]</div>
-                        <div style="color:var(--s); margin-bottom:10px;">Preço: €${m.price}</div>
-                        <button class="btn-buy" onclick="comprar(${i})">COMPRAR</button>
-                    </div>
+            document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
+                <div style="background:#111; padding:15px; border-radius:15px; margin-bottom:15px; border:1px solid #222;">
+                    <div style="font-family:Orbitron;">${m.name} [x${state.inventory[i] || 0}]</div>
+                    <div style="color:var(--s);">Custo: €${m.price.toFixed(2)}</div>
+                    <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
                 </div>
             `).join('');
         }
@@ -108,32 +93,39 @@
             if(state.balance >= miners[i].price) {
                 state.balance -= miners[i].price;
                 state.pps += miners[i].gain;
-                state.inventory[i]++;
+                state.inventory[i] = (state.inventory[i] || 0) + 1;
                 renderShop();
                 webapp.HapticFeedback.notificationOccurred('success');
             } else { webapp.showAlert("Saldo insuficiente!"); }
         }
 
-        // CLIQUE CORRIGIDO
-        document.getElementById('main-clicker').addEventListener('click', (e) => {
-            state.balance += 0.0005;
-            document.getElementById('balance').innerText = state.balance.toFixed(5);
-            webapp.HapticFeedback.impactOccurred('medium');
-            
-            const p = document.createElement('div');
-            p.className = 'particle'; p.innerText = '+€0.0005';
-            p.style.left = (e.pageX || e.touches[0].pageX) + 'px'; 
-            p.style.top = (e.pageY || e.touches[0].pageY) + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 700);
-        });
+        // SISTEMA DE CLIQUE COM ENERGIA
+        document.getElementById('main-clicker').onclick = function() {
+            if(state.energy >= 1) {
+                state.balance += 0.0005;
+                state.energy -= 1;
+                updateUI();
+                webapp.HapticFeedback.impactOccurred('medium');
+            } else {
+                webapp.HapticFeedback.notificationOccurred('error');
+                webapp.showAlert("Sem energia! Espera um pouco...");
+            }
+        };
 
-        // LINK CONFIGURADO COM O TEU USERNAME: Eurodash_bot
+        function updateUI() {
+            document.getElementById('balance').innerText = state.balance.toFixed(5);
+            document.getElementById('energy-val').innerText = Math.floor(state.energy);
+            document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
+            
+            const clicker = document.getElementById('main-clicker');
+            if(state.energy < 1) clicker.classList.add('disabled');
+            else clicker.classList.remove('disabled');
+        }
+
         function shareLink() {
             const uid = webapp.initDataUnsafe.user?.id || "123";
-            const botUser = 'Eurodash_bot'; 
-            const link = `https://t.me/${botUser}/play?startapp=${uid}`;
-            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem ganhar Euros comigo no EuroDash! ⚡`);
+            const link = `https://t.me/EuroDashMinerBot?startapp=${uid}`;
+            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Vem minerar!`);
         }
 
         function showTab(tab) {
@@ -142,31 +134,31 @@
             document.getElementById('tab-' + tab).classList.add('active');
             document.getElementById('nav-' + tab).classList.add('active');
             if(tab === 'store') renderShop();
-            if(tab === 'friends') document.getElementById('my-id').innerText = webapp.initDataUnsafe.user?.id || "ID Pendente";
         }
 
+        // LOOP DE RECARGA E ATUALIZAÇÃO
         function updateLoop() {
             const now = Date.now();
             const diff = (now - state.lastUpdate) / 1000;
+            
+            // Ganho passivo
             state.balance += state.pps * diff;
+            
+            // Recarga de energia (1 ponto a cada 3 segundos)
+            if(state.energy < 500) {
+                state.energy = Math.min(500, state.energy + (diff * 0.33));
+            }
+
             state.lastUpdate = now;
-            document.getElementById('balance').innerText = state.balance.toFixed(5);
+            updateUI();
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
-            localStorage.setItem('eurodash_v7', JSON.stringify(state));
+            localStorage.setItem('eurodash_v9', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
 
         const AdController = window.Adsgram.init({ blockId: "22250" });
         function verAnuncio() {
-            AdController.show().then(() => { state.balance += 0.10; webapp.showAlert("Recebeste €0.10!"); })
-            .catch(() => webapp.showAlert("Vê o vídeo mais tarde."));
-        }
-
-        function checkDaily() {
-            const now = Date.now();
-            if (now - state.lastDaily > 86400000) {
-                state.balance += 0.05; state.lastDaily = now; webapp.showAlert("Bónus coletado!");
-            } else { webapp.showAlert("Já coletaste hoje."); }
+            AdController.show().then(() => { state.balance += 0.10; });
         }
 
         updateLoop();
