@@ -12,104 +12,103 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; }
         
-        /* SPLASH SCREEN */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; transition: 0.8s ease-in-out;
-        }
-        .splash-logo { width: 180px; height: 180px; border-radius: 50%; border: 2px solid var(--p); box-shadow: 0 0 40px var(--p); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); filter: brightness(0.8); } 50% { transform: scale(1.05); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(0.8); } }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .splash-logo { width: 160px; height: 160px; border-radius: 50%; border: 2px solid var(--p); box-shadow: 0 0 40px var(--p); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* HEADER COM LOGO */
-        .header { 
-            background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); 
-            padding: 15px; 
-            text-align: center; 
-            border-bottom: 1px solid #222; 
-            position: sticky; top: 0; z-index: 100; 
-            backdrop-filter: blur(15px); 
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .mini-logo { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--p); margin-bottom: 5px; box-shadow: 0 0 10px var(--p); }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.1rem; color: var(--p); margin: 2px 0; text-shadow: 0 0 15px rgba(0,255,157,0.4); }
-        .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,255,157,0.3); }
+        .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); display: flex; flex-direction: column; align-items: center; }
+        .mini-logo { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--p); margin-bottom: 5px; }
+        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--p); margin: 2px 0; }
+        .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: bold; border: 1px solid rgba(0,255,157,0.3); }
 
-        /* CONTENT TABS */
-        .tab-content { display: none; padding: 20px 15px; height: 72vh; overflow-y: auto; animation: fadeIn 0.4s; }
+        .tab-content { display: none; padding: 20px 15px; height: 70vh; overflow-y: auto; animation: fadeIn 0.4s; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CARDS */
-        .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .miner-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid var(--p); }
-        .owned-badge { position: absolute; top: 12px; right: 12px; background: var(--p); color: black; padding: 2px 14px; border-radius: 20px; font-weight: bold; font-family: 'Orbitron'; font-size: 13px; box-shadow: 0 0 15px var(--p); z-index: 2; }
+        .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; position: relative; }
+        .miner-img { width: 100%; height: 180px; object-fit: cover; border-bottom: 2px solid var(--p); }
+        .owned-badge { position: absolute; top: 10px; right: 10px; background: var(--p); color: black; padding: 2px 10px; border-radius: 20px; font-weight: bold; font-family: 'Orbitron'; font-size: 11px; z-index: 2; }
         
-        /* CLICKER */
-        #click-area { text-align: center; padding: 20px 0; position: relative; }
-        #main-clicker { font-size: 120px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: 0.1s; }
-        #main-clicker:active { transform: scale(0.85); }
+        #main-clicker { font-size: 110px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: 0.1s; margin-top: 20px; }
+        .particle { position: absolute; color: var(--p); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.8s forwards; }
+        @keyframes floatUp { to { opacity: 0; transform: translateY(-120px); } }
+
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.98); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { color: #555; font-size: 9px; text-align: center; cursor: pointer; font-family: 'Orbitron'; }
+        .nav-item.active { color: var(--p); }
+
+        .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 14px; border-radius: 12px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; font-size: 11px; }
+        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; }
         
-        .particle { position: absolute; color: var(--p); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 10; }
-        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130px); } }
-
-        /* MENU */
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95); display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #222; z-index: 1000; }
-        .nav-item { color: #555; font-size: 11px; text-align: center; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; }
-        .nav-item.active { color: var(--p); text-shadow: 0 0 10px var(--p); }
-
-        .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 15px; border-radius: 14px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; cursor: pointer; font-size: 12px; }
-        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s; }
+        /* Estilo Referrals */
+        .ref-box { background: rgba(0,176,255,0.05); border: 1px dashed var(--s); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <img src="logo.jpg" class="splash-logo" onerror="this.src='https://via.placeholder.com/180?text=EURODASH'">
-        <h2 style="font-family: 'Orbitron'; color: var(--p); margin-top: 25px; letter-spacing: 5px; font-size: 16px;">SISTEMA INICIADO</h2>
+        <img src="logo.jpg" class="splash-logo" onerror="this.src='https://via.placeholder.com/150'">
+        <h2 style="font-family: 'Orbitron'; color: var(--p); margin-top: 20px; letter-spacing: 3px; font-size: 14px;">A LIGAR À REDE...</h2>
     </div>
 
     <div class="header">
         <img src="logo.jpg" class="mini-logo" onerror="this.style.display='none'">
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div class="pps-badge"> RENDIMENTO/H: +<span id="pph">0.0000</span> €</div>
+        <div class="pps-badge">LUCRO/H: +<span id="pph">0.0000</span> €</div>
     </div>
 
-    <div id="tab-mine" class="tab-content active">
-        <div id="click-area">
-            <div id="main-clicker">⚡</div>
-        </div>
-        <div style="padding-top: 10px; max-width: 320px; margin: 0 auto;">
-            <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
-            <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 BÓNUS DIÁRIO</button>
-        </div>
+    <div id="tab-mine" class="tab-content active" style="text-align: center;">
+        <div id="click-area"><div id="main-clicker">⚡</div></div>
+        <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
+        <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 BÓNUS DIÁRIO</button>
     </div>
 
     <div id="tab-store" class="tab-content">
         <div id="shop-list"></div>
     </div>
 
+    <div id="tab-friends" class="tab-content">
+        <h3 style="font-family:'Orbitron'; color:var(--s); text-align:center;">SISTEMA DE AFILIADOS</h3>
+        <div class="ref-box">
+            <p style="font-size: 14px; color: #ccc;">Convida amigos e ganha <b style="color:var(--p);">10%</b> de comissão sobre todas as compras deles!</p>
+            <button onclick="shareLink()" class="btn-action" style="background:var(--s); color:black; border:none; font-weight:bold;">🔗 CONVIDAR AMIGOS</button>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #666;">
+            O teu ID de minerador: <br><span id="my-id" style="color:var(--p);">---</span>
+        </div>
+    </div>
+
     <div class="nav">
-        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINERAR</div>
-        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 MERCADO</div>
+        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINE</div>
+        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 LOJA</div>
+        <div class="nav-item" id="nav-friends" onclick="showTab('friends')">🤝 AMIGOS</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
-        webapp.ready();
 
-        setTimeout(() => {
-            const sp = document.getElementById('splash');
-            sp.style.opacity = '0';
-            setTimeout(() => sp.style.display = 'none', 800);
-        }, 2500);
+        setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 2500);
 
-        let state = JSON.parse(localStorage.getItem('eurodash_pro_v5')) || {
+        // Estado inicial
+        let state = JSON.parse(localStorage.getItem('eurodash_pro_v6')) || {
             balance: 0, pps: 0, lastUpdate: Date.now(),
             inventory: [0, 0, 0, 0, 0, 0, 0],
-            lastDaily: 0
+            lastDaily: 0,
+            referredBy: null
         };
+
+        // Gerar ID único se não existir
+        const userId = webapp.initDataUnsafe.user?.id || Math.floor(Math.random() * 1000000);
+        document.getElementById('my-id').innerText = userId;
+
+        // Verificar se entrou por link de convite
+        const params = new URLSearchParams(window.location.search);
+        const refId = params.get('tgWebAppStartParam');
+        if (refId && !state.referredBy && refId != userId) {
+            state.referredBy = refId;
+            webapp.showAlert("Bem-vindo! Entraste pelo convite do minerador " + refId);
+        }
 
         const miners = [
             { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "miner1.jpg" },
@@ -125,11 +124,11 @@
             const container = document.getElementById('shop-list');
             container.innerHTML = miners.map((m, i) => `
                 <div class="miner-card">
-                    ${state.inventory[i] > 0 ? `<div class="owned-badge">POSSUÍDOS: ${state.inventory[i]}</div>` : ''}
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x200?text=Hardware+Offline'">
-                    <div style="padding:18px;">
-                        <div style="font-family:Orbitron; font-size:18px; margin-bottom:5px; color:#fff;">${m.name}</div>
-                        <div style="color:var(--s); font-size:13px; margin-bottom:15px; font-weight:bold; letter-spacing:1px;">CUSTO: €${m.price.toFixed(2)}</div>
+                    ${state.inventory[i] > 0 ? `<div class="owned-badge">x${state.inventory[i]}</div>` : ''}
+                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x180'">
+                    <div style="padding:15px;">
+                        <div style="font-family:Orbitron; font-size:16px;">${m.name}</div>
+                        <div style="color:var(--s); font-size:12px; margin-bottom:10px; font-weight:bold;">PREÇO: €${m.price.toFixed(2)}</div>
                         <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
                     </div>
                 </div>
@@ -141,17 +140,30 @@
                 state.balance -= miners[i].price;
                 state.pps += miners[i].gain;
                 state.inventory[i]++;
+                
+                // Simulação de comissão: No mundo real precisarias de servidor, 
+                // aqui apenas mostramos que o sistema de referral está ativo.
+                if(state.referredBy) {
+                    console.log("Comissão de 10% enviada para o padrinho: " + state.referredBy);
+                }
+
                 renderShop();
                 webapp.HapticFeedback.notificationOccurred('success');
             } else { webapp.showAlert("Saldo insuficiente."); }
+        }
+
+        function shareLink() {
+            const botUser = webapp.initDataUnsafe.receiver?.username || "EuroDashBot"; // Substitui pelo user do teu bot
+            const link = `https://t.me/${botUser}/play?startapp=${userId}`;
+            const text = "Vem minerar Euros comigo no EuroDash! ⚡";
+            webapp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
         }
 
         document.getElementById('main-clicker').onclick = (e) => {
             state.balance += 0.0005;
             webapp.HapticFeedback.impactOccurred('light');
             const p = document.createElement('div');
-            p.className = 'particle';
-            p.innerText = '+€0.0005';
+            p.className = 'particle'; p.innerText = '+€0.0005';
             p.style.left = e.pageX + 'px'; p.style.top = e.pageY + 'px';
             document.body.appendChild(p);
             setTimeout(() => p.remove(), 800);
@@ -160,10 +172,9 @@
         function checkDaily() {
             const now = Date.now();
             if (now - state.lastDaily > 86400000) {
-                state.balance += 0.05;
-                state.lastDaily = now;
-                webapp.showAlert("Bónus Diário Coletado: €0.05!");
-            } else { webapp.showAlert("Volta amanhã para mais!"); }
+                state.balance += 0.05; state.lastDaily = now;
+                webapp.showAlert("Bónus Coletado!");
+            } else { webapp.showAlert("Volta amanhã!"); }
         }
 
         function updateLoop() {
@@ -173,7 +184,7 @@
             state.lastUpdate = now;
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
-            localStorage.setItem('eurodash_pro_v5', JSON.stringify(state));
+            localStorage.setItem('eurodash_pro_v6', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
 
@@ -186,18 +197,10 @@
             webapp.HapticFeedback.selectionChanged();
         }
 
-        // UNIT ID: 22250
         const AdController = window.Adsgram.init({ blockId: "22250" });
         function verAnuncio() {
-            webapp.showConfirm("Queres ver um vídeo para ganhar €0.10?", (confirm) => {
-                if (confirm) {
-                    AdController.show().then(() => {
-                        state.balance += 0.10; webapp.showAlert("Sucesso!");
-                    }).catch(() => {
-                        webapp.showAlert("Anúncio indisponível.");
-                    });
-                }
-            });
+            AdController.show().then(() => { state.balance += 0.10; webapp.showAlert("Creditado!"); })
+            .catch(() => webapp.showAlert("Tenta mais tarde."));
         }
 
         updateLoop();
