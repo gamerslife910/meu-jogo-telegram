@@ -3,246 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EuroDash Elite v4.0</title>
+    <title>EURODASH ULTIMATE V5</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js?v=4.0"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?update=9999"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #0d0d0d; --border: #1a1a1a; --accent: #ff5e00; }
-        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
+        :root { --p: #00ff9d; --bg: #000; --accent: #ff5e00; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow: hidden; }
 
-        /* SELETOR DE LÍNGUA */
-        .lang-selector { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 1000; }
-        .lang-btn { background: #111; border: 1px solid #333; color: white; padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; font-family: 'Orbitron'; }
-        .lang-btn.active { border-color: var(--p); color: var(--p); box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+        /* SELETOR DE LÍNGUA NO TOPO */
+        .v5-lang-bar { position: fixed; top: 10px; left: 10px; display: flex; gap: 5px; z-index: 10000; }
+        .v5-lang-btn { background: #111; border: 1px solid #333; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-family: 'Orbitron'; }
+        .v5-lang-btn.active { border-color: var(--p); color: var(--p); }
 
-        /* EFEITO DE CLIQUE */
-        .float-text { position: absolute; pointer-events: none; color: var(--p); font-family: 'Orbitron'; font-weight: bold; font-size: 14px; z-index: 10000; animation: floatUp 0.6s ease-out forwards; text-shadow: 0 0 10px var(--p); }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.2); opacity: 0; } }
+        /* SISTEMA DE FLUTUAÇÃO DE DINHEIRO */
+        .v5-money-fly { position: absolute; pointer-events: none; color: var(--p); font-family: 'Orbitron'; font-weight: bold; animation: v5-fly 0.7s ease-out forwards; z-index: 1000; text-shadow: 0 0 8px #000; }
+        @keyframes v5-fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
 
-        /* LOADER */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .progress-frame { width: 200px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 20px; border: 1px solid #222; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 15px var(--p); }
+        /* LOADER FORÇADO */
+        #v5-loader { position: fixed; inset: 0; background: #000; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .v5-bar-bg { width: 200px; height: 3px; background: #111; margin-top: 20px; }
+        #v5-bar-fill { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: 0.1s; }
 
-        /* UI */
-        .header { background: #000; padding: 30px 15px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .balance-val { font-family: 'Orbitron'; font-size: 2.8rem; color: #fff; }
+        /* UI PRINCIPAL */
+        .v5-header { text-align: center; padding: 40px 20px 20px; border-bottom: 1px solid #111; }
+        .v5-balance { font-family: 'Orbitron'; font-size: 42px; margin: 10px 0; }
         
-        .click-container { position: relative; margin-top: 30px; display: inline-block; }
-        .click-icon-animated { width: 220px; height: 220px; border-radius: 45px; object-fit: cover; border: 2px solid #222; transition: transform 0.05s; }
-        .click-icon-animated:active { transform: scale(0.92); }
+        .v5-main-clicker { position: relative; margin: 40px auto; width: 220px; height: 220px; cursor: pointer; }
+        .v5-img { width: 100%; height: 100%; border-radius: 40px; object-fit: cover; border: 2px solid #222; transition: 0.1s; }
+        .v5-img:active { transform: scale(0.94); border-color: var(--p); }
 
-        .tab-content { display: none; padding: 20px; height: 62vh; overflow-y: auto; }
-        .tab-content.active { display: block; }
-        .miner-row { display: flex; align-items: center; gap: 12px; background: #0a0a0a; border: 1px solid #151515; padding: 12px; border-radius: 16px; margin-bottom: 12px; }
-        .miner-img { width: 50px; height: 50px; border-radius: 10px; border: 1px solid #333; }
-        .miner-info { flex-grow: 1; }
-        .miner-name { font-family: 'Orbitron'; font-size: 13px; color: #fff; }
-        .miner-details { font-size: 10px; color: #555; display: flex; flex-direction: column; }
-        .btn-buy { background: var(--accent); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
+        /* MARKET E ABAS */
+        .v5-tab-box { display: none; padding: 20px; height: 60vh; overflow-y: auto; padding-bottom: 100px; }
+        .v5-tab-box.active { display: block; }
+        .v5-item { display: flex; align-items: center; gap: 15px; background: #080808; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #111; }
+        .v5-item img { width: 45px; height: 45px; border-radius: 8px; filter: hue-rotate(90deg); }
+        .v5-info { flex: 1; }
+        .v5-name { font-family: 'Orbitron'; font-size: 13px; margin-bottom: 3px; }
+        .v5-meta { font-size: 10px; color: #555; }
+        .v5-btn { background: var(--accent); border: none; color: white; padding: 8px 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid #111; padding-bottom: 25px; }
-        .nav-item { padding: 15px 0; color: #333; font-size: 10px; text-align: center; font-family: 'Orbitron'; flex: 1; }
-        .nav-item.active { color: #fff; border-top: 2px solid var(--p); }
+        /* NAV BAR */
+        .v5-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; border-top: 1px solid #111; padding-bottom: 20px; }
+        .v5-nav-btn { flex: 1; padding: 15px; text-align: center; font-size: 10px; font-family: 'Orbitron'; color: #444; }
+        .v5-nav-btn.active { color: white; border-top: 2px solid var(--p); }
     </style>
 </head>
 <body>
 
-    <div class="lang-selector">
-        <button class="lang-btn active" onclick="setLang('pt')">PT</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    <div class="v5-lang-bar">
+        <button class="v5-lang-btn active" id="btn-pt" onclick="changeLang('pt')">PT</button>
+        <button class="v5-lang-btn" id="btn-en" onclick="changeLang('en')">EN</button>
+        <button class="v5-lang-btn" id="btn-ru" onclick="changeLang('ru')">RU</button>
     </div>
 
-    <div id="loader">
-        <div id="loader-text" style="font-family: Orbitron; color: white;">A CARREGAR...</div>
-        <div class="progress-frame"><div id="load-bar"></div></div>
+    <div id="v5-loader">
+        <div id="v5-load-txt" style="font-family: Orbitron; font-size: 12px;">SYSTEM BOOT...</div>
+        <div class="v5-bar-bg"><div id="v5-bar-fill"></div></div>
     </div>
 
-    <div class="header">
-        <div class="balance-val" id="balance">0.00000</div>
-        <div id="ui-subtitle" style="font-family: 'Orbitron'; color: var(--p); font-size: 10px; letter-spacing: 2px;">EURO DASHBOARD</div>
+    <div class="v5-header">
+        <div id="v5-balance" class="v5-balance">0.00000</div>
+        <div id="txt-sub" style="font-size: 10px; color: var(--p); letter-spacing: 3px;">DATABASE CONNECTED</div>
     </div>
 
-    <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div class="click-container" id="click-trigger">
-            <img src="image_3.jpg?v=4" class="click-icon-animated">
+    <div id="tab-mine" class="v5-tab-box active" style="text-align:center">
+        <div class="v5-main-clicker" id="clicker">
+            <img src="image_3.jpg?v=999" class="v5-img">
         </div>
-        <div style="margin-top: 30px;">
-            <div id="ui-energy-label" style="font-family: Orbitron; font-size: 11px; color: #666;">RESERVA DE ENERGIA</div>
-            <div style="font-family: Orbitron; font-size: 18px; color: #ffdd00;" id="energy-text">500 / 500</div>
-            <div style="width: 200px; height: 6px; background: #111; margin: 10px auto; border-radius: 10px; overflow: hidden; border: 1px solid #222;">
-                <div id="energy-fill" style="height:100%; background: linear-gradient(90deg, #ff5e00, #ffdd00); width: 100%;"></div>
-            </div>
+        <div style="font-family: Orbitron; font-size: 14px; color: #ffdd00;">ENERGY: <span id="v5-energy">500</span>/500</div>
+        <div style="width: 180px; height: 4px; background: #111; margin: 10px auto; border-radius: 10px; overflow: hidden;">
+            <div id="v5-energy-bar" style="height:100%; background: orange; width: 100%;"></div>
         </div>
     </div>
 
-    <div id="tab-market" class="tab-content">
-        <div id="ui-market-title" style="font-family: Orbitron; color: var(--p); margin-bottom: 20px; font-size: 14px;">MELHORIAS DE HARDWARE</div>
-        <div id="shop-list"></div>
+    <div id="tab-market" class="v5-tab-box"><div id="v5-shop"></div></div>
+    <div id="tab-friends" class="v5-tab-box">
+        <h3 id="txt-net">NETWORK</h3>
+        <div style="background:#050505; padding:15px; border:1px solid #222; font-size:10px; color:var(--p)" id="v5-ref">https://t.me/EuroDashMinerBot?start=22250</div>
     </div>
 
-    <div id="tab-friends" class="tab-content">
-        <h3 id="ui-friends-title" style="font-family: Orbitron;">AFILIADOS</h3>
-        <div id="ref-url" style="background: #000; padding: 15px; border-radius: 12px; border: 1px solid #222; font-size: 10px; color: var(--s); word-break: break-all;">https://t.me/EuroDashMinerBot?start=22250</div>
-    </div>
-
-    <div class="nav">
-        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">CORE</div>
-        <div class="nav-item" id="n-market" onclick="showTab('market')">MARKET</div>
-        <div class="nav-item" id="n-friends" onclick="showTab('friends')">NET</div>
+    <div class="v5-nav">
+        <div class="v5-nav-btn active" id="n-mine" onclick="goTab('mine')">CORE</div>
+        <div class="v5-nav-btn" id="n-market" onclick="goTab('market')">MARKET</div>
+        <div class="v5-nav-btn" id="n-friends" onclick="goTab('friends')">NET</div>
     </div>
 
     <script>
-        const webapp = window.Telegram.WebApp;
-        const myID = webapp.initDataUnsafe.user?.id || 22250;
-        let currentLang = 'pt';
-
-        const i18n = {
-            pt: {
-                loader: "A CARREGAR SISTEMA...", subtitle: "PAINEL EURO", energy: "RESERVA DE ENERGIA",
-                market: "MELHORIAS DE HARDWARE", friends: "REDE DE AFILIADOS", buy: "COMPRAR",
-                insufficient: "Saldo insuficiente!", cost: "Custo", owned: "Tens", hr: "/hr",
-                miners: ["Micro Nó", "Servidor Blade", "Rack Turbo", "Estação Cyber", "Plataforma Quantum", "Hub Neural", "Núcleo Titan"]
-            },
-            en: {
-                loader: "LOADING SYSTEM...", subtitle: "EURO DASHBOARD", energy: "ENERGY RESERVE",
-                market: "HARDWARE UPGRADES", friends: "AFFILIATE NETWORK", buy: "UPGRADE",
-                insufficient: "Insufficient funds!", cost: "Cost", owned: "Owned", hr: "/hr",
-                miners: ["Micro Node", "Server Blade", "Turbo Rack", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"]
-            },
-            ru: {
-                loader: "ЗАГРУЗКА СИСТЕМЫ...", subtitle: "ЕВРО ПАНЕЛЬ", energy: "ЗАПАС ЭНЕРГИИ",
-                market: "АПГРЕЙД ЖЕЛЕЗА", friends: "ПARTНЕРСКАЯ СЕТЬ", buy: "КУПИТЬ",
-                insufficient: "Недостаточно средств!", cost: "Цена", owned: "У вас", hr: "/час",
-                miners: ["Микро Узел", "Сервер Blade", "Турбо Стойка", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"]
-            }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // DICIONÁRIO MULTI-LÍNGUA
+        const langData = {
+            pt: { sub: "PAINEL DE CONTROLO", buy: "MELHORAR", cost: "Custo", owned: "Nível", net: "REDE DE AFILIADOS", miners: ["Nó Micro", "Rack Blade", "Turbo Server", "Estação Cyber", "Quantum Rig", "Hub Neural", "Núcleo Titan"] },
+            en: { sub: "DASHBOARD CONTROL", buy: "UPGRADE", cost: "Cost", owned: "Level", net: "AFFILIATE NETWORK", miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"] },
+            ru: { sub: "ПАНЕЛЬ УПРАВЛЕНИЯ", buy: "КУПИТЬ", cost: "Цена", owned: "Уровень", net: "ПАРТНЕРСКАЯ СЕТЬ", miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"] }
         };
+        let curLang = 'pt';
 
-        const firebaseConfig = {
+        // CONFIG FIREBASE
+        const fbConfig = {
             apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
             authDomain: "eurodash-e466c.firebaseapp.com",
-            projectId: "eurodash-e466c",
             databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
-            storageBucket: "eurodash-e466c.firebasestorage.app",
-            messagingSenderId: "99813963051",
+            projectId: "eurodash-e466c",
             appId: "1:99813963051:web:fe96761e990aee01ec016e"
         };
-        
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        firebase.initializeApp(fbConfig);
+        const rtdb = firebase.database();
+        const uid = tg.initDataUnsafe.user?.id || 22250;
 
-        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], energy: 500 };
-        let ready = false;
+        let user = { balance: 0, pps: 0, energy: 500, inventory: [0,0,0,0,0,0,0], last: Date.now() };
+        let isReady = false;
 
-        const minersData = [
-            { price: 0.05, gain: 0.00000010, img: "https://cdn-icons-png.flaticon.com/512/2103/2103633.png" },
-            { price: 1.00, gain: 0.00000060, img: "https://cdn-icons-png.flaticon.com/512/908/908905.png" },
-            { price: 10.00, gain: 0.00000750, img: "https://cdn-icons-png.flaticon.com/512/2906/2906236.png" },
-            { price: 50.00, gain: 0.00004500, img: "https://cdn-icons-png.flaticon.com/512/4342/4342657.png" },
-            { price: 200.00, gain: 0.00021000, img: "https://cdn-icons-png.flaticon.com/512/6042/6042215.png" },
-            { price: 800.00, gain: 0.00095000, img: "https://cdn-icons-png.flaticon.com/512/3665/3665879.png" },
-            { price: 3000.00, gain: 0.00450000, img: "https://cdn-icons-png.flaticon.com/512/2592/2592271.png" }
+        const shop = [
+            { p: 0.05, g: 0.00000010, img: "https://cdn-icons-png.flaticon.com/512/2103/2103633.png" },
+            { p: 1.00, g: 0.00000060, img: "https://cdn-icons-png.flaticon.com/512/908/908905.png" },
+            { p: 10.00, g: 0.00000750, img: "https://cdn-icons-png.flaticon.com/512/2906/2906236.png" },
+            { p: 50.00, g: 0.00004500, img: "https://cdn-icons-png.flaticon.com/512/4342/4342657.png" },
+            { p: 200.00, g: 0.00021000, img: "https://cdn-icons-png.flaticon.com/512/6042/6042215.png" },
+            { p: 800.00, g: 0.00095000, img: "https://cdn-icons-png.flaticon.com/512/3665/3665879.png" },
+            { p: 3000.00, g: 0.00450000, img: "https://cdn-icons-png.flaticon.com/512/2592/2592271.png" }
         ];
 
-        function setLang(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            updateTexts();
-            if(document.getElementById('tab-market').classList.contains('active')) renderShop();
+        function changeLang(l) {
+            curLang = l;
+            document.querySelectorAll('.v5-lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-'+l).classList.add('active');
+            document.getElementById('txt-sub').innerText = langData[l].sub;
+            document.getElementById('txt-net').innerText = langData[l].net;
+            if(document.getElementById('tab-market').classList.contains('active')) renderV5Shop();
         }
 
-        function updateTexts() {
-            const t = i18n[currentLang];
-            document.getElementById('loader-text').innerText = t.loader;
-            document.getElementById('ui-subtitle').innerText = t.subtitle;
-            document.getElementById('ui-energy-label').innerText = t.energy;
-            document.getElementById('ui-market-title').innerText = t.market;
-            document.getElementById('ui-friends-title').innerText = t.friends;
-        }
-
-        db.ref('users/' + myID).once('value', (snap) => {
-            if(snap.exists()) {
-                state = snap.val();
-                if(!state.inventory || state.inventory.length < 7) state.inventory = [0,0,0,0,0,0,0];
+        rtdb.ref('users/' + uid).once('value', (s) => {
+            if(s.exists()) {
+                user = s.val();
+                if(!user.inventory) user.inventory = [0,0,0,0,0,0,0];
             }
-            startLoader();
+            startV5();
         });
 
-        function startLoader() {
+        function startV5() {
             let p = 0;
-            const iv = setInterval(() => {
-                p += 5;
-                document.getElementById('load-bar').style.width = p + "%";
-                if(p >= 100) { clearInterval(iv); ready = true; document.getElementById('loader').style.display = 'none'; updateUI(); }
-            }, 50);
-        }
-
-        document.getElementById('click-trigger').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if(!ready || state.energy < 1) return;
-            const touch = e.touches[0];
-            const text = document.createElement('div');
-            text.className = 'float-text'; text.innerText = '+€0.00005';
-            text.style.left = touch.pageX + 'px'; text.style.top = touch.pageY + 'px';
-            document.body.appendChild(text); setTimeout(() => text.remove(), 600);
-            state.balance += 0.00005; state.energy -= 1; updateUI();
-            webapp.HapticFeedback.impactOccurred('light');
-        });
-
-        function renderShop() {
-            const t = i18n[currentLang];
-            document.getElementById('shop-list').innerHTML = minersData.map((m, i) => `
-                <div class="miner-row">
-                    <img src="${m.img}" class="miner-img">
-                    <div class="miner-info">
-                        <div class="miner-name">${t.miners[i]}</div>
-                        <div class="miner-details">
-                            <span>${t.cost}: €${m.price.toFixed(2)} • ${t.owned}: ${state.inventory[i] || 0}</span>
-                            <span style="color:var(--p)">+€${(m.gain * 3600).toFixed(4)}${t.hr}</span>
-                        </div>
-                    </div>
-                    <button class="btn-buy" onclick="buyMiner(${i})">${t.buy}</button>
-                </div>
-            `).join('');
-        }
-
-        function buyMiner(i) {
-            if(state.balance >= minersData[i].price) {
-                state.balance -= minersData[i].price;
-                state.pps += minersData[i].gain;
-                state.inventory[i]++;
-                renderShop(); updateUI(); save();
-                webapp.HapticFeedback.impactOccurred('success');
-            } else { webapp.showAlert(i18n[currentLang].insufficient); }
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerText = state.balance.toFixed(5);
-            document.getElementById('energy-text').innerText = Math.floor(state.energy) + " / 500";
-            document.getElementById('energy-fill').style.width = (state.energy/500*100) + "%";
-        }
-
-        function showTab(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.getElementById('n-'+t).classList.add('active');
-            if(t === 'market') renderShop();
-        }
-
-        function save() { if(ready) { state.lastUpdate = Date.now(); db.ref('users/' + myID).set(state); }}
-        setInterval(() => { if(ready) { 
-            state.balance += state.pps; 
-            if(state.energy < 500) state.energy = Math.min(500, state.energy + 0.8);
-            updateUI(); 
-        }}, 1000);
-        setInterval(save, 5000);
-    </script>
-</body>
-</html>
+            const t = setInterval(() => {
+                p += 5; document.getElementById('v5-bar-fill').style.
