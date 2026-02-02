@@ -49,6 +49,9 @@
         .n-btn { flex: 1; color: #444; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 1px; }
         .n-btn.active { color: #0f9; text-shadow: 0 0 10px rgba(0,255,153,0.6); }
         .n-icon { font-size: 22px; margin-bottom: 2px; }
+
+        /* Botão de Emergência */
+        #force-btn { display:none; margin-top:20px; padding:10px 20px; background:red; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; z-index:99999; }
     </style>
 </head>
 <body>
@@ -56,7 +59,8 @@
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
-        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
+        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting to Europe-West1...</div>
+        <button id="force-btn" onclick="forceEnter()">⚠️ PLAY OFFLINE</button>
     </div>
 
     <div id="modal-offline" class="modal">
@@ -202,12 +206,12 @@
             uid = 22250; uName = "Test User";
         }
 
-        // TENTATIVA 1: LINK GLOBAL (Muitas vezes o default)
+        // --- FIREBASE OFICIAL (AGORA SIM, O LINK CERTO!) ---
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
                 authDomain: "eurodash-official.firebaseapp.com",
-                databaseURL: "https://eurodash-official-default-rtdb.firebaseio.com", 
+                databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app/", 
                 projectId: "eurodash-official",
                 storageBucket: "eurodash-official.firebasestorage.app",
                 messagingSenderId: "633116941203",
@@ -220,11 +224,11 @@
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
             
-            // --- O MARTELO: FORÇAR ENTRADA APÓS 4 SEGUNDOS ---
+            // TIMEOUT DE SEGURANÇA (Para aparecer o botão se a net for lenta)
             setTimeout(() => {
                 if(!loaded) {
-                    console.log("Forcing Entry...");
-                    finishLoad(); // Entra mesmo que a DB falhe
+                    document.getElementById('force-btn').style.display = 'block';
+                    document.getElementById('load-status').innerHTML = "<span style='color:red'>SLOW CONNECTION</span>";
                 }
             }, 4000);
 
@@ -245,14 +249,19 @@
                     finishLoad();
                 })
                 .catch(error => {
-                    document.getElementById('load-status').innerText = "DB Failed. Playing Offline.";
-                    finishLoad(); 
+                    document.getElementById('load-status').innerText = "DB Error: " + error.code;
+                    document.getElementById('force-btn').style.display = 'block';
                 });
 
             document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
             document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
+
+        // Função global para entrar à força se necessário
+        window.forceEnter = function() {
+            finishLoad();
+        }
 
         function finishLoad() {
             if(loaded) return;
