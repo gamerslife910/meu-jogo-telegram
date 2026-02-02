@@ -36,13 +36,13 @@
 
     <div id="loader">
         <img src="logo.jpg" style="width: 100px; margin-bottom: 10px; border-radius: 50%; border: 2px solid var(--p);">
-        <div class="load-text" id="status-text">A SINCRONIZAR...</div>
+        <div class="load-text" id="status-text">A CARREGAR DADOS...</div>
         <div class="load-container"><div id="load-bar"></div></div>
     </div>
 
     <div class="header">
         <img src="logo.jpg" class="mini-logo" alt="Logo">
-        <div class="balance-val">€ <span id="balance">...</span></div>
+        <div class="balance-val">€ <span id="balance">0.00000</span></div>
         <div style="font-size: 11px; color: var(--p);">LUCRO/H: +<span id="pph">0.0000</span> €</div>
     </div>
 
@@ -50,7 +50,6 @@
         <div id="click-area" style="padding:20px 0;"><div id="main-clicker">⚡</div></div>
         <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">⚡ ENERGIA: <span id="energy-val">500</span>/500</div>
         <div class="energy-container"><div id="energy-bar"></div></div>
-        
         <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p); margin-top: 20px;">🎁 BÓNUS DIÁRIO</button>
     </div>
 
@@ -71,8 +70,8 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        // CHAVE NOVA PARA LIMPAR CACHE
-        const SAVE_KEY = 'eurodash_v21_FORCED_CLEAN';
+        const SAVE_KEY = 'eurodash_final_stable';
+        let isLoaded = false;
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], lastDaily: 0, energy: 500 };
 
         const miners = [
@@ -85,6 +84,11 @@
             { name: "Quantum Cluster V7", price: 600.00, gain: 0.00019835, img: "miner7.jpg" }
         ];
 
+        function saveGame() {
+            if(!isLoaded) return; // NUNCA salva se os dados não foram carregados primeiro
+            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        }
+
         function updateUI() {
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('energy-val').innerText = Math.floor(state.energy);
@@ -92,23 +96,28 @@
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
         }
 
-        let progress = 0;
-        const loadInterval = setInterval(() => {
-            progress += 5;
-            document.getElementById('load-bar').style.width = progress + "%";
-            if (progress >= 100) {
-                clearInterval(loadInterval);
-                const saved = localStorage.getItem(SAVE_KEY);
-                if(saved) state = JSON.parse(saved);
-                updateUI();
-                setTimeout(() => {
+        // CARREGAMENTO SEGURO
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem(SAVE_KEY);
+            if(saved) {
+                state = JSON.parse(saved);
+                state.lastUpdate = Date.now(); // Reseta o tempo para o ganho offline começar agora
+            }
+            isLoaded = true;
+            updateUI();
+            
+            // Barra de carregamento visual
+            let p = 0;
+            const iv = setInterval(() => {
+                p += 10;
+                document.getElementById('load-bar').style.width = p + "%";
+                if(p >= 100) {
+                    clearInterval(iv);
                     document.getElementById('loader').style.opacity = "0";
                     setTimeout(() => document.getElementById('loader').style.display = "none", 500);
-                }, 400);
-            }
-        }, 60);
-
-        function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+                }
+            }, 50);
+        });
 
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
@@ -134,6 +143,7 @@
 
         document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
             e.preventDefault();
+            if(!isLoaded) return;
             const touches = e.changedTouches.length;
             for(let i=0; i < touches; i++) {
                 if(state.energy >= 1) {
@@ -154,12 +164,15 @@
         }
 
         function updateLoop() {
-            const now = Date.now();
-            const diff = (now - state.lastUpdate) / 1000;
-            state.balance += state.pps * diff;
-            if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.33));
-            state.lastUpdate = now;
-            updateUI(); saveGame();
+            if(isLoaded) {
+                const now = Date.now();
+                const diff = (now - state.lastUpdate) / 1000;
+                state.balance += state.pps * diff;
+                if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.33));
+                state.lastUpdate = now;
+                updateUI();
+                saveGame();
+            }
             requestAnimationFrame(updateLoop);
         }
 
