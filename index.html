@@ -4,153 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EuroDash Elite</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; --border: #1a1a1a; --accent: #ff5e00; }
+        :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #0d0d0d; --border: #1a1a1a; --accent: #ff5e00; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* LOADING */
+        /* LOADING FUTURISTA */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #050505; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .progress-frame { width: 200px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 15px; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); transition: width 0.3s; }
+        .progress-frame { width: 220px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 20px; border: 1px solid #222; }
+        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 10px var(--p); transition: width 0.3s; }
 
         /* HEADER */
-        .header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
-        .balance-val { font-family: 'Orbitron'; font-size: 2rem; color: white; margin: 5px 0; }
+        .header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: white; margin: 5px 0; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
         .stats-grid { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
-        .stat-box { background: #0d0d0d; border: 1px solid var(--border); padding: 8px; border-radius: 8px; flex: 1; max-width: 140px; }
-        .stat-label { font-size: 10px; color: var(--accent); font-family: 'Orbitron'; }
-        .stat-val { font-size: 13px; font-weight: bold; }
-
+        .stat-box { background: #0d0d0d; border: 1px solid var(--border); padding: 8px; border-radius: 8px; flex: 1; text-align: center; }
+        .stat-label { font-size: 9px; color: var(--accent); font-family: 'Orbitron'; letter-spacing: 1px; }
+        
         /* TABS */
         .tab-content { display: none; padding: 15px; height: 68vh; overflow-y: auto; }
         .tab-content.active { display: block; }
 
-        /* CARDS & LISTS */
-        .card { background: #0d0d0d; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .miner-row, .task-row { display: flex; align-items: center; gap: 12px; background: #0d0d0d; border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
-        .icon-box { width: 45px; height: 45px; background: #151515; border-radius: 10px; border: 1px solid var(--p); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        /* LISTA DE MINERADORES */
+        .miner-row { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+        .icon-box { width: 48px; height: 48px; background: #151515; border-radius: 10px; border: 1px solid var(--p); overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .icon-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* REFERRALS STYLE (Baseado na tua foto) */
-        .ref-info-box { border: 1px solid var(--accent); border-radius: 10px; padding: 15px; background: rgba(255, 94, 0, 0.05); font-size: 13px; line-height: 1.5; color: #ccc; margin-top: 15px; }
-        .ref-link-container { display: flex; gap: 10px; margin-top: 15px; }
-        .ref-input { background: #000; border: 1px solid #333; color: #999; padding: 10px; border-radius: 8px; flex-grow: 1; font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .copy-btn { background: #1a1a1a; border: 1px solid #333; padding: 10px; border-radius: 8px; cursor: pointer; }
-
-        /* BUTTONS */
-        .btn-buy, .btn-claim { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
-        .btn-withdraw { background: #1ba085; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-family: 'Orbitron'; margin-bottom: 15px; width: 60%; }
+        .btn-buy { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-withdraw { background: #1ba085; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; width: 100%; max-width: 220px; margin-top: 10px; }
 
         /* NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: white; background: rgba(255, 94, 0, 0.1); border-top: 2px solid var(--accent); }
+        .nav-item.active { color: white; border-top: 2px solid var(--accent); background: rgba(255, 94, 0, 0.05); }
+
+        /* ADMIN LOG */
+        #adm-log { font-family: monospace; font-size: 10px; color: #00ff00; background: #000; height: 180px; overflow-y: auto; margin-top: 10px; padding: 10px; border: 1px solid #333; border-radius: 8px; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="euro-title" style="font-family: Orbitron; color: var(--p);">EURODASH ELITE</div>
+        <div style="font-family: Orbitron; color: var(--p); letter-spacing: 5px;">EURODASH ELITE</div>
         <div class="progress-frame"><div id="load-bar"></div></div>
     </div>
 
     <div class="header">
         <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-label">PROFIT / CLICK</div>
-                <div class="stat-val">€ +0.0005</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label" style="color: var(--p);">PROFIT / HOUR</div>
-                <div class="stat-val">€ +<span id="pph">0.0000</span></div>
-            </div>
+            <div class="stat-box"><div class="stat-label">TAP PROFIT</div><div style="font-size:12px">€0.0005</div></div>
+            <div class="stat-box"><div class="stat-label" style="color:var(--p)">PROFIT/H</div><div style="font-size:12px">€<span id="pph">0.0000</span></div></div>
         </div>
         <div class="balance-val"><span id="balance">0.00000</span> EUR</div>
-        <button class="btn-withdraw">WITHDRAW</button>
+        <button class="btn-withdraw" onclick="webapp.showAlert('Min. Withdraw: 50.00 EUR')">WITHDRAW</button>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area" style="padding: 30px 0; font-size: 120px; cursor: pointer;">⚡</div>
-        <div style="font-family: Orbitron; font-size: 11px; color: #ffdd00;">ENERGY: <span id="energy-val">500</span>/500</div>
-        <div style="width: 70%; height: 5px; background: #111; margin: 10px auto; border-radius: 10px;"><div id="energy-fill" style="height:100%; background: orange; width: 100%;"></div></div>
+        <div id="click-area" style="padding: 50px 0; font-size: 140px; cursor: pointer; filter: drop-shadow(0 0 20px var(--p));">⚡</div>
+        <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">ENERGY CORE: <span id="energy-val">500</span>/500</div>
+        <div style="width: 200px; height: 6px; background: #111; margin: 15px auto; border-radius: 10px; border: 1px solid #222;">
+            <div id="energy-fill" style="height:100%; background: linear-gradient(90deg, #ff9500, #ffdd00); width: 100%; transition: width 0.2s;"></div>
+        </div>
     </div>
 
     <div id="tab-market" class="tab-content"><div id="shop-list"></div></div>
 
     <div id="tab-friends" class="tab-content">
-        <div style="text-align: center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/9187/9187532.png" style="width: 80px; margin-bottom: 10px;">
-            <div style="font-family: Orbitron; font-size: 18px;">YOUR INVITER: <span style="color: var(--accent);">Unit_22250</span></div>
+        <h3 style="font-family: Orbitron; color: var(--accent);">NETWORK NODES</h3>
+        <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222; font-size: 12px; margin-bottom: 15px; word-break: break-all;" id="ref-url">
+            https://t.me/EuroDashMinerBot?start=22250
         </div>
-        
-        <div class="ref-link-container">
-            <div class="ref-input" id="ref-url">https://t.me/EuroDashMinerBot?start=22250</div>
-            <div class="copy-btn" onclick="copyLink()">📋</div>
-        </div>
-
-        <div class="ref-info-box">
-            Get <b>0.01 EUR</b> for each friend you invite + earn from 10 referral levels: 
-            Level 1 - 10%, Level 2 - 5%, Level 3 - 3%... Total potential earnings up to 29% from your network.
-        </div>
-
-        <h3 style="font-family: Orbitron; font-size: 14px; margin-top: 25px;">YOUR REFERRALS</h3>
-        <div id="ref-list" class="card" style="text-align: center; color: #444; font-size: 13px;">
-            No friends found yet
-        </div>
+        <button class="btn-buy" style="width:100%" onclick="copyLink()">COPY INVITE LINK</button>
+        <div id="ref-list" style="margin-top:25px; font-size: 13px; color: #444; text-align: center;">No partners connected to your node yet.</div>
     </div>
 
-    <div id="tab-earn" class="tab-content">
-        <h3 style="font-family: Orbitron; font-size: 14px;">GET MORE REWARDS</h3>
-        <div class="task-row">
-            <div class="icon-box">🎁</div>
-            <div style="flex-grow:1;">
-                <div style="font-size:14px; font-weight:bold;">Welcome Bonus</div>
-                <div style="font-size:11px; color:var(--p);">+ 0.50 EUR</div>
-            </div>
-            <button class="btn-claim" onclick="claimTask(0.50)">CLAIM</button>
+    <div id="tab-admin" class="tab-content">
+        <h3 style="font-family: Orbitron; color: var(--p);">SUPERUSER PANEL</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="stat-box"><div class="stat-label">TOTAL USERS</div><div id="adm-users" style="font-size:18px">0</div></div>
+            <div class="stat-box"><div class="stat-label">SYS LIQUIDITY</div><div id="adm-cash" style="font-size:18px">0.00</div></div>
         </div>
-        <div class="task-row">
-            <div class="icon-box">📢</div>
-            <div style="flex-grow:1;">
-                <div style="font-size:14px; font-weight:bold;">Subscribe Channel</div>
-                <div style="font-size:11px; color:var(--p);">+ 0.10 EUR</div>
-            </div>
-            <button class="btn-claim" onclick="window.open('https://t.me/vosso_canal')">JOIN</button>
-        </div>
+        <div id="adm-log"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">HOME</div>
-        <div class="nav-item" id="n-market" onclick="showTab('market')">MINE</div>
+        <div class="nav-item active" id="n-mine" onclick="showTab('mine')">CORE</div>
+        <div class="nav-item" id="n-market" onclick="showTab('market')">MARKET</div>
         <div class="nav-item" id="n-friends" onclick="showTab('friends')">FRIENDS</div>
-        <div class="nav-item" id="n-earn" onclick="showTab('earn')">EARN</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'EURODASH_V30_STABLE';
-        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], energy: 500 };
+        // CONFIGURAÇÃO FIREBASE (JÁ ATUALIZADA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
+            authDomain: "eurodash-e466c.firebaseapp.com",
+            projectId: "eurodash-e466c",
+            databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
+            storageBucket: "eurodash-e466c.firebasestorage.app",
+            messagingSenderId: "99813963051",
+            appId: "1:99813963051:web:fe96761e990aee01ec016e"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const myID = webapp.initDataUnsafe.user?.id || 22250;
+
+        let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0], energy: 500 };
         let ready = false;
 
         const miners = [
-            { name: "Starter Miner", price: 10.00, gain: 0.0001, img: "miner1.jpg" },
-            { name: "Green Miner", price: 25.00, gain: 0.0003, img: "miner2.jpg" },
-            { name: "Turbo Lite", price: 50.00, gain: 0.0008, img: "miner3.jpg" }
+            { name: "Starter Miner", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
+            { name: "Turbo Lite", price: 10.00, gain: 0.00000350, img: "miner2.jpg" },
+            { name: "Cyber Rig", price: 50.00, gain: 0.00001850, img: "miner3.jpg" },
+            { name: "Industrial Rack", price: 150.00, gain: 0.00006500, img: "miner4.jpg" }
         ];
 
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem(SAVE_KEY);
-            if(saved) state = JSON.parse(saved);
-            let p = 0;
-            const iv = setInterval(() => {
-                p += 5; document.getElementById('load-bar').style.width = p + "%";
-                if(p >= 100) { clearInterval(iv); ready = true; updateUI(); document.getElementById('loader').style.display = "none"; }
-            }, 50);
+        // SYNC INICIAL COM FIREBASE
+        db.ref('users/' + myID).once('value', (snap) => {
+            if(snap.exists()) {
+                state = snap.val();
+                // Cálculo offline
+                const now = Date.now();
+                const diff = (now - state.lastUpdate) / 1000;
+                if(diff > 0) state.balance += state.pps * diff;
+            }
+            ready = true;
+            updateUI();
+            
+            // Ativa Admin se fores tu
+            if(myID == 22250) {
+                document.querySelector('.nav').innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
+            }
+            
+            // Fecha loader após sync
+            document.getElementById('load-bar').style.width = "100%";
+            setTimeout(() => { document.getElementById('loader').style.opacity = '0'; 
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 500); }, 500);
         });
+
+        function save() {
+            if(ready) {
+                state.lastUpdate = Date.now();
+                db.ref('users/' + myID).set(state);
+            }
+        }
 
         function updateUI() {
             document.getElementById('balance').innerText = state.balance.toFixed(5);
@@ -159,57 +164,65 @@
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
         }
 
-        function save() { if(ready) localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
-
         function showTab(t) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+t).classList.add('active');
             document.getElementById('n-'+t).classList.add('active');
             if(t === 'market') renderShop();
+            if(t === 'admin') refreshAdmin();
         }
 
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
                 <div class="miner-row">
                     <div class="icon-box"><img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2972/2972185.png'"></div>
-                    <div style="flex-grow:1;">
-                        <div class="miner-name">${m.name}</div>
-                        <div style="font-size:11px; color:#666;">Price: <span style="color:var(--p)">€${m.price}</span></div>
-                        <div style="font-size:11px; color:#666;">Profit: <span style="color:var(--p)">€${(m.gain*3600).toFixed(2)}/h</span></div>
+                    <div style="flex-grow:1">
+                        <div style="font-family:Orbitron; font-size:13px">${m.name}</div>
+                        <div style="font-size:11px; color:#666">Level: ${state.inventory[i] || 0} • €${m.price.toFixed(2)}</div>
                     </div>
-                    <button class="btn-buy" onclick="comprar(${i})">BUY</button>
+                    <button class="btn-buy" onclick="buyMiner(${i})">UPGRADE</button>
                 </div>
             `).join('');
         }
 
-        function comprar(i) {
+        function buyMiner(i) {
             if(state.balance >= miners[i].price) {
                 state.balance -= miners[i].price; state.pps += miners[i].gain;
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
                 renderShop(); save(); updateUI();
-            } else { webapp.showAlert("NOT ENOUGH BALANCE"); }
+                webapp.HapticFeedback.impactOccurred('medium');
+            } else { webapp.showAlert("LACK OF CREDITS"); }
         }
 
         document.getElementById('click-area').addEventListener('touchstart', (e) => {
             e.preventDefault();
             if(!ready || state.energy < 1) return;
             state.balance += 0.0005; state.energy -= 1;
-            updateUI(); save();
+            updateUI();
             webapp.HapticFeedback.impactOccurred('light');
         });
 
+        function refreshAdmin() {
+            db.ref('users').once('value', (snap) => {
+                const users = snap.val();
+                let count = 0, total = 0, log = "> INITIALIZING ADMIN SCAN...<br>";
+                for(let id in users) {
+                    count++; total += (users[id].balance || 0);
+                    log += `> USER_${id}: €${(users[id].balance || 0).toFixed(2)} [LVL ${users[id].inventory.reduce((a,b)=>a+b,0)}]<br>`;
+                }
+                document.getElementById('adm-users').innerText = count;
+                document.getElementById('adm-cash').innerText = total.toFixed(2);
+                document.getElementById('adm-log').innerHTML = log;
+            });
+        }
+
         function copyLink() {
-            const url = document.getElementById('ref-url').innerText;
-            navigator.clipboard.writeText(url);
-            webapp.showAlert("Link Copied!");
+            const link = "https://t.me/EuroDashMinerBot?start=" + myID;
+            navigator.clipboard.writeText(link);
+            webapp.showAlert("Affiliate link copied to clipboard!");
         }
 
-        function claimTask(val) {
-            state.balance += val;
-            updateUI(); save();
-            webapp.showAlert("Reward Claimed!");
-        }
-
+        // Loop de ganhos e salvamento automático
         setInterval(() => {
             if(ready) {
                 const now = Date.now();
@@ -220,6 +233,16 @@
                 updateUI();
             }
         }, 1000);
+
+        setInterval(save, 15000); // Salva na nuvem a cada 15 segundos
+
+        // Loading Progress Visual
+        let lp = 0;
+        const liv = setInterval(() => { 
+            if(lp < 90) { lp += 5; document.getElementById('load-bar').style.width = lp + "%"; }
+            else { clearInterval(liv); }
+        }, 100);
+
     </script>
 </body>
 </html>
