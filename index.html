@@ -7,7 +7,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?v=2.0"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
@@ -15,53 +15,55 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #0d0d0d; --border: #1a1a1a; --accent: #ff5e00; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* LOADER v2 - 6 SEGUNDOS */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at center, #0a1a14 0%, #000 100%); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease-out; }
+        /* LOADER v2.0 - 6 SEGUNDOS REAIS */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s; }
         .loader-visual { position: relative; width: 120px; height: 120px; margin-bottom: 30px; }
-        .circle-outer { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(0, 255, 157, 0.1); border-radius: 50%; border-top: 2px solid var(--p); animation: spin 2s linear infinite; }
-        .pulse-core { position: absolute; width: 20%; height: 20%; top: 40%; left: 40%; background: var(--p); border-radius: 50%; box-shadow: 0 0 30px var(--p); animation: pulse 1.5s ease-in-out infinite; }
-        .euro-glitch { font-family: 'Orbitron'; font-size: 24px; font-weight: 700; color: white; letter-spacing: 8px; text-shadow: 0 0 10px var(--p); }
-        .progress-frame { width: 220px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 25px; border: 1px solid #222; }
-        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 15px var(--p); transition: width 0.2s; }
-        #load-msg { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--p); margin-top: 12px; letter-spacing: 2px; }
+        .circle-outer { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(0, 255, 157, 0.1); border-radius: 50%; border-top: 2px solid var(--p); animation: spin 1.5s linear infinite; }
+        .pulse-core { position: absolute; width: 20%; height: 20%; top: 40%; left: 40%; background: var(--p); border-radius: 50%; box-shadow: 0 0 30px var(--p); animation: pulse 1s ease-in-out infinite; }
+        .euro-glitch { font-family: 'Orbitron'; font-size: 26px; font-weight: 700; color: white; letter-spacing: 5px; text-shadow: 0 0 15px var(--p); }
+        .progress-frame { width: 220px; height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 25px; border: 1px solid #222; }
+        #load-bar { width: 0%; height: 100%; background: var(--p); box-shadow: 0 0 15px var(--p); }
+        #load-msg { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--p); margin-top: 15px; text-transform: uppercase; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         
-        /* CLICKER IMAGE */
+        /* IMAGE CLICKER v2.0 */
         @keyframes pulse-clicker {
             0% { transform: scale(1); filter: drop-shadow(0 0 5px var(--p)); }
-            50% { transform: scale(1.03); filter: drop-shadow(0 0 20px var(--p)); }
+            50% { transform: scale(1.04); filter: drop-shadow(0 0 25px var(--p)); }
             100% { transform: scale(1); filter: drop-shadow(0 0 5px var(--p)); }
         }
-        .click-icon-animated { width: 220px; height: 220px; border-radius: 35px; object-fit: cover; animation: pulse-clicker 2.5s ease-in-out infinite; border: 1px solid #333; }
+        .click-icon-animated { 
+            width: 200px; height: 200px; border-radius: 40px; 
+            object-fit: cover; animation: pulse-clicker 2s ease-in-out infinite; 
+            border: 1px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
 
-        /* HEADER */
-        .header { background: #000; padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
-        .balance-val { font-family: 'Orbitron'; font-size: 2.4rem; color: #fff; margin: 8px 0; }
-        .stats-grid { display: flex; gap: 8px; justify-content: center; }
-        .stat-box { background: #080808; border: 1px solid #151515; padding: 10px; border-radius: 10px; flex: 1; }
-        .stat-label { font-size: 8px; color: var(--accent); font-family: 'Orbitron'; letter-spacing: 1px; }
+        /* HEADER & UI */
+        .header { background: rgba(0,0,0,0.9); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
+        .balance-val { font-family: 'Orbitron'; font-size: 2.5rem; color: #fff; margin: 10px 0; letter-spacing: -1px; }
+        .stats-grid { display: flex; gap: 10px; justify-content: center; }
+        .stat-box { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 10px; border-radius: 12px; flex: 1; }
+        .stat-label { font-size: 8px; color: var(--accent); font-family: 'Orbitron'; }
         
-        /* TABS */
         .tab-content { display: none; padding: 20px; height: 65vh; overflow-y: auto; }
         .tab-content.active { display: block; }
         .miner-row { display: flex; align-items: center; gap: 15px; background: #0c0c0c; border: 1px solid #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 12px; }
-        .btn-buy { background: var(--accent); color: white; border: none; padding: 12px 18px; border-radius: 10px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-buy { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; font-size: 10px; }
         
-        /* NAVIGATION */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #050505; display: flex; border-top: 1px solid #111; padding-bottom: 20px; }
-        .nav-item { padding: 18px 0; color: #333; font-size: 10px; text-align: center; font-family: 'Orbitron'; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: #fff; border-top: 2px solid var(--p); background: linear-gradient(to bottom, rgba(0,255,157,0.05), transparent); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid #111; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { padding: 20px 0; color: #444; font-size: 10px; text-align: center; font-family: 'Orbitron'; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: #fff; border-top: 2px solid var(--p); background: rgba(0,255,157,0.05); }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="loader-visual"><div class="circle-outer"></div><div class="pulse-core"></div></div>
-        <div class="euro-glitch">EURODASH ELITE</div>
+        <div class="euro-glitch">EURODASH</div>
         <div class="progress-frame"><div id="load-bar"></div></div>
-        <div id="load-msg">CONNECTING TO NODES...</div>
+        <div id="load-msg">INITIALIZING SYSTEMS...</div>
     </div>
 
     <div class="header">
@@ -69,38 +71,37 @@
             <div class="stat-box"><div class="stat-label">TAP PROFIT</div><div style="font-size:13px">€0.00005</div></div>
             <div class="stat-box"><div class="stat-label" style="color:var(--p)">PROFIT/H</div><div style="font-size:13px">€<span id="pph">0.0000</span></div></div>
         </div>
-        <div class="balance-val"><span id="balance">0.00000</span></div>
-        <button style="background: #00ff9d; color: #000; border: none; padding: 12px 30px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; width: 100%; max-width: 250px;" onclick="webapp.showAlert('Minimum Withdrawal: €50.00')">WITHDRAW FUNDS</button>
+        <div class="balance-val" id="balance">0.00000</div>
+        <button style="background: var(--p); color: #000; border: none; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; width: 100%;" onclick="webapp.showAlert('Min. Withdrawal: €50.00')">WITHDRAW</button>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
         <div id="click-area" style="padding: 20px 0; cursor: pointer;">
-            <img src="image_3.jpg" class="click-icon-animated" alt="Core Miner">
+            <img src="image_3.jpg?v=2" class="click-icon-animated" alt="Core Miner">
         </div>
-        <div style="font-family: Orbitron; font-size: 13px; color: #ffdd00; margin-top: 10px;">ENERGY: <span id="energy-val">500</span> / 500</div>
-        <div style="width: 220px; height: 8px; background: #111; margin: 15px auto; border-radius: 20px; border: 1px solid #222; overflow: hidden;">
-            <div id="energy-fill" style="height:100%; background: linear-gradient(90deg, #ff9100, #ffdd00); width: 100%; transition: width 0.1s;"></div>
+        <div style="font-family: Orbitron; font-size: 13px; color: #ffdd00; margin-top: 10px;">CORE ENERGY: <span id="energy-val">500</span></div>
+        <div style="width: 200px; height: 8px; background: #111; margin: 15px auto; border-radius: 10px; overflow: hidden; border: 1px solid #222;">
+            <div id="energy-fill" style="height:100%; background: linear-gradient(90deg, #ff9100, #ffdd00); width: 100%;"></div>
         </div>
     </div>
 
     <div id="tab-market" class="tab-content"><div id="shop-list"></div></div>
     
     <div id="tab-friends" class="tab-content">
-        <h3 style="font-family: Orbitron; color: var(--p);">NETWORK PARTNERS</h3>
-        <p style="font-size: 13px; color: #666;">Earn 10% from your partners' mining.</p>
-        <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; font-size: 11px; word-break: break-all; color: var(--s);" id="ref-url">https://t.me/EuroDashMinerBot?start=22250</div>
-        <button class="btn-buy" style="width:100%; margin-top: 15px;" onclick="copyLink()">COPY INVITE LINK</button>
+        <h3 style="font-family: Orbitron; color: var(--p);">NETWORK</h3>
+        <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; font-size: 11px; word-break: break-all;" id="ref-url">https://t.me/EuroDashMinerBot?start=22250</div>
+        <button class="btn-buy" style="width:100%; margin-top: 15px;" onclick="copyLink()">COPY INVITE</button>
     </div>
 
     <div id="tab-admin" class="tab-content">
-        <h3 style="font-family: Orbitron; color: var(--p);">ROOT TERMINAL</h3>
-        <div id="adm-log" style="font-family: 'Share Tech Mono'; font-size: 11px; color: #0f0; background: #000; padding: 15px; border: 1px solid #222; height: 300px; overflow-y: auto;"></div>
+        <h3 style="font-family: Orbitron;">ADMIN TERMINAL</h3>
+        <div id="adm-log" style="font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; background: #000; padding: 10px; border: 1px solid #222; height: 300px; overflow-y: auto;"></div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" id="n-mine" onclick="showTab('mine')">MINING</div>
         <div class="nav-item" id="n-market" onclick="showTab('market')">MARKET</div>
-        <div class="nav-item" id="n-friends" onclick="showTab('friends')">NETWORK</div>
+        <div class="nav-item" id="n-friends" onclick="showTab('friends')">FRIENDS</div>
     </div>
 
     <script>
@@ -121,11 +122,9 @@
         const db = firebase.database();
         const myID = webapp.initDataUnsafe.user?.id || 22250;
 
-        // ESTADO INICIAL ATUALIZADO
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0], energy: 500 };
         let ready = false;
 
-        // NOVA ECONOMIA: Primeiro item €0.05
         const miners = [
             { name: "Micro Node", price: 0.05, gain: 0.00000010 },
             { name: "Starter Rack", price: 1.00, gain: 0.00000045 },
@@ -145,19 +144,21 @@
 
         function startLoader() {
             let progress = 0;
-            const msgs = ["STABILIZING QUANTUM FIELD...", "LOADING ASSETS...", "SYNCING DATABASE...", "SYSTEM ONLINE."];
+            const msgs = ["CONNECTING...", "SYNCING NODES...", "SECURITY CHECK...", "WELCOME ELITE."];
             const interval = setInterval(() => {
                 progress += 2;
                 document.getElementById('load-bar').style.width = progress + "%";
                 document.getElementById('load-msg').innerText = msgs[Math.floor((progress/101)*msgs.length)];
                 if(progress >= 100) {
-                    clearInterval(interval); 
-                    ready = true; 
+                    clearInterval(interval);
+                    ready = true;
                     updateUI();
                     if(myID == 22250) document.querySelector('.nav').innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
-                    setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 800);
+                    setTimeout(() => { document.getElementById('loader').style.opacity = '0';
+                        setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
+                    }, 500);
                 }
-            }, 120); 
+            }, 120); // Loader de ~6 segundos
         }
 
         function save() { if(ready) { state.lastUpdate = Date.now(); db.ref('users/' + myID).set(state); }}
@@ -183,9 +184,9 @@
                 <div class="miner-row">
                     <div style="flex-grow:1">
                         <div style="font-family:Orbitron; font-size:14px; color:#fff">${m.name}</div>
-                        <div style="font-size:11px; color:#555; margin-top:4px">Level: ${state.inventory[i] || 0} • Cost: €${m.price.toFixed(2)}</div>
+                        <div style="font-size:11px; color:#555">Cost: €${m.price.toFixed(2)} • Owned: ${state.inventory[i] || 0}</div>
                     </div>
-                    <button class="btn-buy" onclick="buyMiner(${i})">UPGRADE</button>
+                    <button class="btn-buy" onclick="buyMiner(${i})">BUY</button>
                 </div>
             `).join('');
         }
@@ -197,7 +198,7 @@
                 state.inventory[i] = (state.inventory[i] || 0) + 1;
                 renderShop(); save(); updateUI();
                 webapp.HapticFeedback.impactOccurred('medium');
-            } else { webapp.showAlert("Inadequate balance for this upgrade."); }
+            } else { webapp.showAlert("Insufficient EUR!"); }
         }
 
         document.getElementById('click-area').addEventListener('touchstart', (e) => {
@@ -211,15 +212,15 @@
         function refreshAdmin() {
             db.ref('users').once('value', (snap) => {
                 const users = snap.val();
-                let log = "--- GLOBAL NETWORK LOG ---<br>";
-                for(let id in users) { log += `> NODE_${id}: €${(users[id].balance || 0).toFixed(4)}<br>`; }
+                let log = "--- ADMIN ACTIVE ---<br>";
+                for(let id in users) { log += `> USER_${id}: €${(users[id].balance || 0).toFixed(4)}<br>`; }
                 document.getElementById('adm-log').innerHTML = log;
             });
         }
 
         function copyLink() { 
             navigator.clipboard.writeText("https://t.me/EuroDashMinerBot?start=" + myID); 
-            webapp.showAlert("Affiliate link copied to clipboard!"); 
+            webapp.showAlert("Copied!"); 
         }
 
         setInterval(() => { if(ready) { 
