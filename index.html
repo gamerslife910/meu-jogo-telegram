@@ -223,13 +223,16 @@
             uid = 22250; uName = "Test User";
         }
 
+        // --- FIREBASE OFICIAL (TUAS CHAVES) ---
         try {
             firebase.initializeApp({
-                apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
-                authDomain: "eurodash-e466c.firebaseapp.com",
-                databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
-                projectId: "eurodash-e466c",
-                appId: "1:99813963051:web:fe96761e990aee01ec016e"
+                apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
+                authDomain: "eurodash-official.firebaseapp.com",
+                databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app", // TESTA ESTE LINK SE DER ERRO
+                projectId: "eurodash-official",
+                storageBucket: "eurodash-official.firebasestorage.app",
+                messagingSenderId: "633116941203",
+                appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666"
             });
         } catch(err) {
             console.log("Firebase Init Error");
@@ -242,10 +245,9 @@
                 document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
                 document.getElementById('loader').innerHTML += '<br><small style="color:yellow; font-size:10px;">Establishing Connection...</small>';
 
-                // FORCE TIMEOUT (Se demorar mais de 5s, entra na mesma)
                 setTimeout(() => {
                     if(!loaded) {
-                        alert("Network Slow: Entering Offline Mode");
+                        // FALLBACK: Se falhar a conexão, entra na mesma
                         finishLoad();
                     }
                 }, 5000);
@@ -270,7 +272,7 @@
                         finishLoad();
                     })
                     .catch(error => {
-                        alert("DB Connection Error. Playing Offline.");
+                        // Se der erro (ex: regras), entra na mesma
                         finishLoad(); 
                     });
 
@@ -362,7 +364,7 @@
                 });
                 document.getElementById('rank-list').innerHTML = html;
             }).catch(e => {
-                document.getElementById('rank-list').innerHTML = '<div style="padding:20px; color:red">Offline (DB Error)</div>';
+                // Ignore rank errors
             });
         }
 
@@ -427,7 +429,7 @@
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert("Copied!"); }
 
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
+        setInterval(() => { if(loaded && uid) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
 
     </script>
 </body>
