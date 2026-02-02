@@ -3,123 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EURODASH GLOBAL V6</title>
+    <title>EURODASH V7</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js?v=600"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --p: #00ff9d; --bg: #000; --accent: #ff5e00; }
-        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; overflow: hidden; }
+        :root { --p: #00ff9d; --bg: #000; }
+        body { background: #000; color: white; font-family: 'Rajdhani', sans-serif; margin: 0; overflow: hidden; }
 
-        /* SELETOR DE LÍNGUAS */
-        .lang-grid { position: fixed; top: 15px; left: 15px; display: flex; gap: 5px; z-index: 10000; }
-        .lang-btn { background: #111; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
-        .lang-btn.active { border-color: var(--p); color: var(--p); box-shadow: 0 0 10px var(--p); }
+        /* SELETOR DE LÍNGUAS - NOVO DESIGN */
+        .v7-lang-header { position: fixed; top: 10px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 10000; }
+        .v7-lbtn { background: #111; border: 1px solid #333; color: white; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
+        .v7-lbtn.active { border-color: var(--p); background: rgba(0,255,157,0.1); }
 
-        /* ANIMAÇÃO DE CLIQUE */
-        .coin-pop { position: absolute; pointer-events: none; color: var(--p); font-family: 'Orbitron'; font-weight: bold; animation: popUp 0.6s ease-out forwards; z-index: 9999; }
-        @keyframes popUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        /* EFEITO DE CLIQUE DINÂMICO */
+        .v7-pop { position: absolute; pointer-events: none; color: var(--p); font-family: 'Orbitron'; font-weight: bold; animation: v7-anim 0.7s forwards; z-index: 999; }
+        @keyframes v7-anim { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5); } }
 
-        /* LOADER */
-        #loading-screen { position: fixed; inset: 0; background: #000; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .bar-wrap { width: 220px; height: 4px; background: #111; margin-top: 20px; border-radius: 10px; overflow: hidden; }
-        #bar-fill { width: 0%; height: 100%; background: var(--p); transition: 0.1s; }
-
-        /* INTERFACE */
-        .main-header { text-align: center; padding: 50px 20px 20px; border-bottom: 1px solid #151515; }
-        .main-balance { font-family: 'Orbitron'; font-size: 3rem; margin: 10px 0; letter-spacing: -2px; }
+        /* INTERFACE V7 */
+        .v7-container { height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 60px; }
+        .v7-balance { font-family: 'Orbitron'; font-size: 3.5rem; color: #fff; text-shadow: 0 0 20px rgba(0,255,157,0.3); }
         
-        .clicker-box { position: relative; margin: 30px auto; width: 230px; height: 230px; }
-        .core-img { width: 100%; height: 100%; border-radius: 50px; object-fit: cover; border: 3px solid #222; transition: 0.05s; }
-        .core-img:active { transform: scale(0.92); border-color: var(--p); }
+        .v7-circle { width: 240px; height: 240px; border-radius: 60px; border: 4px solid #1a1a1a; position: relative; overflow: hidden; margin-top: 20px; transition: 0.1s; }
+        .v7-circle:active { transform: scale(0.95); border-color: var(--p); }
+        .v7-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* MARKET V6 */
-        .tab-v6 { display: none; padding: 20px; height: 60vh; overflow-y: auto; padding-bottom: 120px; }
-        .tab-v6.active { display: block; }
-        .shop-card { display: flex; align-items: center; gap: 15px; background: #0a0a0a; padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 1px solid #1a1a1a; }
-        .shop-card img { width: 50px; height: 50px; border-radius: 12px; }
-        .shop-info { flex: 1; }
-        .shop-name { font-family: 'Orbitron'; font-size: 14px; color: #fff; }
-        .shop-meta { font-size: 10px; color: #666; }
-        .buy-btn { background: var(--accent); border: none; color: white; padding: 10px 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
+        /* MARKET V7 */
+        .v7-market-page { position: fixed; inset: 0; background: #000; z-index: 500; padding: 80px 20px; display: none; overflow-y: auto; }
+        .v7-market-page.open { display: block; }
+        .v7-card { display: flex; align-items: center; background: #0a0a0a; padding: 15px; border-radius: 20px; margin-bottom: 10px; border: 1px solid #1a1a1a; gap: 15px; }
+        .v7-card img { width: 45px; height: 45px; border-radius: 10px; border: 1px solid #333; }
+        .v7-card-info { flex: 1; }
+        .v7-btn { background: #ff5e00; border: none; color: white; padding: 10px; border-radius: 10px; font-family: 'Orbitron'; font-size: 9px; }
 
-        /* NAV */
-        .nav-v6 { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; border-top: 1px solid #111; padding-bottom: 30px; }
-        .nav-btn { flex: 1; padding: 15px; text-align: center; font-size: 10px; font-family: 'Orbitron'; color: #444; }
-        .nav-btn.active { color: white; border-top: 2px solid var(--p); background: linear-gradient(to bottom, rgba(0,255,157,0.05), transparent); }
+        /* NAV V7 */
+        .v7-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #000; border-top: 1px solid #111; display: flex; z-index: 1000; padding-bottom: 20px; }
+        .v7-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
+        .v7-nav-item.active { color: #fff; border-top: 2px solid var(--p); }
     </style>
 </head>
 <body>
 
-    <div class="lang-grid">
-        <button class="lang-btn active" id="l-pt" onclick="setLang('pt')">PT</button>
-        <button class="lang-btn" id="l-en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" id="l-ru" onclick="setLang('ru')">RU</button>
+    <div class="v7-lang-header">
+        <button class="v7-lbtn active" id="l-pt" onclick="setV7Lang('pt')">PT</button>
+        <button class="v7-lbtn" id="l-en" onclick="setV7Lang('en')">EN</button>
+        <button class="v7-lbtn" id="l-ru" onclick="setV7Lang('ru')">RU</button>
     </div>
 
-    <div id="loading-screen">
-        <div id="load-msg" style="font-family: Orbitron; font-size: 12px; letter-spacing: 2px;">V6 INITIALIZING...</div>
-        <div class="bar-wrap"><div id="bar-fill"></div></div>
-    </div>
-
-    <div class="main-header">
-        <div id="balance-txt" class="main-balance">0.00000</div>
-        <div id="ui-label" style="font-size: 10px; color: var(--p); letter-spacing: 4px; font-family: Orbitron;">GLOBAL DASHBOARD</div>
-    </div>
-
-    <div id="tab-mine" class="tab-v6 active" style="text-align:center">
-        <div class="clicker-box" id="main-clicker">
-            <img src="image_3.jpg?v=6" class="core-img">
+    <div class="v7-container" id="page-core">
+        <div class="v7-balance" id="v7-bal">0.00000</div>
+        <div id="v7-sub" style="color: var(--p); letter-spacing: 2px; font-size: 10px; font-family: Orbitron;">GLOBAL SYSTEM</div>
+        
+        <div class="v7-circle" id="v7-clicker">
+            <img src="image_3.jpg?v=700" alt="Core">
         </div>
-        <div style="font-family: Orbitron; font-size: 16px; color: #ffdd00;">ENERGY: <span id="energy-val">500</span></div>
-        <div style="width: 200px; height: 5px; background: #111; margin: 10px auto; border-radius: 10px; overflow: hidden;">
-            <div id="energy-bar" style="height:100%; background: linear-gradient(90deg, orange, yellow); width: 100%;"></div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <div id="v7-eng-lbl" style="font-size: 12px; color: #555;">ENERGY</div>
+            <div id="v7-eng-val" style="font-family: Orbitron; font-size: 20px; color: #ffdd00;">500</div>
         </div>
     </div>
 
-    <div id="tab-market" class="tab-v6"><div id="shop-container"></div></div>
-
-    <div id="tab-friends" class="tab-v6">
-        <h3 id="ui-net" style="font-family: Orbitron;">NETWORK</h3>
-        <div style="background:#050505; padding:20px; border-radius:15px; border:1px solid #222; font-size:11px; color:var(--p)" id="ref-link">https://t.me/EuroDashMinerBot?start=22250</div>
+    <div class="v7-market-page" id="page-market">
+        <h2 id="v7-mkt-title" style="font-family: Orbitron; color: var(--p);">MARKET</h2>
+        <div id="v7-list"></div>
     </div>
 
-    <div class="nav-v6">
-        <div class="nav-btn active" id="b-mine" onclick="openTab('mine')">CORE</div>
-        <div class="nav-btn" id="b-market" onclick="openTab('market')">MARKET</div>
-        <div class="nav-btn" id="b-friends" onclick="openTab('friends')">NET</div>
+    <div class="v7-nav">
+        <div class="v7-nav-item active" id="btn-core" onclick="showV7('core')">CORE</div>
+        <div class="v7-nav-item" id="btn-mkt" onclick="showV7('mkt')">MARKET</div>
     </div>
 
     <script>
-        const webapp = window.Telegram.WebApp;
-        webapp.expand();
-
-        const translations = {
-            pt: { sub: "PAINEL DE CONTROLO", buy: "COMPRAR", cost: "Custo", owned: "Nível", net: "REDE DE AFILIADOS", miners: ["Micro Nó", "Rack Blade", "Turbo Server", "Estação Cyber", "Quantum Rig", "Hub Neural", "Núcleo Titan"] },
-            en: { sub: "CONTROL PANEL", buy: "UPGRADE", cost: "Cost", owned: "Level", net: "AFFILIATE NETWORK", miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"] },
-            ru: { sub: "ПАНЕЛЬ УПРАВЛЕНИЯ", buy: "КУПИТЬ", cost: "Цена", owned: "Уровень", net: "ПАРТНЕРСКАЯ СЕТЬ", miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"] }
-        };
+        const tg = window.Telegram.WebApp;
         let lang = 'pt';
+        const dict = {
+            pt: { sub: "SISTEMA GLOBAL", eng: "ENERGIA", mkt: "MERCADO", buy: "MELHORAR", miners: ["Nó Micro", "Rack Blade", "Turbo Server", "Estação Cyber", "Quantum Rig", "Hub Neural", "Núcleo Titan"] },
+            en: { sub: "GLOBAL SYSTEM", eng: "ENERGY", mkt: "MARKET", buy: "UPGRADE", miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"] },
+            ru: { sub: "ГЛОБАЛЬНАЯ СИСТЕМА", eng: "ЭНЕРГИЯ", mkt: "РЫНОК", buy: "КУПИТЬ", miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"] }
+        };
 
-        const fb = {
+        const config = {
             apiKey: "AIzaSyDFpFu8sba50rqnJSstg--cLrNDG4ybmu8",
             authDomain: "eurodash-e466c.firebaseapp.com",
             databaseURL: "https://eurodash-e466c-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "eurodash-e466c",
             appId: "1:99813963051:web:fe96761e990aee01ec016e"
         };
-        firebase.initializeApp(fb);
-        const rtdb = firebase.database();
-        const myID = webapp.initDataUnsafe.user?.id || 22250;
+        firebase.initializeApp(config);
+        const db = firebase.database();
+        const uid = tg.initDataUnsafe.user?.id || 22250;
 
-        let state = { balance: 0, pps: 0, energy: 500, inventory: [0,0,0,0,0,0,0], last: Date.now() };
-        let ready = false;
+        let user = { balance: 0, pps: 0, energy: 500, inventory: [0,0,0,0,0,0,0], last: Date.now() };
 
-        const miners = [
+        const items = [
             { p: 0.05, g: 0.00000010, img: "https://cdn-icons-png.flaticon.com/512/2103/2103633.png" },
             { p: 1.00, g: 0.00000060, img: "https://cdn-icons-png.flaticon.com/512/908/908905.png" },
             { p: 10.00, g: 0.00000750, img: "https://cdn-icons-png.flaticon.com/512/2906/2906236.png" },
@@ -129,86 +110,81 @@
             { p: 3000.00, g: 0.00450000, img: "https://cdn-icons-png.flaticon.com/512/2592/2592271.png" }
         ];
 
-        function setLang(l) {
+        function setV7Lang(l) {
             lang = l;
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.v7-lbtn').forEach(b => b.classList.remove('active'));
             document.getElementById('l-'+l).classList.add('active');
-            document.getElementById('ui-label').innerText = translations[l].sub;
-            document.getElementById('ui-net').innerText = translations[l].net;
-            if(document.getElementById('tab-market').classList.contains('active')) renderShop();
+            document.getElementById('v7-sub').innerText = dict[l].sub;
+            document.getElementById('v7-eng-lbl').innerText = dict[l].eng;
+            document.getElementById('v7-mkt-title').innerText = dict[l].mkt;
+            if(document.getElementById('page-market').classList.contains('open')) renderV7Shop();
         }
 
-        rtdb.ref('users/' + myID).once('value', (s) => {
-            if(s.exists()) {
-                state = s.val();
-                if(!state.inventory) state.inventory = [0,0,0,0,0,0,0];
-            }
-            let p = 0;
-            const t = setInterval(() => {
-                p += 5; document.getElementById('bar-fill').style.width = p + "%";
-                if(p >= 100) { clearInterval(t); ready = true; document.getElementById('loading-screen').style.display = 'none'; }
-            }, 30);
+        db.ref('users/' + uid).once('value', (s) => {
+            if(s.exists()) user = s.val();
+            if(!user.inventory) user.inventory = [0,0,0,0,0,0,0];
+            updateV7UI();
         });
 
-        document.getElementById('main-clicker').addEventListener('touchstart', (e) => {
+        document.getElementById('v7-clicker').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if(!ready || state.energy < 1) return;
-            
-            const touch = e.touches[0];
-            const div = document.createElement('div');
-            div.className = 'coin-pop'; div.innerText = '+€0.00005';
-            div.style.left = touch.pageX + 'px'; div.style.top = touch.pageY + 'px';
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 600);
-
-            state.balance += 0.00005; state.energy -= 1;
-            webapp.HapticFeedback.impactOccurred('light');
-            updateUI();
+            if(user.energy < 1) return;
+            const t = e.touches[0];
+            const d = document.createElement('div');
+            d.className = 'v7-pop'; d.innerText = '+€0.00005';
+            d.style.left = t.pageX + 'px'; d.style.top = t.pageY + 'px';
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 700);
+            user.balance += 0.00005; user.energy -= 1;
+            tg.HapticFeedback.impactOccurred('light');
+            updateV7UI();
         });
 
-        function renderShop() {
-            const l = translations[lang];
-            document.getElementById('shop-container').innerHTML = miners.map((m, i) => `
-                <div class="shop-card">
+        function renderV7Shop() {
+            const l = dict[lang];
+            document.getElementById('v7-list').innerHTML = items.map((m, i) => `
+                <div class="v7-card">
                     <img src="${m.img}">
-                    <div class="shop-info">
-                        <div class="shop-name">${l.miners[i]}</div>
-                        <div class="shop-meta">${l.cost}: €${m.p.toFixed(2)} • ${l.owned}: ${state.inventory[i] || 0}</div>
+                    <div class="v7-card-info">
+                        <div style="font-family:Orbitron; font-size:13px">${l.miners[i]}</div>
+                        <div style="font-size:10px; color:#555">Price: €${m.p.toFixed(2)} • Lvl: ${user.inventory[i] || 0}</div>
                     </div>
-                    <button class="buy-btn" onclick="buyItem(${i})">${l.buy}</button>
+                    <button class="v7-btn" onclick="buyV7(${i})">${l.buy}</button>
                 </div>
             `).join('');
         }
 
-        function buyItem(i) {
-            if(state.balance >= miners[i].p) {
-                state.balance -= miners[i].p; state.pps += miners[i].g;
-                state.inventory[i] = (state.inventory[i] || 0) + 1;
-                renderShop(); updateUI();
-                webapp.HapticFeedback.impactOccurred('success');
-            } else { webapp.showAlert(lang === 'pt' ? "Saldo insuficiente!" : "Insufficient funds!"); }
+        function buyV7(i) {
+            if(user.balance >= items[i].p) {
+                user.balance -= items[i].p; user.pps += items[i].g;
+                user.inventory[i]++; renderV7Shop(); updateV7UI();
+                tg.HapticFeedback.impactOccurred('success');
+            }
         }
 
-        function updateUI() {
-            document.getElementById('balance-txt').innerText = state.balance.toFixed(5);
-            document.getElementById('energy-val').innerText = Math.floor(state.energy);
-            document.getElementById('energy-bar').style.width = (state.energy/500*100) + "%";
+        function updateV7UI() {
+            document.getElementById('v7-bal').innerText = user.balance.toFixed(5);
+            document.getElementById('v7-eng-val').innerText = Math.floor(user.energy);
         }
 
-        function openTab(t) {
-            document.querySelectorAll('.tab-v6, .nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.getElementById('b-'+t).classList.add('active');
-            if(t === 'market') renderShop();
+        function showV7(p) {
+            document.querySelectorAll('.v7-nav-item').forEach(b => b.classList.remove('active'));
+            if(p === 'core') {
+                document.getElementById('page-market').classList.remove('open');
+                document.getElementById('btn-core').classList.add('active');
+            } else {
+                document.getElementById('page-market').classList.add('open');
+                document.getElementById('btn-mkt').classList.add('active');
+                renderV7Shop();
+            }
         }
 
-        setInterval(() => { if(ready) { 
-            state.balance += state.pps; 
-            if(state.energy < 500) state.energy = Math.min(500, state.energy + 0.8);
-            updateUI(); 
-        }}, 1000);
-
-        setInterval(() => { if(ready) rtdb.ref('users/'+myID).set(state); }, 5000);
+        setInterval(() => {
+            user.balance += user.pps;
+            if(user.energy < 500) user.energy += 0.8;
+            updateV7UI();
+        }, 1000);
+        setInterval(() => db.ref('users/'+uid).set(user), 5000);
     </script>
 </body>
 </html>
