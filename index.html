@@ -21,9 +21,9 @@
             -webkit-user-select: none;
         }
 
-        /* Top Bar fixo */
+        /* Header Dinâmico */
         .header { 
-            background: linear-gradient(180deg, rgba(0,255,157,0.1) 0%, transparent 100%); 
+            background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); 
             padding: 25px 15px; 
             text-align: center; 
             border-bottom: 1px solid #222; 
@@ -52,12 +52,12 @@
             display: inline-block; 
         }
 
-        /* Tabs */
+        /* Tabs de Conteúdo */
         .tab-content { display: none; padding: 20px 15px; animation: slideUp 0.4s ease-out; }
         .tab-content.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Loja de Mineradores */
+        /* Cartões da Loja */
         .miner-card { 
             background: var(--card); 
             border-radius: 24px; 
@@ -111,7 +111,7 @@
 
         .buy-btn:active { transform: scale(0.97); }
 
-        /* Clicker Principal */
+        /* Clicker Central */
         #main-clicker { 
             font-size: 140px; 
             cursor: pointer; 
@@ -122,7 +122,7 @@
         }
         #main-clicker:active { transform: scale(0.85); }
 
-        /* Menu Inferior */
+        /* Menu Inferior Estilo App */
         .nav { 
             position: fixed; 
             bottom: 0; 
@@ -136,7 +136,7 @@
             z-index: 100; 
         }
 
-        .nav-item { color: #444; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; }
+        .nav-item { color: #444; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .nav-item.active { color: var(--p); text-shadow: 0 0 8px var(--p); }
 
         .btn-video { 
@@ -145,46 +145,51 @@
             border: 1px solid var(--s); 
             padding: 18px; 
             border-radius: 16px; 
-            width: 90%; 
+            width: 100%; 
+            max-width: 320px;
             font-weight: bold; 
             font-family: 'Orbitron'; 
             margin: 0 auto;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,176,255,0.2);
         }
+        .btn-video:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-size: 10px; color: #888; letter-spacing: 3px;">SALDO ATUAL</div>
+        <div style="font-size: 10px; color: #888; letter-spacing: 3px;">BALANCE TOTAL</div>
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
         <div class="pps-badge"> Rendimento/Hora: +<span id="pph">0.0000</span> €</div>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
         <div id="main-clicker">⚡</div>
-        <button onclick="verAnuncio()" class="btn-video">📺 VER ANÚNCIO (+€0.10)</button>
+        <br>
+        <button onclick="verAnuncio()" class="btn-video">📺 VIDEO BOOST (+€0.10)</button>
     </div>
 
     <div id="tab-store" class="tab-content">
-        <h3 style="font-family:'Orbitron'; color:var(--p); margin-bottom:25px; text-align: center;">HARDWARE STORE</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--p); margin-bottom:25px; text-align: center;">HARDWARE SHOP</h3>
         <div id="shop-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINERAR</div>
-        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 MERCADO</div>
+        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINE</div>
+        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 SHOP</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        // Carregar dados ou iniciar novo
+        // Estado do Jogo
         let state = JSON.parse(localStorage.getItem('eurodash_save')) || {
             balance: 0, pps: 0.0000001, lastUpdate: Date.now()
         };
 
-        // Lista de Mineradores configurada para .JPG
+        // Configuração dos Mineradores (.JPG)
         const miners = [
             { name: "Pocket Miner V1", price: 1, gain: 0.00000033, img: "miner1.jpg" },
             { name: "Pocket Miner V2", price: 5, gain: 0.00000165, img: "miner2.jpg" },
@@ -195,7 +200,6 @@
             { name: "Quantum Cluster V7", price: 600, gain: 0.00019835, img: "miner7.jpg" }
         ];
 
-        // Mostrar a loja
         function renderShop() {
             const container = document.getElementById('shop-list');
             container.innerHTML = miners.map(m => {
@@ -203,22 +207,22 @@
                 const monthGain = (m.gain * 2592000).toFixed(2);
                 return `
                     <div class="miner-card">
-                        <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/500x250/111/00ff9d?text=Imagem+JPG+em+falta'">
+                        <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/500x250/111/00ff9d?text=Ficheiro+JPG+não+encontrado'">
                         <div class="miner-body">
                             <h4 class="miner-title">${m.name}</h4>
-                            <span style="color:var(--s); font-family:Orbitron; font-size:14px;">Preço: € ${m.price.toFixed(2)}</span>
+                            <span style="color:var(--s); font-family:Orbitron; font-size:14px; font-weight:bold;">PREÇO: € ${m.price.toFixed(2)}</span>
                             <table class="profit-table">
                                 <tr><th>Lucro/Dia</th><th>Lucro/Mês</th></tr>
                                 <tr><td>€ ${dayGain}</td><td>€ ${monthGain}</td></tr>
                             </table>
-                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">ADQUIRIR</button>
+                            <button class="buy-btn" onclick="comprar(${m.price}, ${m.gain})">INVESTIR</button>
                         </div>
                     </div>`;
             }).join('');
         }
         renderShop();
 
-        // Ciclo de atualização de saldo (Mining passivo)
+        // Loop Principal
         function updateLoop() {
             const now = Date.now();
             const diff = (now - state.lastUpdate) / 1000;
@@ -233,13 +237,13 @@
         }
         updateLoop();
 
-        // Clique manual
+        // Clique Manual
         document.getElementById('main-clicker').onclick = () => {
             state.balance += 0.00050;
-            webapp.HapticFeedback.impactOccurred('medium');
+            webapp.HapticFeedback.impactOccurred('light');
         };
 
-        // Trocar de aba
+        // Troca de Tabs
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -248,25 +252,33 @@
             webapp.HapticFeedback.selectionChanged();
         }
 
-        // Sistema de compra
+        // Sistema de Compra
         function comprar(preco, ganho) {
             if(state.balance >= preco) {
                 state.balance -= preco;
                 state.pps += ganho;
-                webapp.showAlert("Investimento concluído!");
+                webapp.showAlert("Sucesso! O teu hardware já está a minerar.");
+                webapp.HapticFeedback.notificationOccurred('success');
             } else {
-                webapp.showAlert("Saldo insuficiente para comprar este hardware.");
+                webapp.showAlert("Saldo insuficiente.");
+                webapp.HapticFeedback.notificationOccurred('error');
             }
         }
 
-        // Publicidade
+        // Adsgram - Botão Boost Atualizado
         const AdController = window.Adsgram.init({ blockId: "22244" });
+
         function verAnuncio() {
-            AdController.show().then(() => {
-                state.balance += 0.10;
-                webapp.showAlert("Obrigado! Recebeste €0.10");
-            }).catch(() => {
-                webapp.showAlert("Sem anúncios disponíveis no momento.");
+            webapp.showConfirm("Queres ver um vídeo para ganhar bónus de €0.10?", (confirm) => {
+                if (confirm) {
+                    AdController.show().then(() => {
+                        state.balance += 0.10;
+                        webapp.showAlert("BOOST! Recebeste €0.10");
+                    }).catch((err) => {
+                        console.error(err);
+                        webapp.showAlert("Anúncio indisponível. Tenta novamente mais tarde.");
+                    });
+                }
             });
         }
     </script>
