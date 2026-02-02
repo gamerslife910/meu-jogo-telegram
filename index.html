@@ -12,62 +12,76 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; }
         
-        /* ECRÃ DE SPLASH (LOADING) */
+        /* SPLASH SCREEN */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; transition: 0.5s;
+            align-items: center; justify-content: center; transition: 0.8s ease-in-out;
         }
-        .splash-logo { width: 180px; height: 180px; border-radius: 50%; border: 2px solid var(--p); box-shadow: 0 0 30px var(--p); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        .splash-logo { width: 180px; height: 180px; border-radius: 50%; border: 2px solid var(--p); box-shadow: 0 0 40px var(--p); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); filter: brightness(0.8); } 50% { transform: scale(1.05); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(0.8); } }
 
-        /* INTERFACE PRINCIPAL */
-        .header { background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); padding: 20px 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
-        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--p); margin: 5px 0; text-shadow: 0 0 15px rgba(0,255,157,0.4); }
+        /* HEADER COM LOGO */
+        .header { 
+            background: linear-gradient(180deg, rgba(0,255,157,0.15) 0%, transparent 100%); 
+            padding: 15px; 
+            text-align: center; 
+            border-bottom: 1px solid #222; 
+            position: sticky; top: 0; z-index: 100; 
+            backdrop-filter: blur(15px); 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .mini-logo { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--p); margin-bottom: 5px; box-shadow: 0 0 10px var(--p); }
+        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 2.1rem; color: var(--p); margin: 2px 0; text-shadow: 0 0 15px rgba(0,255,157,0.4); }
         .pps-badge { background: rgba(0,255,157,0.1); color: var(--p); padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,255,157,0.3); }
 
-        .tab-content { display: none; padding: 20px 15px; height: 75vh; overflow-y: auto; animation: fadeIn 0.4s; }
+        /* CONTENT TABS */
+        .tab-content { display: none; padding: 20px 15px; height: 72vh; overflow-y: auto; animation: fadeIn 0.4s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* CARDS */
         .miner-card { background: var(--card); border-radius: 20px; border: 1px solid #282828; margin-bottom: 25px; overflow: hidden; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .miner-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid var(--p); }
-        .owned-badge { position: absolute; top: 10px; right: 10px; background: var(--p); color: black; padding: 2px 12px; border-radius: 20px; font-weight: bold; font-family: 'Orbitron'; font-size: 12px; box-shadow: 0 0 10px var(--p); }
+        .owned-badge { position: absolute; top: 12px; right: 12px; background: var(--p); color: black; padding: 2px 14px; border-radius: 20px; font-weight: bold; font-family: 'Orbitron'; font-size: 13px; box-shadow: 0 0 15px var(--p); z-index: 2; }
         
-        #click-area { text-align: center; padding: 30px 0; position: relative; }
-        #main-clicker { font-size: 130px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: 0.1s; z-index: 5; }
+        /* CLICKER */
+        #click-area { text-align: center; padding: 20px 0; position: relative; }
+        #main-clicker { font-size: 120px; cursor: pointer; display: inline-block; filter: drop-shadow(0 0 20px var(--p)); transition: 0.1s; }
         #main-clicker:active { transform: scale(0.85); }
         
         .particle { position: absolute; color: var(--p); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 10; }
-        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-120px); } }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130px); } }
 
+        /* MENU */
         .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95); display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #222; z-index: 1000; }
         .nav-item { color: #555; font-size: 11px; text-align: center; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; }
         .nav-item.active { color: var(--p); text-shadow: 0 0 10px var(--p); }
 
-        .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 16px; border-radius: 14px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; cursor: pointer; font-size: 12px; }
-        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; cursor: pointer; }
+        .btn-action { background: #1a1a1a; color: white; border: 1px solid var(--s); padding: 15px; border-radius: 14px; width: 100%; font-family: 'Orbitron'; margin-top: 10px; cursor: pointer; font-size: 12px; }
+        .btn-buy { background: var(--p); color: black; border: none; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s; }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <img src="logo.jpg" class="splash-logo" onerror="this.src='https://via.placeholder.com/180?text=EuroDash'">
-        <h2 style="font-family: 'Orbitron'; color: var(--p); margin-top: 20px; letter-spacing: 4px;">CARREGANDO...</h2>
+        <img src="logo.jpg" class="splash-logo" onerror="this.src='https://via.placeholder.com/180?text=EURODASH'">
+        <h2 style="font-family: 'Orbitron'; color: var(--p); margin-top: 25px; letter-spacing: 5px; font-size: 16px;">SISTEMA INICIADO</h2>
     </div>
 
     <div class="header">
+        <img src="logo.jpg" class="mini-logo" onerror="this.style.display='none'">
         <div class="balance-val">€ <span id="balance">0.00000</span></div>
-        <div class="pps-badge">LUCRO/H: +<span id="pph">0.0000</span> €</div>
+        <div class="pps-badge"> RENDIMENTO/H: +<span id="pph">0.0000</span> €</div>
     </div>
 
     <div id="tab-mine" class="tab-content active">
         <div id="click-area">
             <div id="main-clicker">⚡</div>
         </div>
-        <div style="padding-top: 20px;">
+        <div style="padding-top: 10px; max-width: 320px; margin: 0 auto;">
             <button onclick="verAnuncio()" class="btn-action">📺 VIDEO BOOST (+€0.10)</button>
-            <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 RECOMPENSA DIÁRIA</button>
+            <button onclick="checkDaily()" class="btn-action" style="border-color: var(--p);">🎁 BÓNUS DIÁRIO</button>
         </div>
     </div>
 
@@ -76,21 +90,22 @@
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINE</div>
-        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 LOJA</div>
+        <div class="nav-item active" id="nav-mine" onclick="showTab('mine')">⚡ MINERAR</div>
+        <div class="nav-item" id="nav-store" onclick="showTab('store')">🛒 MERCADO</div>
     </div>
 
     <script>
         const webapp = window.Telegram.WebApp;
         webapp.expand();
+        webapp.ready();
 
-        // Splash screen timeout
         setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => document.getElementById('splash').style.display = 'none', 500);
+            const sp = document.getElementById('splash');
+            sp.style.opacity = '0';
+            setTimeout(() => sp.style.display = 'none', 800);
         }, 2500);
 
-        let state = JSON.parse(localStorage.getItem('eurodash_pro_v3')) || {
+        let state = JSON.parse(localStorage.getItem('eurodash_pro_v5')) || {
             balance: 0, pps: 0, lastUpdate: Date.now(),
             inventory: [0, 0, 0, 0, 0, 0, 0],
             lastDaily: 0
@@ -110,12 +125,12 @@
             const container = document.getElementById('shop-list');
             container.innerHTML = miners.map((m, i) => `
                 <div class="miner-card">
-                    ${state.inventory[i] > 0 ? `<div class="owned-badge">x${state.inventory[i]}</div>` : ''}
-                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x200?text=Hardware'">
-                    <div style="padding:15px;">
-                        <div style="font-family:Orbitron; font-size:17px; margin-bottom:5px;">${m.name}</div>
-                        <div style="color:var(--s); font-size:13px; margin-bottom:15px; font-weight:bold;">PREÇO: €${m.price}</div>
-                        <button class="btn-buy" onclick="comprar(${i})">ADQUIRIR AGORA</button>
+                    ${state.inventory[i] > 0 ? `<div class="owned-badge">POSSUÍDOS: ${state.inventory[i]}</div>` : ''}
+                    <img src="${m.img}" class="miner-img" onerror="this.src='https://via.placeholder.com/400x200?text=Hardware+Offline'">
+                    <div style="padding:18px;">
+                        <div style="font-family:Orbitron; font-size:18px; margin-bottom:5px; color:#fff;">${m.name}</div>
+                        <div style="color:var(--s); font-size:13px; margin-bottom:15px; font-weight:bold; letter-spacing:1px;">CUSTO: €${m.price.toFixed(2)}</div>
+                        <button class="btn-buy" onclick="comprar(${i})">INVESTIR</button>
                     </div>
                 </div>
             `).join('');
@@ -128,13 +143,12 @@
                 state.inventory[i]++;
                 renderShop();
                 webapp.HapticFeedback.notificationOccurred('success');
-            } else { webapp.showAlert("Saldo insuficiente!"); }
+            } else { webapp.showAlert("Saldo insuficiente."); }
         }
 
         document.getElementById('main-clicker').onclick = (e) => {
             state.balance += 0.0005;
-            webapp.HapticFeedback.impactOccurred('medium');
-            
+            webapp.HapticFeedback.impactOccurred('light');
             const p = document.createElement('div');
             p.className = 'particle';
             p.innerText = '+€0.0005';
@@ -149,7 +163,7 @@
                 state.balance += 0.05;
                 state.lastDaily = now;
                 webapp.showAlert("Bónus Diário Coletado: €0.05!");
-            } else { webapp.showAlert("Já coletaste hoje! Volta daqui a 24h."); }
+            } else { webapp.showAlert("Volta amanhã para mais!"); }
         }
 
         function updateLoop() {
@@ -159,7 +173,7 @@
             state.lastUpdate = now;
             document.getElementById('balance').innerText = state.balance.toFixed(5);
             document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
-            localStorage.setItem('eurodash_pro_v3', JSON.stringify(state));
+            localStorage.setItem('eurodash_pro_v5', JSON.stringify(state));
             requestAnimationFrame(updateLoop);
         }
 
@@ -172,10 +186,18 @@
             webapp.HapticFeedback.selectionChanged();
         }
 
-        const AdController = window.Adsgram.init({ blockId: "22244" });
+        // UNIT ID: 22250
+        const AdController = window.Adsgram.init({ blockId: "22250" });
         function verAnuncio() {
-            AdController.show().then(() => { state.balance += 0.10; webapp.showAlert("Boost: €0.10 creditados!"); })
-            .catch(() => webapp.showAlert("Sem anúncios disponíveis. Tenta em 5 min."));
+            webapp.showConfirm("Queres ver um vídeo para ganhar €0.10?", (confirm) => {
+                if (confirm) {
+                    AdController.show().then(() => {
+                        state.balance += 0.10; webapp.showAlert("Sucesso!");
+                    }).catch(() => {
+                        webapp.showAlert("Anúncio indisponível.");
+                    });
+                }
+            });
         }
 
         updateLoop();
