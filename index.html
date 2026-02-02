@@ -15,58 +15,28 @@
         :root { --p: #00ff9d; --s: #00b0ff; --bg: #050505; --card: #0d0d0d; --border: #1a1a1a; --accent: #ff5e00; }
         body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 100px; overflow: hidden; user-select: none; touch-action: none; }
 
-        /* LOADER FUTURISTA V3 */
-        #loader { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: radial-gradient(circle at center, #0a1a14 0%, #000 100%); 
-            z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: opacity 0.8s ease-out;
-        }
-
-        .loader-visual {
-            position: relative; width: 150px; height: 150px; margin-bottom: 40px;
-        }
-
-        .circle-outer {
-            position: absolute; width: 100%; height: 100%;
-            border: 2px solid rgba(0, 255, 157, 0.1); border-radius: 50%;
-            border-top: 2px solid var(--p); animation: spin 2s linear infinite;
-        }
-
-        .circle-inner {
-            position: absolute; width: 70%; height: 70%; top: 15%; left: 15%;
-            border: 1px dashed var(--s); border-radius: 50%;
-            animation: spin-rev 4s linear infinite; opacity: 0.5;
-        }
-
-        .pulse-core {
-            position: absolute; width: 20%; height: 20%; top: 40%; left: 40%;
-            background: var(--p); border-radius: 50%;
-            box-shadow: 0 0 30px var(--p); animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .euro-glitch {
-            font-family: 'Orbitron'; font-size: 24px; font-weight: 700; color: white;
-            letter-spacing: 8px; text-shadow: 2px 2px var(--accent); margin-bottom: 10px;
-        }
-
-        .progress-container { width: 250px; position: relative; }
-        .progress-frame { 
-            width: 100%; height: 6px; background: rgba(0,0,0,0.5); 
-            border: 1px solid #333; border-radius: 10px; overflow: hidden; margin-top: 10px;
-        }
+        /* LOADER */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at center, #0a1a14 0%, #000 100%); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease-out; }
+        .loader-visual { position: relative; width: 150px; height: 150px; margin-bottom: 40px; }
+        .circle-outer { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(0, 255, 157, 0.1); border-radius: 50%; border-top: 2px solid var(--p); animation: spin 2s linear infinite; }
+        .pulse-core { position: absolute; width: 20%; height: 20%; top: 40%; left: 40%; background: var(--p); border-radius: 50%; box-shadow: 0 0 30px var(--p); animation: pulse 1.5s ease-in-out infinite; }
+        .euro-glitch { font-family: 'Orbitron'; font-size: 24px; font-weight: 700; color: white; letter-spacing: 8px; text-shadow: 2px 2px var(--accent); }
+        .progress-frame { width: 250px; height: 6px; background: rgba(0,0,0,0.5); border: 1px solid #333; border-radius: 10px; overflow: hidden; margin-top: 20px; }
         #load-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--s), var(--p)); box-shadow: 0 0 15px var(--p); transition: width 0.4s; }
-
-        #load-msg { 
-            font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--p); 
-            text-transform: uppercase; margin-top: 15px; height: 15px; letter-spacing: 1px;
-        }
+        #load-msg { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--p); text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes spin-rev { to { transform: rotate(-360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.3); opacity: 1; } }
+        
+        /* ANIMAÇÃO DO CLIQUE */
+        @keyframes pulse-clicker {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px var(--p)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 20px var(--p)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px var(--p)); }
+        }
+        .click-icon-animated { width: 180px; height: 180px; border-radius: 30px; object-fit: cover; animation: pulse-clicker 2s ease-in-out infinite; border: 2px solid var(--border); }
 
-        /* HEADER & UI */
+        /* UI */
         .header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
         .balance-val { font-family: 'Orbitron'; font-size: 2.2rem; color: white; margin: 5px 0; }
         .stats-grid { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
@@ -75,47 +45,37 @@
         
         .tab-content { display: none; padding: 15px; height: 68vh; overflow-y: auto; }
         .tab-content.active { display: block; }
-
         .miner-row { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
-        .icon-box { width: 48px; height: 48px; background: #151515; border-radius: 10px; border: 1px solid var(--p); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .icon-box img { width: 100%; height: 100%; object-fit: cover; }
-        
         .btn-buy { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; }
-        .btn-withdraw { background: #1ba085; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; width: 100%; max-width: 220px; }
-
+        
         .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { padding: 15px 0; color: #444; font-size: 9px; text-align: center; font-family: 'Orbitron'; flex: 1; }
         .nav-item.active { color: white; border-top: 2px solid var(--accent); background: rgba(255, 94, 0, 0.05); }
-
-        #adm-log { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #00ff00; background: #000; height: 180px; overflow-y: auto; margin-top: 10px; padding: 10px; border: 1px solid #333; }
+        #adm-log { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #00ff00; background: #000; height: 180px; overflow-y: auto; padding: 10px; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loader-visual">
-            <div class="circle-outer"></div>
-            <div class="circle-inner"></div>
-            <div class="pulse-core"></div>
-        </div>
+        <div class="loader-visual"><div class="circle-outer"></div><div class="pulse-core"></div></div>
         <div class="euro-glitch">EURODASH</div>
-        <div class="progress-container">
-            <div class="progress-frame"><div id="load-bar"></div></div>
-        </div>
+        <div class="progress-frame"><div id="load-bar"></div></div>
         <div id="load-msg">INITIALIZING SYSTEM...</div>
     </div>
 
     <div class="header">
         <div class="stats-grid">
-            <div class="stat-box"><div class="stat-label">TAP PROFIT</div><div style="font-size:12px">€0.0005</div></div>
+            <div class="stat-box"><div class="stat-label">TAP PROFIT</div><div style="font-size:12px">€0.00005</div></div>
             <div class="stat-box"><div class="stat-label" style="color:var(--p)">PROFIT/H</div><div style="font-size:12px">€<span id="pph">0.0000</span></div></div>
         </div>
         <div class="balance-val"><span id="balance">0.00000</span> EUR</div>
-        <button class="btn-withdraw" onclick="webapp.showAlert('Min. Withdraw: 50.00 EUR')">WITHDRAW</button>
+        <button style="background: #1ba085; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; width: 100%; max-width: 220px;" onclick="webapp.showAlert('Min. Withdraw: 50.00 EUR')">WITHDRAW</button>
     </div>
 
     <div id="tab-mine" class="tab-content active" style="text-align: center;">
-        <div id="click-area" style="padding: 50px 0; font-size: 140px; cursor: pointer;">⚡</div>
+        <div id="click-area" style="padding: 30px 0; cursor: pointer;">
+            <img src="image_3.jpg" class="click-icon-animated" alt="Core">
+        </div>
         <div style="font-family: Orbitron; font-size: 12px; color: #ffdd00;">ENERGY CORE: <span id="energy-val">500</span>/500</div>
         <div style="width: 200px; height: 6px; background: #111; margin: 15px auto; border-radius: 10px; border: 1px solid #222;">
             <div id="energy-fill" style="height:100%; background: orange; width: 100%;"></div>
@@ -123,22 +83,14 @@
     </div>
 
     <div id="tab-market" class="tab-content"><div id="shop-list"></div></div>
-
     <div id="tab-friends" class="tab-content">
         <h3 style="font-family: Orbitron; color: var(--accent);">NETWORK</h3>
-        <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222; font-size: 12px; margin-bottom: 15px;" id="ref-url">
-            https://t.me/EuroDashMinerBot?start=22250
-        </div>
+        <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222; font-size: 12px; margin-bottom: 15px;" id="ref-url">https://t.me/EuroDashMinerBot?start=22250</div>
         <button class="btn-buy" style="width:100%" onclick="copyLink()">COPY LINK</button>
-        <div id="ref-list" style="margin-top:25px; font-size: 13px; color: #444; text-align: center;">No active nodes found.</div>
     </div>
 
     <div id="tab-admin" class="tab-content">
-        <h3 style="font-family: Orbitron; color: var(--p);">ADMIN PANEL</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="stat-box"><div class="stat-label">TOTAL USERS</div><div id="adm-users">0</div></div>
-            <div class="stat-box"><div class="stat-label">TOTAL EUR</div><div id="adm-cash">0.00</div></div>
-        </div>
+        <h3 style="font-family: Orbitron; color: var(--p);">SUPERUSER ADMIN</h3>
         <div id="adm-log"></div>
     </div>
 
@@ -169,25 +121,14 @@
         let state = { balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0], energy: 500 };
         let ready = false;
 
+        // ECONOMIA EQUILIBRADA: Primeiro item mais barato para retenção
         const miners = [
-            { name: "Starter Miner", price: 1.00, gain: 0.00000033, img: "miner1.jpg" },
-            { name: "Turbo Lite", price: 10.00, gain: 0.00000350, img: "miner2.jpg" },
-            { name: "Cyber Rig", price: 50.00, gain: 0.00001850, img: "miner3.jpg" },
-            { name: "Industrial Rack", price: 150.00, gain: 0.00006500, img: "miner4.jpg" }
+            { name: "Micro Node", price: 0.05, gain: 0.00000010 },
+            { name: "Starter Miner", price: 1.00, gain: 0.00000033 },
+            { name: "Turbo Lite", price: 10.00, gain: 0.00000350 },
+            { name: "Cyber Rig", price: 50.00, gain: 0.00001850 }
         ];
 
-        const bootMsgs = [
-            "CONNECTING TO SECURE SERVER...",
-            "DECRYPTING BLOCKCHAIN DATA...",
-            "SYNCING QUANTUM NODES...",
-            "BYPASSING NETWORK FIREWALL...",
-            "VALIDATING USER IDENTITY...",
-            "ACCESSING EURODASH DATABASE...",
-            "ESTABLISHING HANDSHAKE...",
-            "SYSTEM READY. WELCOME ELITE."
-        ];
-
-        // SYNC E LOADER LENTO
         db.ref('users/' + myID).once('value', (snap) => {
             if(snap.exists()) {
                 state = snap.val();
@@ -199,41 +140,20 @@
 
         function startLoader() {
             let progress = 0;
+            const bootMsgs = ["BOOTING...", "SYNCING NODES...", "ACCESSING DB...", "READY."];
             const interval = setInterval(() => {
-                progress += Math.random() * 2; // Avança aleatoriamente para parecer real
-                if(progress > 100) progress = 100;
-                
+                progress += 2;
                 document.getElementById('load-bar').style.width = progress + "%";
-                
-                // Muda a mensagem de acordo com o progresso
-                const msgIndex = Math.floor((progress / 100) * bootMsgs.length);
-                if(bootMsgs[msgIndex]) {
-                    document.getElementById('load-msg').innerText = bootMsgs[msgIndex];
-                }
-
+                document.getElementById('load-msg').innerText = bootMsgs[Math.floor((progress/101)*bootMsgs.length)];
                 if(progress >= 100) {
-                    clearInterval(interval);
-                    ready = true;
-                    updateUI();
-                    if(myID == 22250) {
-                        const nav = document.querySelector('.nav');
-                        if(!document.getElementById('n-admin'))
-                            nav.innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
-                    }
-                    setTimeout(() => {
-                        document.getElementById('loader').style.opacity = '0';
-                        setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
-                    }, 1000);
+                    clearInterval(interval); ready = true; updateUI();
+                    if(myID == 22250) document.querySelector('.nav').innerHTML += `<div class="nav-item" id="n-admin" onclick="showTab('admin')">ADMIN</div>`;
+                    setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 800);
                 }
-            }, 80); // Velocidade controlada para demorar uns 8-10 seg
+            }, 120); 
         }
 
-        function save() {
-            if(ready) {
-                state.lastUpdate = Date.now();
-                db.ref('users/' + myID).set(state);
-            }
-        }
+        function save() { if(ready) { state.lastUpdate = Date.now(); db.ref('users/' + myID).set(state); }}
 
         function updateUI() {
             document.getElementById('balance').innerText = state.balance.toFixed(5);
@@ -254,7 +174,6 @@
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
                 <div class="miner-row">
-                    <div class="icon-box"><img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2972/2972185.png'"></div>
                     <div style="flex-grow:1">
                         <div style="font-family:Orbitron; font-size:13px">${m.name}</div>
                         <div style="font-size:11px; color:#666">Level: ${state.inventory[i] || 0} • €${m.price.toFixed(2)}</div>
@@ -276,7 +195,7 @@
         document.getElementById('click-area').addEventListener('touchstart', (e) => {
             e.preventDefault();
             if(!ready || state.energy < 1) return;
-            state.balance += 0.0005; state.energy -= 1;
+            state.balance += 0.00005; state.energy -= 1;
             updateUI();
             webapp.HapticFeedback.impactOccurred('light');
         });
@@ -284,36 +203,23 @@
         function refreshAdmin() {
             db.ref('users').once('value', (snap) => {
                 const users = snap.val();
-                let count = 0, total = 0, log = "";
-                for(let id in users) {
-                    count++; total += (users[id].balance || 0);
-                    log += `> NODE_${id}: €${(users[id].balance || 0).toFixed(2)}<br>`;
-                }
-                document.getElementById('adm-users').innerText = count;
-                document.getElementById('adm-cash').innerText = total.toFixed(2);
+                let log = "SYSTEM LOG:<br>";
+                for(let id in users) { log += `> USER_${id}: €${(users[id].balance || 0).toFixed(2)}<br>`; }
                 document.getElementById('adm-log').innerHTML = log;
             });
         }
 
-        function copyLink() {
-            navigator.clipboard.writeText("https://t.me/EuroDashMinerBot?start=" + myID);
-            webapp.showAlert("Affiliate link copied!");
-        }
+        function copyLink() { navigator.clipboard.writeText("https://t.me/EuroDashMinerBot?start=" + myID); webapp.showAlert("Link Copied!"); }
 
-        setInterval(() => {
-            if(ready) {
-                const now = Date.now();
-                const diff = (now - state.lastUpdate) / 1000;
-                state.balance += state.pps * diff;
-                if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.4));
-                state.lastUpdate = now;
-                updateUI();
-            }
-        }, 1000);
-
+        setInterval(() => { if(ready) { 
+            const now = Date.now(); const diff = (now - state.lastUpdate) / 1000;
+            state.balance += state.pps * diff; 
+            // ENERGIA REGENERA MAIS RÁPIDO AGORA (0.8/s)
+            if(state.energy < 500) state.energy = Math.min(500, state.energy + (diff * 0.8));
+            state.lastUpdate = now; updateUI(); 
+        }}, 1000);
         setInterval(save, 5000);
         window.addEventListener('blur', save);
-        window.addEventListener('beforeunload', save);
     </script>
 </body>
 </html>
