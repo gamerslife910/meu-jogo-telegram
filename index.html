@@ -70,9 +70,11 @@
         const webapp = window.Telegram.WebApp;
         webapp.expand();
 
-        const SAVE_KEY = 'eurodash_v14_fix';
+        const SAVE_KEY = 'eurodash_v15_final';
         
-        let state = JSON.parse(localStorage.getItem(SAVE_KEY)) || {
+        // 1. CARREGAR OS DADOS LOGO NO INÍCIO
+        let saved = localStorage.getItem(SAVE_KEY);
+        let state = saved ? JSON.parse(saved) : {
             balance: 0, pps: 0, lastUpdate: Date.now(), inventory: [0,0,0,0,0,0,0], 
             lastDaily: 0, energy: 500
         };
@@ -91,17 +93,30 @@
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
         }
 
-        // ATUALIZAÇÃO IMEDIATA DO SALDO AO CARREGAR
+        // FUNÇÃO DE ATUALIZAÇÃO QUE ESCREVE NO HTML
         function updateUI() {
-            document.getElementById('balance').innerText = state.balance.toFixed(5);
-            document.getElementById('energy-val').innerText = Math.floor(state.energy);
-            document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
-            document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
+            if(document.getElementById('balance')) {
+                document.getElementById('balance').innerText = state.balance.toFixed(5);
+            }
+            if(document.getElementById('energy-val')) {
+                document.getElementById('energy-val').innerText = Math.floor(state.energy);
+            }
+            if(document.getElementById('energy-bar')) {
+                document.getElementById('energy-bar').style.width = (state.energy / 500 * 100) + "%";
+            }
+            if(document.getElementById('pph')) {
+                document.getElementById('pph').innerText = (state.pps * 3600).toFixed(4);
+            }
             
             const clicker = document.getElementById('main-clicker');
-            if(state.energy < 1) clicker.classList.add('disabled');
-            else clicker.classList.remove('disabled');
+            if(clicker) {
+                if(state.energy < 1) clicker.classList.add('disabled');
+                else clicker.classList.remove('disabled');
+            }
         }
+
+        // 2. EXECUTAR A ATUALIZAÇÃO LOGO AQUI (FORÇA O SALDO A APARECER)
+        updateUI();
 
         function renderShop() {
             document.getElementById('shop-list').innerHTML = miners.map((m, i) => `
@@ -180,9 +195,11 @@
             } else { webapp.showAlert("Volta amanhã!"); }
         }
 
-        // INICIALIZAÇÃO FORÇADA
-        updateUI(); 
-        updateLoop();
+        // 3. SEGUNDO REFORÇO DE INICIALIZAÇÃO
+        window.onload = () => {
+            updateUI();
+            updateLoop();
+        };
         renderShop();
     </script>
 </body>
