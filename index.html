@@ -31,7 +31,9 @@
 
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
         .glitch { font-size: 40px; font-weight: bold; color: #0f9; text-shadow: 2px 2px #f0f; animation: glitch 1s infinite; letter-spacing: 5px; }
-        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+        
+        /* DEBUG LOG STYLE */
+        #debug-log { color: yellow; font-size: 10px; margin-top: 10px; width: 90%; text-align: left; background: #111; padding: 10px; border: 1px solid #333; height: 150px; overflow-y: auto; }
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
@@ -81,7 +83,6 @@
         .a-approve { background: #0f9; color: #000; }
         .a-reject { background: #f00; color: #fff; }
         
-        /* DICE & COIN GAME */
         .game-box { background:#111; border:1px solid #333; border-radius:10px; padding:20px; margin-bottom:10px; text-align:center; position:relative; overflow:hidden;}
         .game-res { font-size:32px; font-weight:bold; margin:10px 0; color:#fff; min-height:40px; }
         .win { color:#0f9; text-shadow:0 0 20px #0f9; }
@@ -112,8 +113,8 @@
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
-        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
+        <div id="debug-log">Log:<br></div>
+        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE (FORCE)</button>
     </div>
 
     <div id="modal-tutorial" class="modal">
@@ -316,6 +317,13 @@
     </div>
 
     <script>
+        // LOG SYSTEM FOR DEBUGGING
+        function log(msg) {
+            console.log(msg);
+            let d = document.getElementById('debug-log');
+            if(d) d.innerHTML += ">> " + msg + "<br>";
+        }
+
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -358,7 +366,6 @@
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
-        
         const ADMIN_ID = 253106429; 
 
         let CUR_LANG = 'en';
@@ -450,6 +457,7 @@
         } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
 
         try {
+            log("Init Firebase...");
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
                 authDomain: "eurodash-official.firebaseapp.com",
@@ -459,20 +467,24 @@
                 messagingSenderId: "633116941203",
                 appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666"
             });
-        } catch(err) { console.log(err); }
+            log("Firebase OK");
+        } catch(err) { log("Firebase Init Error: " + err.message); }
 
         const db = firebase.database();
 
         window.onload = function() {
+            log("Window Loaded");
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
             document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
             
             setLang('en');
-            setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
+            setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 4000);
 
             if(uid == ADMIN_ID) { document.getElementById('btn-admin').style.display = 'block'; }
 
+            log("Connecting DB...");
             db.ref('users/' + uid).once('value').then(s => {
+                log("Data Received");
                 if(s.exists()) {
                     let d = s.val();
                     u = { ...u, ...d };
@@ -494,7 +506,9 @@
                 checkDaily();
                 finishLoad();
             }).catch(error => {
-                document.getElementById('load-status').innerText = txt[CUR_LANG].db_err + error.code;
+                log("DB Error: " + error.message);
+                document.getElementById('load-status').innerText = "FAILED: " + error.code;
+                document.getElementById('load-status').style.color = "red";
                 document.getElementById('force-btn').style.display = 'block';
             });
 
@@ -511,18 +525,14 @@
             let el = document.getElementById('dice-result');
             el.innerText = "ROLLING...";
             el.className = "game-res";
-            
             setTimeout(() => {
                 let win = Math.random() > 0.55; 
                 if(win) {
-                    let profit = bet * 2;
-                    u.bal += profit;
-                    el.innerText = "WIN! +€" + profit.toFixed(2);
-                    el.className = "game-res win";
+                    let profit = bet * 2; u.bal += profit;
+                    el.innerText = "WIN! +€" + profit.toFixed(2); el.className = "game-res win";
                     tg.HapticFeedback.notificationOccurred('success');
                 } else {
-                    el.innerText = "LOST -€" + bet.toFixed(2);
-                    el.className = "game-res lose";
+                    el.innerText = "LOST -€" + bet.toFixed(2); el.className = "game-res lose";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
                 up();
@@ -536,15 +546,12 @@
             u.bal -= bet;
             let el = document.getElementById('coin-result');
             el.classList.add('coin-anim');
-            
             setTimeout(() => {
                 el.classList.remove('coin-anim');
                 let outcome = Math.random() > 0.5 ? 'heads' : 'tails';
                 let symbol = outcome === 'heads' ? '🟡' : '🦅';
-                
                 if(choice === outcome) {
-                    let profit = bet * 2;
-                    u.bal += profit;
+                    let profit = bet * 2; u.bal += profit;
                     el.innerHTML = symbol + "<br><span class='win'>WIN!</span>";
                     tg.HapticFeedback.notificationOccurred('success');
                 } else {
@@ -823,7 +830,7 @@
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openSupport() { tg.openTelegramLink("https://t.me/EuroDashOfficial"); }
+        function openSupport() { tg.openTelegramLink("https://t.me/EuroDash_Support"); }
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'modal-withdraw') {
