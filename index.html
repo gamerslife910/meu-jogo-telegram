@@ -50,7 +50,6 @@
         .n-btn.active { color: #0f9; text-shadow: 0 0 10px rgba(0,255,153,0.6); }
         .n-icon { font-size: 22px; margin-bottom: 2px; }
 
-        /* Botão de Emergência */
         #force-btn { display:none; margin-top:20px; padding:10px 20px; background:red; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; z-index:99999; }
     </style>
 </head>
@@ -90,9 +89,20 @@
             <span class="close-btn" onclick="closeModal('modal-withdraw')">&times;</span>
             <h3 style="color:#ff3333">WITHDRAW (TRC20)</h3>
             <p style="font-size:12px; color:#888;">Min: €1.00 | Fee: 2%</p>
+            
+            <div style="text-align:right; margin-bottom:5px; font-size:12px;">
+                <span style="color:#888">Disponível:</span> <span style="color:#fff">€<span id="wd-avail">0.00</span></span>
+                <span style="color:#0f9; cursor:pointer; margin-left:8px; font-weight:bold; border:1px solid #0f9; padding:0 4px; border-radius:3px;" onclick="setMax()">MÁX</span>
+            </div>
+
             <input type="text" id="wd-addr" class="inp" placeholder="Paste TRC20 Address">
             <input type="number" id="wd-amount" class="inp" placeholder="Amount (€)" oninput="calcFee()">
-            <div style="font-size:13px; margin:10px 0;">Receive: <b style="color:#fff">€<span id="wd-final">0.00</span></b></div>
+            
+            <div style="font-size:13px; margin:10px 0; background:#222; padding:10px; border-radius:5px;">
+                Vais Receber: <b style="color:#fff; font-size:16px;">€<span id="wd-final">0.00</span></b>
+                <div style="color:#555; font-size:10px;">(Taxas incluídas)</div>
+            </div>
+            
             <button class="w-btn" onclick="submitWithdraw()">CONFIRM</button>
         </div>
     </div>
@@ -196,7 +206,6 @@
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
         let loaded = false;
         
-        // ESTA É A FUNÇÃO GLOBAL DE ARRANQUE
         window.finishLoad = function() {
             if(loaded) return;
             loaded = true;
@@ -214,7 +223,7 @@
             uid = 22250; uName = "Test User";
         }
 
-        // --- FIREBASE OFICIAL (TUAS CHAVES) ---
+        // --- FIREBASE OFICIAL (V30) ---
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
@@ -232,11 +241,10 @@
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
             
-            // TIMEOUT DE SEGURANÇA: Se a DB falhar, entra em 2s
             setTimeout(() => {
                 if(!loaded) {
                     console.log("DB Slow/Error. Playing anyway.");
-                    finishLoad(); // ENTRA À FORÇA
+                    finishLoad(); 
                 }
             }, 3000);
 
@@ -257,7 +265,6 @@
                     finishLoad();
                 })
                 .catch(error => {
-                    // SE DER ERRO, ENTRA NA MESMA E MOSTRA MENSAGEM
                     document.getElementById('load-status').innerText = "Error: " + error.message;
                     setTimeout(finishLoad, 2000); 
                 });
@@ -294,23 +301,37 @@
             setTimeout(()=>el.remove(), 800);
         }
 
+        // --- FUNÇÕES DE LEVANTAMENTO NOVAS ---
+        function setMax() {
+            document.getElementById('wd-amount').value = u.bal.toFixed(2);
+            calcFee();
+        }
+
         function calcFee() {
             let val = parseFloat(document.getElementById('wd-amount').value) || 0;
             let final = val - (val * CONFIG.fee);
+            if(final < 0) final = 0;
             document.getElementById('wd-final').innerText = final.toFixed(2);
         }
 
         function submitWithdraw() {
             let addr = document.getElementById('wd-addr').value;
             let val = parseFloat(document.getElementById('wd-amount').value);
+            
             if(!addr.startsWith("T")) { tg.showAlert("Invalid TRC20 Address!"); return; }
             if(val < CONFIG.min_withdraw) { tg.showAlert(`Min withdraw is €${CONFIG.min_withdraw}`); return; }
-            if(u.bal < val) { tg.showAlert("Insufficient Balance!"); return; }
+            
+            // VERIFICAÇÃO DE SALDO EM PORTUGUÊS
+            if(u.bal < val) { 
+                tg.showAlert(`❌ Saldo Insuficiente! Tens apenas €${u.bal.toFixed(2)}`); 
+                return; 
+            }
+
             u.bal -= val;
             up();
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
-            tg.showAlert("Request Sent!");
+            tg.showAlert("Pedido enviado! O dinheiro chegará em breve.");
         }
 
         function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert("Address Copied!"); }
@@ -336,7 +357,6 @@
             }).catch(e => { document.getElementById('rank-list').innerHTML = '<div style="padding:20px; color:red">Offline</div>'; });
         }
 
-        // ESTA FOI A FUNÇÃO QUE EU TINHA ESQUECIDO (AGORA ESTÁ AQUI)
         function checkTasks() {
             if(u.tasks['group']) { 
                 let btn = document.getElementById('task-group');
@@ -369,6 +389,11 @@
             else { l = "TITAN"; w = 100; }
             document.getElementById('l-fill').style.width = w+"%";
             document.getElementById('l-name').innerText = l;
+            
+            // Atualiza Saldo no Modal de Levantamento
+            if(document.getElementById('wd-avail')) {
+                document.getElementById('wd-avail').innerText = u.bal.toFixed(2);
+            }
         }
 
         function renderShop() {
@@ -390,7 +415,10 @@
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if(id === 'modal-withdraw') up(); // Atualiza o saldo ao abrir
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function sw(t) {
             document.querySelectorAll('.tab').forEach(e=>e.style.display='none');
