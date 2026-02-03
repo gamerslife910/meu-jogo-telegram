@@ -9,7 +9,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap'); /* FONTE HACKER */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         
         body { background-color: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
@@ -464,7 +464,7 @@
                     div.innerText = line;
                     container.appendChild(div);
                 }, delay);
-                delay += 800; // 0.8s per line
+                delay += 800;
             });
             setTimeout(() => {
                 if(!loaded) document.getElementById('force-btn').style.display = 'block';
@@ -811,7 +811,8 @@
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
-                document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -827,19 +828,19 @@
         }
 
         function up() {
-            document.getElementById('bal-val').innerText = u.bal.toFixed(5);
-            document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
-            document.getElementById('eg').innerText = Math.floor(u.eng);
-            document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
+            if(document.getElementById('bal-val')) document.getElementById('bal-val').innerText = u.bal.toFixed(5);
+            if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
+            if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
+            if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
             let pct = (u.eng / 500) * 100;
-            document.getElementById('eng-bar').style.width = pct + "%";
+            if(document.getElementById('eng-bar')) document.getElementById('eng-bar').style.width = pct + "%";
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
             else if(u.bal < 200) { l = "CYBER LORD"; w = (u.bal/200)*100; }
             else { l = "TITAN"; w = 100; }
-            document.getElementById('l-fill').style.width = w+"%";
-            document.getElementById('l-name').innerText = l;
+            if(document.getElementById('l-fill')) document.getElementById('l-fill').style.width = w+"%";
+            if(document.getElementById('l-name')) document.getElementById('l-name').innerText = l;
             if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
         }
 
@@ -872,7 +873,7 @@
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); } // FIXED SUPPORT LINK
+        function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); tg.HapticFeedback.impactOccurred('medium'); }
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'modal-withdraw') {
