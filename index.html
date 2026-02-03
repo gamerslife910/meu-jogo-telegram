@@ -62,9 +62,12 @@
         .rank-img { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; border: 1px solid #0f9; background: #333; }
         
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: rgba(5,5,5,0.95); border-top: 1px solid #222; padding-bottom: 20px; padding-top: 10px; z-index: 100; backdrop-filter: blur(10px); }
-        .n-btn { flex: 1; color: #444; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .n-btn { flex: 1; color: #444; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 1px; position: relative; }
         .n-btn.active { color: #0f9; text-shadow: 0 0 10px rgba(0,255,153,0.6); }
         .n-icon { font-size: 22px; margin-bottom: 2px; }
+        
+        /* NOTIFICATION DOT */
+        .badge { position: absolute; top: 0; right: 25%; width: 8px; height: 8px; background: red; border-radius: 50%; border: 1px solid #fff; display: none; box-shadow: 0 0 5px red; }
 
         #force-btn { display:none; margin-top:20px; padding:10px 20px; background:red; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; z-index:99999; }
         
@@ -354,11 +357,23 @@
     </div>
 
     <div class="nav">
-        <div class="n-btn active" id="nb-core" onclick="sw('core')"><span class="n-icon">⚡</span><span id="n-mine">MINE</span></div>
-        <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
-        <div class="n-btn" id="nb-games" onclick="sw('games')"><span class="n-icon">🎲</span><span>GAMES</span></div>
-        <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span id="n-team">TEAM</span></div>
-        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span id="n-rank">RANK</span></div>
+        <div class="n-btn active" id="nb-core" onclick="sw('core')">
+            <span class="n-icon">⚡</span><span id="n-mine">MINE</span>
+        </div>
+        <div class="n-btn" id="nb-shop" onclick="sw('shop')">
+            <span class="n-icon">🛍️</span><span id="n-shop">SHOP</span>
+            <div class="badge" id="badge-shop"></div>
+        </div>
+        <div class="n-btn" id="nb-games" onclick="sw('games')">
+            <span class="n-icon">🎲</span><span id="n-games">GAMES</span>
+            <div class="badge" id="badge-games"></div>
+        </div>
+        <div class="n-btn" id="nb-friends" onclick="sw('friends')">
+            <span class="n-icon">👥</span><span id="n-team">TEAM</span>
+        </div>
+        <div class="n-btn" id="nb-earn" onclick="sw('earn')">
+            <span class="n-icon">🎯</span><span id="n-earn">EARN</span>
+        </div>
     </div>
 
     <script>
@@ -423,7 +438,7 @@
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
                 promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
+                nav: ["MINE", "SHOP", "GAMES", "TEAM", "EARN"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
@@ -878,10 +893,10 @@
                 list.forEach((p, i) => {
                     let style = i===0 ? 'color:#ffd700' : 'color:#fff';
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
-                    let money = p.bal ? p.bal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00";
-                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${money}</span></div>`;
+                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -897,12 +912,8 @@
         }
 
         function up() {
-            // FORMAT NUMBERS NICELY (e.g. 1,234.56)
-            let balFmt = u.bal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); // Balance with commas
-            let balPrecise = u.bal.toFixed(5); // For main display
-
-            if(document.getElementById('bal-val')) document.getElementById('bal-val').innerText = balPrecise;
-            if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = balFmt;
+            if(document.getElementById('bal-val')) document.getElementById('bal-val').innerText = u.bal.toFixed(5);
+            if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
             if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
             let pct = (u.eng / 500) * 100;
@@ -914,7 +925,14 @@
             else { l = "TITAN"; w = 100; }
             if(document.getElementById('l-fill')) document.getElementById('l-fill').style.width = w+"%";
             if(document.getElementById('l-name')) document.getElementById('l-name').innerText = l;
-            if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = balFmt; }
+            if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
+
+            // SMART NOTIFICATIONS
+            if(u.bal >= minerStats[0].p) { document.getElementById('badge-shop').style.display = 'block'; }
+            else { document.getElementById('badge-shop').style.display = 'none'; }
+            
+            if(u.bal >= 0.10) { document.getElementById('badge-games').style.display = 'block'; }
+            else { document.getElementById('badge-games').style.display = 'none'; }
         }
 
         function renderShop() {
@@ -972,6 +990,9 @@
             document.getElementById('tab-'+t).style.display='block';
             document.querySelectorAll('.n-btn').forEach(b=>b.classList.remove('active'));
             if(t !== 'admin') document.getElementById('nb-'+t).classList.add('active');
+            
+            // HAPTIC FEEDBACK ON TAB SWITCH
+            tg.HapticFeedback.impactOccurred('light');
         }
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
