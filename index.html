@@ -87,7 +87,6 @@
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
         <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <div style="color:orange; font-size:10px; margin-top:5px; font-family:monospace;" id="debug-uid"></div>
         <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
     </div>
 
@@ -291,8 +290,8 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         
-        // --- 🛑 MUDAR ISTO PARA O ID QUE APARECE NO TELEMÓVEL ---
-        const ADMIN_ID = 22250; 
+        // --- 🛑 ID DO VIKTOR (AGORA ESTÁ CERTO) ---
+        const ADMIN_ID = 253106429; 
 
         let CUR_LANG = 'en';
         const txt = {
@@ -390,9 +389,6 @@
 
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            // SHOW REAL ID ON LOADING SCREEN SO YOU CAN COPY IT
-            document.getElementById('debug-uid').innerText = "ID: " + uid;
-            
             setLang('en');
             setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
 
