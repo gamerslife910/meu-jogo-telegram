@@ -13,9 +13,8 @@
         body { background-color: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
 
-        /* TICKER BAR (NEWS) */
         .ticker-wrap { position: fixed; top: 40px; left: 0; width: 100%; background: rgba(0,0,0,0.8); overflow: hidden; height: 25px; line-height: 25px; z-index: 40; border-bottom: 1px solid #333; }
-        .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 15s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
+        .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 20s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
         .tab { display: none; padding: 20px; padding-top: 70px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
@@ -107,6 +106,18 @@
         <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
     </div>
 
+    <div id="modal-tutorial" class="modal">
+        <div class="modal-box">
+            <h2 style="color:#0f9">WELCOME, MINER!</h2>
+            <div style="text-align:left; font-size:14px; margin:20px 0; color:#ddd;">
+                1. 👆 <b>TAP</b> to generate Energy.<br><br>
+                2. 🛍️ <b>BUY</b> Miners in the Shop to earn money while you sleep.<br><br>
+                3. 💰 <b>WITHDRAW</b> real money via TRC20.<br>
+            </div>
+            <button class="buy-btn" style="width:100%" onclick="closeModal('modal-tutorial')">LET'S GO!</button>
+        </div>
+    </div>
+
     <div id="modal-daily" class="modal">
         <div class="modal-box">
             <h2 style="color:#ffd700;">DAILY STREAK 🔥</h2>
@@ -166,6 +177,9 @@
                 <div style="color:#555; font-size:10px;" id="t-fee-inc">(Fees included)</div>
             </div>
             
+            <div style="margin-bottom:10px; font-size:11px; text-align:left; color:#aaa; max-height:60px; overflow-y:auto;" id="wd-history">
+                </div>
+
             <button class="w-btn" onclick="submitWithdraw()" id="t-confirm">CONFIRM</button>
         </div>
     </div>
@@ -255,7 +269,7 @@
     <div id="tab-admin" class="tab">
         <h2 style="color:orange; border-bottom:1px solid orange;">ADMIN PANEL 👮‍♂️</h2>
         <p style="font-size:12px; color:#888;">Pending Deposits</p>
-        <div id="admin-list" style="margin-top:10px;"></div>
+        <div id="admin-list" style="margin-top:10px; max-height:80vh; overflow-y:auto;"></div>
     </div>
 
     <div class="nav">
@@ -267,7 +281,6 @@
     </div>
 
     <script>
-        // --- MATRIX BACKGROUND ---
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -312,7 +325,6 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         
-        // --- 🛑 ID DO VIKTOR ---
         const ADMIN_ID = 253106429; 
 
         let CUR_LANG = 'en';
@@ -431,7 +443,6 @@
                     u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
                     if(!u.codes) u.codes = {};
                     
-                    // Update latest profile info
                     u.name = uName; u.photo = uPhoto; u.username = uUser;
 
                     let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
@@ -441,7 +452,11 @@
                         document.getElementById('off-val').innerText = profit.toFixed(4);
                         openModal('modal-offline');
                     }
-                } else { u.name = uName; u.photo = uPhoto; u.username = uUser; }
+                } else { 
+                    u.name = uName; u.photo = uPhoto; u.username = uUser; 
+                    // SHOW TUTORIAL FOR NEW USER
+                    openModal('modal-tutorial');
+                }
                 checkDaily();
                 finishLoad();
             }).catch(error => {
@@ -463,7 +478,7 @@
                     snap.forEach(c => {
                         let d = c.val();
                         let key = c.key;
-                        let displayUser = d.username || d.uid; // Show username if available
+                        let displayUser = d.username || d.uid;
                         html += `<div class="admin-row"><b>USER:</b> ${displayUser}<br><b>HASH:</b> ...${d.hash.substr(-6)}<br><div class="admin-actions"><button class="a-btn a-check" onclick="window.open('https://tronscan.org/#/transaction/${d.hash}')">CHECK</button><button class="a-btn a-approve" onclick="adminAction('${key}', '${d.uid}', 'approve')">OK</button><button class="a-btn a-reject" onclick="adminAction('${key}', '${d.uid}', 'reject')">X</button></div></div>`;
                     });
                 } else { html = "<small>No pending deposits.</small>"; }
@@ -542,7 +557,6 @@
             document.getElementById('n-team').innerText = t.nav[3];
             document.getElementById('n-earn').innerText = t.nav[4];
             
-            // Update News Ticker Language
             const newsText = {
                 en: "🚀 Welcome to EuroDash! --- 💰 John just withdrew €5.00 --- ⚡ Ana upgraded to Hacker Level --- 🏆 Pedro is now #1 Rank --- 💎 200+ Users Online",
                 pt: "🚀 Bem-vindo ao EuroDash! --- 💰 João levantou €5.00 --- ⚡ Ana subiu para Nível Hacker --- 🏆 Pedro é Top #1 --- 💎 200+ Utilizadores Online",
@@ -557,7 +571,6 @@
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
         
         function tap(x, y) {
-            // ANTI-CHEAT: SPEED LIMIT (80ms)
             const now = Date.now();
             if (now - lastClickTime < 80) return;
             lastClickTime = now;
@@ -566,7 +579,6 @@
             u.eng--;
             playBeep();
             
-            // ANIMATION
             let btn = document.getElementById('click-btn');
             btn.classList.remove('click-anim');
             void btn.offsetWidth;
@@ -579,19 +591,14 @@
             if(u.bal >= 200) critChance = 0.10;
             let isCrit = Math.random() < critChance;
             
-            if(isCrit) { 
-                gain *= 10; 
-                tg.HapticFeedback.notificationOccurred('success'); 
-            } else { 
-                tg.HapticFeedback.impactOccurred('light'); 
-            }
+            if(isCrit) { gain *= 10; tg.HapticFeedback.notificationOccurred('success'); } 
+            else { tg.HapticFeedback.impactOccurred('light'); }
 
-            // LUCKY DROP (1 in 500 chance)
             let isLucky = Math.random() < 0.002; 
             if(isLucky) {
                 let bonus = 0.05;
                 u.bal += bonus;
-                spawnFloat(x, y, bonus, false, true); // True for lucky style
+                spawnFloat(x, y, bonus, false, true); 
                 tg.HapticFeedback.notificationOccurred('warning');
             }
 
@@ -602,11 +609,9 @@
         function spawnFloat(x, y, val, crit, lucky) {
             let el = document.createElement('div');
             if(lucky) {
-                el.className = 'float-text lucky';
-                el.innerText = `LUCKY! +${val.toFixed(2)}`;
+                el.className = 'float-text lucky'; el.innerText = `LUCKY! +${val.toFixed(2)}`;
             } else {
-                el.className = crit ? 'float-text crit' : 'float-text';
-                el.innerText = crit ? `CRITICAL +${val.toFixed(5)}` : `+${val.toFixed(5)}`;
+                el.className = crit ? 'float-text crit' : 'float-text'; el.innerText = crit ? `CRITICAL +${val.toFixed(5)}` : `+${val.toFixed(5)}`;
             }
             el.style.left = x+'px'; el.style.top = y+'px';
             document.body.appendChild(el);
@@ -658,7 +663,6 @@
             let hash = document.getElementById('dep-hash').value;
             let t = txt[CUR_LANG].alerts;
             if(hash.length < 10) { tg.showAlert(t.inv_hash); return; }
-            // SAVE USERNAME IN DEPOSIT
             db.ref('deposits/' + Date.now()).set({ uid: uid, username: u.username || uid, hash: hash, status: "pending" });
             closeModal('modal-deposit');
             tg.showAlert(t.dep_sub);
@@ -672,15 +676,8 @@
                 list.reverse(); 
                 list.forEach((p, i) => {
                     let style = i===0 ? 'color:#ffd700' : 'color:#fff';
-                    // USE PHOTO OR PLACEHOLDER
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
-                    html += `
-                        <div class="rank-row">
-                            <span style="width:30px; ${style}">#${i+1}</span>
-                            ${img}
-                            <span style="flex-grow:1; text-align:left;">${p.name || "User"}</span>
-                            <span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span>
-                        </div>`;
+                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
             }).catch(e => { document.getElementById('rank-list').innerHTML = `<div style="padding:20px; color:red">${txt[CUR_LANG].rank_off}</div>`; });
@@ -722,19 +719,44 @@
                         <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
                         <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                     </div>
-                    <button class="buy-btn" onclick="buy(${i})">€${m.p}</button>
+                    <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
                 </div>
             `).join('');
         }
 
-        function buy(i) {
+        function buy(i, e) {
             if(u.bal >= minerStats[i].p) {
                 u.bal -= minerStats[i].p; u.pps += minerStats[i].g; u.inv[i] = (u.inv[i]||0)+1;
+                // VISUAL FEEDBACK
+                let btn = e.target;
+                let oldText = btn.innerText;
+                btn.innerText = "👍";
+                btn.style.background = "#fff";
+                setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
+                
+                spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); // Show Profit Gain
                 renderShop(); up(); tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'modal-withdraw') up(); }
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if(id === 'modal-withdraw') {
+                up();
+                // Load Withdrawal History
+                db.ref('withdrawals').orderByChild('uid').equalTo(uid).limitToLast(3).once('value').then(snap => {
+                    let html = "<b>Recent History:</b><br>";
+                    if(snap.exists()) {
+                        snap.forEach(s => {
+                            let d = s.val();
+                            let color = d.status === 'pending' ? 'orange' : (d.status === 'approved' ? '#0f9' : 'red');
+                            html += `<div style="border-bottom:1px solid #333; padding:2px;">€${d.val} <span style="float:right; color:${color}">${d.status.toUpperCase()}</span></div>`;
+                        });
+                    } else html += "No requests yet.";
+                    document.getElementById('wd-history').innerHTML = html;
+                });
+            }
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function sw(t) {
             if(t === 'admin') loadAdmin();
