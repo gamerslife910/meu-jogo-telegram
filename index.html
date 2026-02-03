@@ -98,6 +98,9 @@
         @keyframes spin { 0% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
         
         .fallback-icon { font-size:30px; display:flex; align-items:center; justify-content:center; width:50px; height:50px; background:#222; border-radius:5px; border:1px solid #333; }
+        
+        /* HIDE DEBUG BOX */
+        #debug-box { display:none; }
     </style>
 </head>
 <body>
@@ -121,6 +124,7 @@
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div id="boot-seq" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+        <div id="debug-box"></div>
         <button id="force-btn" onclick="finishLoad()">⚠️ FORCE START</button>
     </div>
 
@@ -371,12 +375,28 @@
         <div class="n-btn" id="nb-friends" onclick="sw('friends')">
             <span class="n-icon">👥</span><span id="n-team">TEAM</span>
         </div>
-        <div class="n-btn" id="nb-earn" onclick="sw('earn')">
-            <span class="n-icon">🎯</span><span id="n-earn">EARN</span>
+        <div class="n-btn" id="nb-rank" onclick="sw('rank')">
+            <span class="n-icon">🏆</span><span id="n-rank">RANK</span>
         </div>
     </div>
 
     <script>
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(msg, url, line) {
+            let logBox = document.getElementById('debug-box');
+            if(logBox) {
+                logBox.style.display = 'block';
+                logBox.innerHTML += `<div style="color:red; border-bottom:1px solid #333;">ERROR: ${msg} (Line ${line})</div>`;
+            }
+            document.getElementById('force-btn').style.display = 'block';
+            return false;
+        };
+
+        function log(msg) {
+            let logBox = document.getElementById('debug-box');
+            if(logBox) logBox.innerHTML += `<div>>> ${msg}</div>`;
+        }
+
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -423,7 +443,7 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         const ADMIN_ID = 253106429; 
-        const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌", "🪐"]; 
+        const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌"]; // 6 ITEMS NOW
 
         let CUR_LANG = 'en';
         const txt = {
@@ -438,8 +458,8 @@
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
                 promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "GAMES", "TEAM", "EARN"],
-                miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
+                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
+                miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
                     insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
@@ -459,7 +479,7 @@
                 task_tit: "TAREFAS", join_ch: "Entrar no Canal Oficial", rew: "+€0.10 Recompensa",
                 promo_tit: "CÓDIGO SECRETO", redeem: "RESGATAR", force_play: "⚠️ JOGAR OFFLINE", db_slow: "A ligar...", db_err: "Erro: ",
                 nav: ["MINAR", "LOJA", "JOGOS", "EQUIPA", "RANK"],
-                miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural", "Núcleo Titã"],
+                miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural"],
                 alerts: {
                     copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
                     insufficient: "❌ Saldo Insuficiente! Tens apenas €", req_sent: "Pedido Enviado!",
@@ -479,7 +499,7 @@
                 task_tit: "ЗАДАНИЯ", join_ch: "Вступить в канал", rew: "+€0.10 Награда",
                 promo_tit: "СЕКРЕТНЫЙ КОД", redeem: "АКТИВИРОВАТЬ", force_play: "⚠️ ИГРАТЬ ОФЛАЙН", db_slow: "Подключение...", db_err: "Ошибка: ",
                 nav: ["МАЙНИНГ", "МАРКЕТ", "ИГРЫ", "КОМАНДА", "ТОП"],
-                miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"],
+                miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб"],
                 alerts: {
                     copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
                     insufficient: "❌ Недостаточно средств! У вас только €", req_sent: "Запрос отправлен!",
@@ -489,9 +509,16 @@
             }
         };
 
-        const minerStats = [ {p:0.05, g:0.00000012, img: "miner1.jpg"}, {p:1.00, g:0.00000096, img: "miner2.jpg"}, {p:10.00, g:0.00000720, img: "miner3.jpg"}, {p:50.00, g:0.00002800, img: "miner4.jpg"}, {p:200.00, g:0.00009200, img: "miner5.jpg"}, {p:800.00, g:0.00030000, img: "miner6.jpg"}, {p:3000.00, g:0.00099000, img: "miner7.jpg"} ];
+        const minerStats = [ 
+            {p:0.05, g:0.00000012, img: "miner1.jpg"}, 
+            {p:1.00, g:0.00000096, img: "miner2.jpg"}, 
+            {p:10.00, g:0.00000720, img: "miner3.jpg"}, 
+            {p:50.00, g:0.00002800, img: "miner4.jpg"}, 
+            {p:200.00, g:0.00009200, img: "miner5.jpg"}, 
+            {p:800.00, g:0.00030000, img: "miner6.jpg"} 
+        ];
 
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
         let loaded = false;
         let dailyRewVal = 0;
         let lastClickTime = 0;
@@ -588,7 +615,7 @@
                     if(s.exists()) {
                         let d = s.val();
                         u = { ...u, ...d };
-                        u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                        u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0];
                         if(!u.codes) u.codes = {};
                         u.name = uName; u.photo = uPhoto; u.username = uUser;
 
@@ -893,10 +920,10 @@
                 list.forEach((p, i) => {
                     let style = i===0 ? 'color:#ffd700' : 'color:#fff';
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
-                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
+                    let money = p.bal ? p.bal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00";
+                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${money}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
-                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
