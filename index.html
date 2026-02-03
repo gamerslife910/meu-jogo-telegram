@@ -11,8 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
         
         body { background-color: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
-        
-        /* MATRIX BACKGROUND */
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
 
         .tab { display: none; padding: 20px; padding-top: 60px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
@@ -40,7 +38,6 @@
         .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
 
-        /* ENERGY BAR */
         .eng-bar-bg { width: 200px; height: 10px; background: #222; margin: 5px auto; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
         .eng-bar-fill { height: 100%; background: #0f9; width: 100%; box-shadow: 0 0 10px #0f9; transition: width 0.2s; }
 
@@ -63,10 +60,17 @@
         .l-btn { background: rgba(0,0,0,0.6); color: #888; border: 1px solid #333; padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; font-weight: bold; }
         .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
 
-        /* DAILY REWARD GRID */
         .day-grid { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
         .day-box { background: #222; border: 1px solid #333; padding: 5px; width: 30px; font-size: 10px; opacity: 0.5; border-radius: 4px; }
         .day-box.active { border-color: #0f9; opacity: 1; box-shadow: 0 0 5px #0f9; background: rgba(0,255,153,0.1); }
+
+        /* ADMIN PANEL STYLES */
+        .admin-row { background: #222; padding: 10px; margin-bottom: 5px; border-left: 3px solid orange; text-align: left; font-size: 12px; }
+        .admin-actions { display: flex; gap: 5px; margin-top: 5px; }
+        .a-btn { padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
+        .a-check { background: #00ccff; color: #000; }
+        .a-approve { background: #0f9; color: #000; }
+        .a-reject { background: #f00; color: #fff; }
     </style>
 </head>
 <body>
@@ -76,13 +80,14 @@
         <div class="l-btn active" id="btn-en" onclick="setLang('en')">EN</div>
         <div class="l-btn" id="btn-pt" onclick="setLang('pt')">PT</div>
         <div class="l-btn" id="btn-ru" onclick="setLang('ru')">RU</div>
+        <div class="l-btn" id="btn-admin" style="display:none; border-color: orange; color: orange;" onclick="sw('admin')">ADMIN</div>
     </div>
 
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
         <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ JOGAR (OFFLINE)</button>
+        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
     </div>
 
     <div id="modal-daily" class="modal">
@@ -230,6 +235,12 @@
         </div>
     </div>
 
+    <div id="tab-admin" class="tab">
+        <h2 style="color:orange; border-bottom:1px solid orange;">ADMIN PANEL 👮‍♂️</h2>
+        <p style="font-size:12px; color:#888;">Pending Deposits</p>
+        <div id="admin-list" style="margin-top:10px;"></div>
+    </div>
+
     <div class="nav">
         <div class="n-btn active" id="nb-core" onclick="sw('core')"><span class="n-icon">⚡</span><span id="n-mine">MINE</span></div>
         <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
@@ -260,7 +271,7 @@
         setInterval(drawMatrix, 50);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-        // --- AUDIO SYNTH (BEEP) ---
+        // --- AUDIO SYNTH ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playBeep() {
             if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -280,6 +291,7 @@
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
+        const ADMIN_ID = 22250; // VIKTOR'S ID
 
         let CUR_LANG = 'en';
         const txt = {
@@ -380,14 +392,17 @@
             setLang('en');
             setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
 
+            // ADMIN CHECK
+            if(uid === ADMIN_ID) {
+                document.getElementById('btn-admin').style.display = 'block';
+            }
+
             db.ref('users/' + uid).once('value').then(s => {
                 if(s.exists()) {
                     let d = s.val();
                     u = { ...u, ...d };
                     u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
                     if(!u.codes) u.codes = {};
-                    
-                    // OFFLINE EARNINGS
                     let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
                     if(sec > 60 && u.pps > 0) {
                         let profit = sec * u.pps;
@@ -408,34 +423,71 @@
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
 
+        // --- ADMIN FUNCTIONS ---
+        function loadAdmin() {
+            if(uid !== ADMIN_ID) return;
+            document.getElementById('admin-list').innerHTML = "Loading...";
+            db.ref('deposits').orderByChild('status').equalTo('pending').once('value').then(snap => {
+                let html = "";
+                if(snap.exists()) {
+                    snap.forEach(c => {
+                        let d = c.val();
+                        let key = c.key;
+                        html += `
+                            <div class="admin-row">
+                                <b>UID:</b> ${d.uid}<br>
+                                <b>HASH:</b> ...${d.hash.substr(-6)}<br>
+                                <div class="admin-actions">
+                                    <button class="a-btn a-check" onclick="window.open('https://tronscan.org/#/transaction/${d.hash}')">CHECK</button>
+                                    <button class="a-btn a-approve" onclick="adminAction('${key}', '${d.uid}', 'approve')">OK</button>
+                                    <button class="a-btn a-reject" onclick="adminAction('${key}', '${d.uid}', 'reject')">X</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else { html = "<small>No pending deposits.</small>"; }
+                document.getElementById('admin-list').innerHTML = html;
+            });
+        }
+
+        function adminAction(key, userUid, action) {
+            if(action === 'approve') {
+                let amount = prompt("Amount to credit (€):");
+                if(!amount) return;
+                amount = parseFloat(amount);
+                
+                // Credit User
+                db.ref('users/' + userUid + '/bal').transaction(currentBal => {
+                    return (currentBal || 0) + amount;
+                });
+                
+                // Update Deposit Status
+                db.ref('deposits/' + key).update({ status: 'approved', amount: amount });
+                alert("Credited €" + amount);
+                loadAdmin();
+            } else {
+                if(confirm("Reject this deposit?")) {
+                    db.ref('deposits/' + key).update({ status: 'rejected' });
+                    loadAdmin();
+                }
+            }
+        }
+
         function checkDaily() {
             const now = Date.now();
             const msInDay = 86400000;
-            // If last daily was more than 24h ago
             if(now - (u.lastDaily || 0) > msInDay) {
-                // Check if streak is broken (more than 48h)
                 if(now - (u.lastDaily || 0) > msInDay * 2) { u.streak = 0; }
-                
                 let dayIdx = u.streak % 7;
                 dailyRewVal = DAILY_REWARDS[dayIdx];
                 document.getElementById('daily-amt').innerText = dailyRewVal.toFixed(2);
-                
-                // Highlight current day
-                document.querySelectorAll('.day-box').forEach((el, i) => {
-                    el.classList.toggle('active', i === dayIdx);
-                });
-                
+                document.querySelectorAll('.day-box').forEach((el, i) => { el.classList.toggle('active', i === dayIdx); });
                 openModal('modal-daily');
             }
         }
 
         function claimDaily() {
-            u.bal += dailyRewVal;
-            u.lastDaily = Date.now();
-            u.streak++;
-            up();
-            closeModal('modal-daily');
-            tg.showAlert(txt[CUR_LANG].alerts.rew_rec);
+            u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); closeModal('modal-daily'); tg.showAlert(txt[CUR_LANG].alerts.rew_rec);
         }
 
         function setLang(l) {
@@ -488,7 +540,7 @@
         function tap(x, y) {
             if(u.eng < 1) return;
             u.eng--;
-            playBeep(); // PLAY SOUND
+            playBeep();
             let btn = document.getElementById('click-btn');
             btn.classList.remove('click-anim');
             void btn.offsetWidth;
@@ -571,7 +623,7 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span><span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
-            }).catch(e => { document.getElementById('rank-list').innerHTML = `<div style="padding:20px; color:red">${txt[CUR_LANG].rank_off}</div>`; });
+            }).catch(e => { });
         }
 
         function checkTasks() { if(u.tasks['group']) { let btn = document.getElementById('task-group'); if(btn) { btn.innerText = "DONE"; btn.style.opacity = 0.5; } } }
@@ -592,7 +644,6 @@
             document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
             let pct = (u.eng / 500) * 100;
             document.getElementById('eng-bar').style.width = pct + "%";
-
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
@@ -600,7 +651,6 @@
             else { l = "TITAN"; w = 100; }
             document.getElementById('l-fill').style.width = w+"%";
             document.getElementById('l-name').innerText = l;
-            
             if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
         }
 
@@ -627,10 +677,11 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'modal-withdraw') up(); }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function sw(t) {
+            if(t === 'admin') loadAdmin(); // Load deposits when clicking admin
             document.querySelectorAll('.tab').forEach(e=>e.style.display='none');
             document.getElementById('tab-'+t).style.display='block';
             document.querySelectorAll('.n-btn').forEach(b=>b.classList.remove('active'));
-            document.getElementById('nb-'+t).classList.add('active');
+            if(t !== 'admin') document.getElementById('nb-'+t).classList.add('active');
         }
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
