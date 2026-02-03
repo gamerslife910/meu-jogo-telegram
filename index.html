@@ -18,7 +18,9 @@
         .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        .tab { display: none; padding: 20px; padding-top: 75px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
+        /* AUMENTEI O PADDING-BOTTOM PARA 160px PARA O MENU NÃO TAPAR NADA */
+        .tab { display: none; padding: 20px; padding-top: 75px; padding-bottom: 160px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
+        
         .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.1s; }
         .buy-btn:active { transform: scale(0.95); }
         .w-btn { background: #ff3333; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); }
@@ -223,7 +225,9 @@
                 <span id="t-receive">You Receive:</span> <b style="color:#fff; font-size:16px;">€<span id="wd-final">0.00</span></b>
                 <div style="color:#555; font-size:10px;" id="t-fee-inc">(Fees included)</div>
             </div>
+            
             <div style="margin-bottom:10px; font-size:11px; text-align:left; color:#aaa; max-height:60px; overflow-y:auto;" id="wd-history"></div>
+
             <button class="w-btn" onclick="submitWithdraw()" id="t-confirm">CONFIRM</button>
         </div>
     </div>
@@ -233,9 +237,11 @@
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
             <h3 style="color:#00ccff" id="t-dep-tit">DEPOSIT (USDT)</h3>
             <p style="font-size:12px; color:#aaa;" id="t-dep-info">Send USDT (TRC20) to this address:</p>
+            
             <div style="background:#fff; padding:10px; display:inline-block; border-radius:10px; margin:10px 0;">
                 <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'">
             </div>
+
             <div style="background:#222; padding:10px; font-size:10px; word-break:break-all; color:#0f9; border:1px dashed #555; user-select:text;" id="admin-wallet">...</div>
             <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()" id="t-copy">COPY ADDRESS</button>
             <hr style="border-color:#333; margin:15px 0;">
@@ -295,6 +301,7 @@
             <br>
             <button class="buy-btn" style="margin-top:10px; width:60%;" onclick="rollDice()">ROLL</button>
         </div>
+
         <div class="game-box" style="border-left:3px solid #ffd700;">
             <h3 style="color:#ffd700; margin:0;">COIN FLIP 🪙</h3>
             <p style="color:#aaa; font-size:12px;">Heads or Tails (2x)</p>
@@ -426,7 +433,7 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         const ADMIN_ID = 253106429; 
-        const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌"]; // 6 ITEMS
+        const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌"]; 
 
         let CUR_LANG = 'en';
         const txt = {
