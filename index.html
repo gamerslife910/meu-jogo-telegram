@@ -32,8 +32,8 @@
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
         .glitch { font-size: 40px; font-weight: bold; color: #0f9; text-shadow: 2px 2px #f0f; animation: glitch 1s infinite; letter-spacing: 5px; }
         
-        /* DEBUG LOG STYLE */
-        #debug-log { color: yellow; font-size: 10px; margin-top: 10px; width: 90%; text-align: left; background: #111; padding: 10px; border: 1px solid #333; height: 150px; overflow-y: auto; }
+        /* LOG BOX PARA VER ERROS */
+        #debug-box { width:90%; height:100px; background:#111; border:1px solid #333; overflow-y:scroll; font-size:10px; color:yellow; text-align:left; padding:5px; margin-top:20px; }
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
@@ -113,8 +113,9 @@
     <div id="loader">
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
-        <div id="debug-log">Log:<br></div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE (FORCE)</button>
+        <div id="debug-box">Logs:<br></div>
+        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
+        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
     </div>
 
     <div id="modal-tutorial" class="modal">
@@ -273,9 +274,9 @@
             </div>
         </div>
         
-        <h2 style="color:#0f9; border-bottom:1px solid #333; margin-top:30px;" id="t-rank-tit">TOP INVESTORS</h2>
-        <div style="background:#111; border-radius:10px; padding:10px; border:1px solid #333;" id="rank-list">
-            <div style="padding:20px; color:#555;" id="t-load-rank">Loading...</div>
+        <h2 style="color:#0f9; border-bottom:1px solid #333; margin-top:30px;" id="t-rank-tit2">TOP INVESTORS</h2>
+        <div style="background:#111; border-radius:10px; padding:10px; border:1px solid #333;" id="rank-list-games">
+            <div style="padding:20px; color:#555;" id="t-load-rank2">Loading...</div>
         </div>
     </div>
 
@@ -317,11 +318,17 @@
     </div>
 
     <script>
-        // LOG SYSTEM FOR DEBUGGING
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(msg, url, line) {
+            let logBox = document.getElementById('debug-box');
+            if(logBox) logBox.innerHTML += `<div style="color:red; border-bottom:1px solid #333;">ERROR: ${msg} (Line ${line})</div>`;
+            document.getElementById('force-btn').style.display = 'block';
+            return false;
+        };
+
         function log(msg) {
-            console.log(msg);
-            let d = document.getElementById('debug-log');
-            if(d) d.innerHTML += ">> " + msg + "<br>";
+            let logBox = document.getElementById('debug-box');
+            if(logBox) logBox.innerHTML += `<div>>> ${msg}</div>`;
         }
 
         const canvas = document.getElementById('matrix-bg');
@@ -468,23 +475,25 @@
                 appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666"
             });
             log("Firebase OK");
-        } catch(err) { log("Firebase Init Error: " + err.message); }
+        } catch(err) { log("Error: " + err.message); }
 
         const db = firebase.database();
 
         window.onload = function() {
             log("Window Loaded");
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
-            
-            setLang('en');
+            try {
+                document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
+                setLang('en');
+            } catch(e) { log("UI Setup Error: " + e.message); }
+
             setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 4000);
 
             if(uid == ADMIN_ID) { document.getElementById('btn-admin').style.display = 'block'; }
 
-            log("Connecting DB...");
+            log("DB Connecting...");
             db.ref('users/' + uid).once('value').then(s => {
-                log("Data Received");
+                log("Data OK");
                 if(s.exists()) {
                     let d = s.val();
                     u = { ...u, ...d };
@@ -507,8 +516,7 @@
                 finishLoad();
             }).catch(error => {
                 log("DB Error: " + error.message);
-                document.getElementById('load-status').innerText = "FAILED: " + error.code;
-                document.getElementById('load-status').style.color = "red";
+                document.getElementById('load-status').innerText = "ERROR";
                 document.getElementById('force-btn').style.display = 'block';
             });
 
@@ -613,51 +621,56 @@
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+l).classList.add('active');
             const t = txt[l];
-            document.getElementById('t-welcome').innerText = t.welcome;
-            document.getElementById('t-off-earn').innerText = t.off_earn;
-            document.getElementById('t-collect').innerText = t.collect;
-            document.getElementById('t-lvl-sys').innerText = t.lvl_sys;
-            document.getElementById('t-wd-tit').innerText = t.wd_tit;
-            document.getElementById('t-wd-info').innerText = t.wd_info;
-            document.getElementById('t-avail').innerText = t.avail;
-            document.getElementById('t-receive').innerText = t.receive;
-            document.getElementById('t-fee-inc').innerText = t.fee_inc;
-            document.getElementById('t-confirm').innerText = t.confirm;
-            document.getElementById('t-dep-tit').innerText = t.dep_tit;
-            document.getElementById('t-dep-info').innerText = t.dep_info;
-            document.getElementById('t-copy').innerText = t.copy;
-            document.getElementById('t-hash-info').innerText = t.hash_info;
-            document.getElementById('t-sent').innerText = t.sent;
-            document.getElementById('t-energy').innerText = t.energy;
-            document.getElementById('t-pps').innerText = t.pps;
-            document.getElementById('t-market').innerText = t.market;
-            document.getElementById('t-wallet').innerText = t.wallet;
-            document.getElementById('t-rank-tit').innerText = t.rank_tit;
-            document.getElementById('t-load-rank').innerText = t.load_rank;
-            document.getElementById('t-net-tit').innerText = t.net_tit;
-            document.getElementById('t-inv-desc').innerText = t.inv_desc;
-            document.getElementById('t-copy-link').innerText = t.copy_link;
-            document.getElementById('t-task-tit').innerText = t.task_tit;
-            document.getElementById('t-join-ch').innerText = t.join_ch;
-            document.getElementById('t-rew').innerText = t.rew;
-            document.getElementById('t-promo-tit').innerText = t.promo_tit;
-            document.getElementById('t-redeem').innerText = t.redeem;
-            document.getElementById('force-btn').innerText = t.force_play;
-            document.getElementById('load-status').innerText = t.db_slow;
-            document.getElementById('n-mine').innerText = t.nav[0];
-            document.getElementById('n-shop').innerText = t.nav[1];
-            document.getElementById('n-rank').innerText = t.nav[2];
-            document.getElementById('n-team').innerText = t.nav[3];
-            document.getElementById('n-earn').innerText = t.nav[4];
-            
-            const newsText = {
-                en: "🚀 Welcome to EuroDash! --- 💰 John just withdrew €5.00 --- ⚡ Ana upgraded to Hacker Level --- 🏆 Pedro is now #1 Rank --- 💎 200+ Users Online",
-                pt: "🚀 Bem-vindo ao EuroDash! --- 💰 João levantou €5.00 --- ⚡ Ana subiu para Nível Hacker --- 🏆 Pedro é Top #1 --- 💎 200+ Utilizadores Online",
-                ru: "🚀 Добро пожаловать в EuroDash! --- 💰 Иван вывел €5.00 --- ⚡ Анна получила уровень Хакер --- 🏆 Петр Топ #1 --- 💎 200+ Онлайн"
-            };
-            document.getElementById('news-ticker').innerText = newsText[l];
-
-            renderShop(); loadRank();
+            try {
+                // UI UPDATES
+                if(document.getElementById('t-welcome')) document.getElementById('t-welcome').innerText = t.welcome;
+                if(document.getElementById('t-off-earn')) document.getElementById('t-off-earn').innerText = t.off_earn;
+                if(document.getElementById('t-collect')) document.getElementById('t-collect').innerText = t.collect;
+                if(document.getElementById('t-lvl-sys')) document.getElementById('t-lvl-sys').innerText = t.lvl_sys;
+                if(document.getElementById('t-wd-tit')) document.getElementById('t-wd-tit').innerText = t.wd_tit;
+                if(document.getElementById('t-wd-info')) document.getElementById('t-wd-info').innerText = t.wd_info;
+                if(document.getElementById('t-avail')) document.getElementById('t-avail').innerText = t.avail;
+                if(document.getElementById('t-receive')) document.getElementById('t-receive').innerText = t.receive;
+                if(document.getElementById('t-fee-inc')) document.getElementById('t-fee-inc').innerText = t.fee_inc;
+                if(document.getElementById('t-confirm')) document.getElementById('t-confirm').innerText = t.confirm;
+                if(document.getElementById('t-dep-tit')) document.getElementById('t-dep-tit').innerText = t.dep_tit;
+                if(document.getElementById('t-dep-info')) document.getElementById('t-dep-info').innerText = t.dep_info;
+                if(document.getElementById('t-copy')) document.getElementById('t-copy').innerText = t.copy;
+                if(document.getElementById('t-hash-info')) document.getElementById('t-hash-info').innerText = t.hash_info;
+                if(document.getElementById('t-sent')) document.getElementById('t-sent').innerText = t.sent;
+                if(document.getElementById('t-energy')) document.getElementById('t-energy').innerText = t.energy;
+                if(document.getElementById('t-pps')) document.getElementById('t-pps').innerText = t.pps;
+                if(document.getElementById('t-market')) document.getElementById('t-market').innerText = t.market;
+                if(document.getElementById('t-wallet')) document.getElementById('t-wallet').innerText = t.wallet;
+                if(document.getElementById('t-rank-tit')) document.getElementById('t-rank-tit').innerText = t.rank_tit;
+                if(document.getElementById('t-rank-tit2')) document.getElementById('t-rank-tit2').innerText = t.rank_tit;
+                if(document.getElementById('t-load-rank')) document.getElementById('t-load-rank').innerText = t.load_rank;
+                if(document.getElementById('t-load-rank2')) document.getElementById('t-load-rank2').innerText = t.load_rank;
+                if(document.getElementById('t-net-tit')) document.getElementById('t-net-tit').innerText = t.net_tit;
+                if(document.getElementById('t-inv-desc')) document.getElementById('t-inv-desc').innerText = t.inv_desc;
+                if(document.getElementById('t-copy-link')) document.getElementById('t-copy-link').innerText = t.copy_link;
+                if(document.getElementById('t-task-tit')) document.getElementById('t-task-tit').innerText = t.task_tit;
+                if(document.getElementById('t-join-ch')) document.getElementById('t-join-ch').innerText = t.join_ch;
+                if(document.getElementById('t-rew')) document.getElementById('t-rew').innerText = t.rew;
+                if(document.getElementById('t-promo-tit')) document.getElementById('t-promo-tit').innerText = t.promo_tit;
+                if(document.getElementById('t-redeem')) document.getElementById('t-redeem').innerText = t.redeem;
+                if(document.getElementById('force-btn')) document.getElementById('force-btn').innerText = t.force_play;
+                if(document.getElementById('load-status')) document.getElementById('load-status').innerText = t.db_slow;
+                // Nav
+                if(document.getElementById('n-mine')) document.getElementById('n-mine').innerText = t.nav[0];
+                if(document.getElementById('n-shop')) document.getElementById('n-shop').innerText = t.nav[1];
+                if(document.getElementById('n-rank')) document.getElementById('n-rank').innerText = t.nav[2];
+                if(document.getElementById('n-team')) document.getElementById('n-team').innerText = t.nav[3];
+                if(document.getElementById('n-earn')) document.getElementById('n-earn').innerText = t.nav[4];
+                
+                const newsText = {
+                    en: "🚀 Welcome to EuroDash! --- 💰 John just withdrew €5.00 --- ⚡ Ana upgraded to Hacker Level --- 🏆 Pedro is now #1 Rank --- 💎 200+ Users Online",
+                    pt: "🚀 Bem-vindo ao EuroDash! --- 💰 João levantou €5.00 --- ⚡ Ana subiu para Nível Hacker --- 🏆 Pedro é Top #1 --- 💎 200+ Utilizadores Online",
+                    ru: "🚀 Добро пожаловать в EuroDash! --- 💰 Иван вывел €5.00 --- ⚡ Анна получила уровень Хакер --- 🏆 Петр Топ #1 --- 💎 200+ Онлайн"
+                };
+                document.getElementById('news-ticker').innerText = newsText[l];
+                renderShop(); loadRank();
+            } catch(e) { log("Lang Error: " + e.message); }
         }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
@@ -772,7 +785,8 @@
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
-                document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -788,33 +802,35 @@
         }
 
         function up() {
-            document.getElementById('bal-val').innerText = u.bal.toFixed(5);
-            document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
-            document.getElementById('eg').innerText = Math.floor(u.eng);
-            document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
+            if(document.getElementById('bal-val')) document.getElementById('bal-val').innerText = u.bal.toFixed(5);
+            if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
+            if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
+            if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
             let pct = (u.eng / 500) * 100;
-            document.getElementById('eng-bar').style.width = pct + "%";
+            if(document.getElementById('eng-bar')) document.getElementById('eng-bar').style.width = pct + "%";
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
             else if(u.bal < 200) { l = "CYBER LORD"; w = (u.bal/200)*100; }
             else { l = "TITAN"; w = 100; }
-            document.getElementById('l-fill').style.width = w+"%";
-            document.getElementById('l-name').innerText = l;
+            if(document.getElementById('l-fill')) document.getElementById('l-fill').style.width = w+"%";
+            if(document.getElementById('l-name')) document.getElementById('l-name').innerText = l;
             if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
         }
 
         function renderShop() {
             let names = txt[CUR_LANG].miners;
-            document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => `
-                <div class="card">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
-                        <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
+            if(document.getElementById('shop-list')) {
+                document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => `
+                    <div class="card">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
+                            <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
+                        </div>
+                        <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
                     </div>
-                    <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         function buy(i, e) {
