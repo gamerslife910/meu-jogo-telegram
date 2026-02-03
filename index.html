@@ -18,7 +18,7 @@
         .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* AUMENTEI O PADDING-BOTTOM PARA 160px PARA O MENU NÃO TAPAR NADA */
+        /* PADDING CORRIGIDO PARA O MENU NÃO TAPAR NADA */
         .tab { display: none; padding: 20px; padding-top: 75px; padding-bottom: 160px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
         
         .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.1s; }
@@ -132,10 +132,20 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-settings')">&times;</span>
             <h2 style="color:#fff; margin-bottom:20px;">SETTINGS</h2>
-            <button class="set-btn" onclick="toggleSound()"><span>Sound Effects</span> <span id="snd-stat">ON 🔊</span></button>
-            <button class="set-btn" onclick="closeModal('modal-settings'); openModal('modal-tutorial');"><span>Replay Tutorial</span> <span>🎓</span></button>
-            <button class="set-btn" onclick="openSupport()"><span>Support</span> <span>📞</span></button>
-            <button class="set-btn" onclick="openChannel()"><span>Official Channel</span> <span>📢</span></button>
+            
+            <button class="set-btn" onclick="toggleSound()">
+                <span>Sound Effects</span> <span id="snd-stat">ON 🔊</span>
+            </button>
+            <button class="set-btn" onclick="closeModal('modal-settings'); openModal('modal-tutorial');">
+                <span>Replay Tutorial</span> <span>🎓</span>
+            </button>
+            <button class="set-btn" onclick="openSupport()">
+                <span>Support</span> <span>📞</span>
+            </button>
+            <button class="set-btn" onclick="openChannel()">
+                <span>Official Channel</span> <span>📢</span>
+            </button>
+            
             <p style="color:#555; font-size:10px; margin-top:20px;">UID: <span id="disp-uid">...</span></p>
         </div>
     </div>
@@ -914,6 +924,7 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${money}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -955,15 +966,18 @@
         function renderShop() {
             let names = txt[CUR_LANG].miners;
             if(document.getElementById('shop-list')) {
-                document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => `
+                // FIXED RENDER LOOP: NOW HANDLES MISSING NAMES GRACEFULLY
+                document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => {
+                    let itemName = names[i] || "Secret Miner"; // Fallback name
+                    return `
                     <div class="card">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.outerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'">
-                            <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
+                            <div><b>${itemName}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                         </div>
                         <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
             }
         }
 
