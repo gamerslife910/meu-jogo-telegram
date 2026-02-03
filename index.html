@@ -30,7 +30,7 @@
         .inp { width: 90%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; text-align: center; }
         .inp:focus { border-color: #0f9; outline: none; }
 
-        /* LOADING SCREEN STYLE */
+        /* LOADING SCREEN */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'VT323', monospace; }
         .boot-text { color: #0f9; font-size: 16px; width: 80%; text-align: left; margin-bottom: 5px; text-shadow: 0 0 5px #0f9; }
         .glitch { font-size: 50px; font-weight: bold; color: #fff; text-shadow: 2px 2px #0f9; animation: glitch 1s infinite; letter-spacing: 5px; margin-bottom: 20px; font-family: 'Rajdhani'; }
@@ -38,16 +38,24 @@
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
-        .main-img.click-anim { animation: pulseWave 0.2s ease-out; }
-        @keyframes pulseWave { 0% { transform: scale(0.95); border-color:#fff; } 100% { transform: scale(1); border-color:rgba(0,255,153,0.3); } }
+        .main-img.click-anim { animation: pulseWave 0.15s ease-out; }
+        @keyframes pulseWave { 0% { transform: scale(0.96); border-color:#fff; } 100% { transform: scale(1); border-color:rgba(0,255,153,0.3); } }
 
+        /* DYNAMIC PARTICLES */
         .float-text { position: absolute; color: #fff; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 5px #0f9; z-index: 20; }
         .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         .lucky { color: #00ccff !important; font-size: 28px !important; text-shadow: 0 0 15px #00ccff !important; z-index: 30; }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+        @keyframes floatUp { 
+            0% { transform: translate(0, 0) scale(1); opacity: 1; } 
+            100% { transform: translate(var(--tx), -100px) scale(1.2); opacity: 0; } 
+        }
 
-        .eng-bar-bg { width: 200px; height: 10px; background: #222; margin: 5px auto; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
+        .eng-bar-bg { width: 200px; height: 10px; background: #222; margin: 5px auto; border-radius: 5px; overflow: hidden; border: 1px solid #333; position: relative; }
         .eng-bar-fill { height: 100%; background: #0f9; width: 100%; box-shadow: 0 0 10px #0f9; transition: width 0.2s; }
+        
+        /* BOOST BUTTON */
+        .boost-btn { position: absolute; right: -35px; top: -8px; background: #ffd700; color: #000; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; border: 2px solid #fff; box-shadow: 0 0 10px #ffd700; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         .lvl-con { width: 60%; margin: 0 auto 5px auto; background: #111; height: 6px; border-radius: 3px; position: relative; border: 1px solid #333; display: inline-block; vertical-align: middle; }
         .lvl-fill { height: 100%; background: linear-gradient(90deg, #0f9, #00ffff); width: 0%; border-radius: 3px; transition: width 0.5s; box-shadow: 0 0 10px #0f9; }
@@ -73,7 +81,6 @@
         .ctrl-btn { position: absolute; top: 10px; left: 10px; z-index: 50; display:flex; gap:5px; }
         .c-icon { background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
         
-        /* ONLINE COUNTER */
         .online-cnt { position: absolute; top: 45px; left: 10px; z-index: 50; font-size: 10px; color: #0f9; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; border: 1px solid #333; }
 
         .day-grid { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
@@ -153,6 +160,17 @@
         </div>
     </div>
 
+    <div id="modal-refill" class="modal">
+        <div class="modal-box">
+            <h2 style="color:#0f9">⚡ ENERGY BOOST</h2>
+            <p style="color:#aaa;">Refill 500 Energy instantly?</p>
+            <h1 style="color:#fff;">Price: <span style="color:#ffd700">€0.05</span></h1>
+            <button class="buy-btn" onclick="buyRefill()">BUY REFILL</button>
+            <br><br>
+            <button class="buy-btn" style="background:#333; color:#fff" onclick="closeModal('modal-refill')">CANCEL</button>
+        </div>
+    </div>
+
     <div id="modal-offline" class="modal">
         <div class="modal-box">
             <h2 style="color:#fff;" id="t-welcome">WELCOME BACK</h2>
@@ -205,11 +223,9 @@
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
             <h3 style="color:#00ccff" id="t-dep-tit">DEPOSIT (USDT)</h3>
             <p style="font-size:12px; color:#aaa;" id="t-dep-info">Send USDT (TRC20) to this address:</p>
-            
             <div style="background:#fff; padding:10px; display:inline-block; border-radius:10px; margin:10px 0;">
                 <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'">
             </div>
-
             <div style="background:#222; padding:10px; font-size:10px; word-break:break-all; color:#0f9; border:1px dashed #555; user-select:text;" id="admin-wallet">...</div>
             <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()" id="t-copy">COPY ADDRESS</button>
             <hr style="border-color:#333; margin:15px 0;">
@@ -232,7 +248,10 @@
         <div style="margin-top:20px; display:flex; justify-content:center; gap:30px;">
             <div>
                 <b style="color:#0f9; font-size:20px;">⚡ <span id="eg">500</span></b>
-                <div class="eng-bar-bg"><div class="eng-bar-fill" id="eng-bar"></div></div>
+                <div class="eng-bar-bg">
+                    <div class="eng-bar-fill" id="eng-bar"></div>
+                    <div class="boost-btn" onclick="openModal('modal-refill')">+</div>
+                </div>
                 <small style="color:#555" id="t-energy">ENERGY</small>
             </div>
             <div style="margin-top:5px;">
@@ -266,7 +285,6 @@
             <br>
             <button class="buy-btn" style="margin-top:10px; width:60%;" onclick="rollDice()">ROLL</button>
         </div>
-
         <div class="game-box" style="border-left:3px solid #ffd700;">
             <h3 style="color:#ffd700; margin:0;">COIN FLIP 🪙</h3>
             <p style="color:#aaa; font-size:12px;">Heads or Tails (2x)</p>
@@ -320,7 +338,7 @@
         <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
         <div class="n-btn" id="nb-games" onclick="sw('games')"><span class="n-icon">🎲</span><span>GAMES</span></div>
         <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span id="n-team">TEAM</span></div>
-        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span id="n-rank">RANK</span></div>
+        <div class="n-btn" id="nb-earn" onclick="sw('earn')"><span class="n-icon">🎯</span><span id="n-earn">EARN</span></div>
     </div>
 
     <script>
@@ -381,7 +399,7 @@
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
                 promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
+                nav: ["MINE", "SHOP", "GAMES", "TEAM", "EARN"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
@@ -451,7 +469,6 @@
             const lines = [
                 "> INITIALIZING KERNEL...",
                 "> CONNECTING TO EURO-NET...",
-                "> BYPASSING SECURITY LAYER 1...",
                 "> DECRYPTING WALLET DATA...",
                 "> ACCESS GRANTED."
             ];
@@ -495,7 +512,6 @@
 
         const db = firebase.database();
 
-        // SAVE FUNCTION (CRITICAL FIX)
         function saveNow() {
             if(uid) {
                 u.lastT = Date.now();
@@ -552,12 +568,24 @@
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
 
+        function buyRefill() {
+            if(u.bal >= 0.05) {
+                u.bal -= 0.05;
+                u.eng = 500;
+                saveNow(); up();
+                closeModal('modal-refill');
+                tg.showAlert("Energy Refilled!");
+            } else {
+                tg.showAlert("Not enough funds (€0.05)");
+            }
+        }
+
         function rollDice() {
             let bet = parseFloat(document.getElementById('dice-bet').value);
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
             u.bal -= bet;
-            saveNow(); // SAVE ON BET
+            saveNow(); 
             let el = document.getElementById('dice-result');
             el.innerText = "ROLLING...";
             el.className = "game-res";
@@ -571,7 +599,7 @@
                     el.innerText = "LOST -€" + bet.toFixed(2); el.className = "game-res lose";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
-                up(); saveNow(); // SAVE ON RESULT
+                up(); saveNow(); 
             }, 1000);
         }
 
@@ -580,7 +608,7 @@
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
             u.bal -= bet;
-            saveNow(); // SAVE ON BET
+            saveNow(); 
             let el = document.getElementById('coin-result');
             el.classList.add('coin-anim');
             setTimeout(() => {
@@ -595,7 +623,7 @@
                     el.innerHTML = symbol + "<br><span class='lose'>LOSE</span>";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
-                up(); saveNow(); // SAVE ON RESULT
+                up(); saveNow(); 
             }, 1000);
         }
 
@@ -740,6 +768,10 @@
 
         function spawnFloat(x, y, val, crit, lucky) {
             let el = document.createElement('div');
+            // Randomize Direction
+            let tx = (Math.random() - 0.5) * 100;
+            el.style.setProperty('--tx', tx + 'px');
+            
             if(lucky) {
                 el.className = 'float-text lucky'; el.innerText = `LUCKY! +${val.toFixed(2)}`;
             } else {
@@ -766,7 +798,7 @@
             if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
             if(u.bal < val) { tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); return; }
             u.bal -= val;
-            saveNow(); // SAVE ON WITHDRAW
+            saveNow(); 
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
             tg.showAlert(t.req_sent);
@@ -785,7 +817,7 @@
             let reward = PROMO_CODES[codeInput];
             u.bal += reward;
             u.codes[codeInput] = true;
-            up(); saveNow(); // SAVE ON REDEEM
+            up(); saveNow(); 
             tg.showAlert(t.code_ok + " +€" + reward.toFixed(2));
             document.getElementById('promo-in').value = "";
         }
@@ -812,7 +844,6 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
-                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -868,7 +899,7 @@
                 btn.style.background = "#fff";
                 setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
-                renderShop(); up(); saveNow(); // SAVE ON BUY
+                renderShop(); up(); saveNow(); 
                 tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
@@ -901,9 +932,8 @@
         }
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
-        // REDUCED SAVE INTERVAL TO 1 SECOND (WAS 5)
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 3000);
+        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); // SAVE EVERY 1S
     </script>
 </body>
 </html>
