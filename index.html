@@ -47,7 +47,10 @@
 
         .card { background: rgba(10,10,10,0.8); border: 1px solid #222; border-left: 3px solid #0f9; border-radius: 10px; padding: 15px; margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .market-header { background: #111; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* RANKING STYLES */
         .rank-row { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #222; }
+        .rank-img { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; border: 1px solid #0f9; background: #333; }
         
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: rgba(5,5,5,0.95); border-top: 1px solid #222; padding-bottom: 20px; padding-top: 10px; z-index: 100; backdrop-filter: blur(10px); }
         .n-btn { flex: 1; color: #444; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 1px; }
@@ -59,6 +62,9 @@
         .lang-bar { position: absolute; top: 10px; right: 10px; z-index: 50; display: flex; gap: 5px; }
         .l-btn { background: rgba(0,0,0,0.6); color: #888; border: 1px solid #333; padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; font-weight: bold; }
         .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
+
+        /* MUTE BUTTON */
+        .mute-btn { position: absolute; top: 10px; left: 10px; z-index: 50; background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
 
         .day-grid { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
         .day-box { background: #222; border: 1px solid #333; padding: 5px; width: 30px; font-size: 10px; opacity: 0.5; border-radius: 4px; }
@@ -75,6 +81,8 @@
 </head>
 <body>
     <canvas id="matrix-bg"></canvas>
+
+    <div class="mute-btn" onclick="toggleSound()" id="btn-sound">🔊</div>
 
     <div class="lang-bar">
         <div class="l-btn active" id="btn-en" onclick="setLang('en')">EN</div>
@@ -270,8 +278,15 @@
         setInterval(drawMatrix, 50);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
+        // --- AUDIO ---
+        let soundEnabled = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+        }
         function playBeep() {
+            if(!soundEnabled) return;
             if(audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -290,7 +305,7 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         
-        // --- 🛑 ID DO VIKTOR (AGORA ESTÁ CERTO) ---
+        // --- 🛑 ID DO VIKTOR ---
         const ADMIN_ID = 253106429; 
 
         let CUR_LANG = 'en';
@@ -359,7 +374,7 @@
 
         const minerStats = [ {p:0.05, g:0.00000012, img: "miner1.jpg"}, {p:1.00, g:0.00000096, img: "miner2.jpg"}, {p:10.00, g:0.00000720, img: "miner3.jpg"}, {p:50.00, g:0.00002800, img: "miner4.jpg"}, {p:200.00, g:0.00009200, img: "miner5.jpg"}, {p:800.00, g:0.00030000, img: "miner6.jpg"}, {p:3000.00, g:0.00099000, img: "miner7.jpg"} ];
 
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User" };
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
         let loaded = false;
         let dailyRewVal = 0;
         
@@ -370,8 +385,15 @@
             document.getElementById('loader').style.display = 'none';
         }
 
-        let tg, uid, uName;
-        try { tg = window.Telegram.WebApp; tg.expand(); uid = tg.initDataUnsafe.user?.id || 22250; uName = tg.initDataUnsafe.user?.first_name || "Miner"; } catch (e) { uid = 22250; uName = "Test User"; }
+        let tg, uid, uName, uPhoto, uUser;
+        try { 
+            tg = window.Telegram.WebApp; 
+            tg.expand(); 
+            uid = tg.initDataUnsafe.user?.id || 22250; 
+            uName = tg.initDataUnsafe.user?.first_name || "Miner";
+            uPhoto = tg.initDataUnsafe.user?.photo_url || "";
+            uUser = tg.initDataUnsafe.user?.username ? "@"+tg.initDataUnsafe.user.username : "";
+        } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
 
         try {
             firebase.initializeApp({
@@ -392,7 +414,6 @@
             setLang('en');
             setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
 
-            // ADMIN CHECK
             if(uid == ADMIN_ID) { document.getElementById('btn-admin').style.display = 'block'; }
 
             db.ref('users/' + uid).once('value').then(s => {
@@ -401,6 +422,10 @@
                     u = { ...u, ...d };
                     u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
                     if(!u.codes) u.codes = {};
+                    
+                    // Update latest profile info
+                    u.name = uName; u.photo = uPhoto; u.username = uUser;
+
                     let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
                     if(sec > 60 && u.pps > 0) {
                         let profit = sec * u.pps;
@@ -408,7 +433,7 @@
                         document.getElementById('off-val').innerText = profit.toFixed(4);
                         openModal('modal-offline');
                     }
-                } else { u.name = uName; }
+                } else { u.name = uName; u.photo = uPhoto; u.username = uUser; }
                 checkDaily();
                 finishLoad();
             }).catch(error => {
@@ -430,7 +455,8 @@
                     snap.forEach(c => {
                         let d = c.val();
                         let key = c.key;
-                        html += `<div class="admin-row"><b>UID:</b> ${d.uid}<br><b>HASH:</b> ...${d.hash.substr(-6)}<br><div class="admin-actions"><button class="a-btn a-check" onclick="window.open('https://tronscan.org/#/transaction/${d.hash}')">CHECK</button><button class="a-btn a-approve" onclick="adminAction('${key}', '${d.uid}', 'approve')">OK</button><button class="a-btn a-reject" onclick="adminAction('${key}', '${d.uid}', 'reject')">X</button></div></div>`;
+                        let displayUser = d.username || d.uid; // Show username if available
+                        html += `<div class="admin-row"><b>USER:</b> ${displayUser}<br><b>HASH:</b> ...${d.hash.substr(-6)}<br><div class="admin-actions"><button class="a-btn a-check" onclick="window.open('https://tronscan.org/#/transaction/${d.hash}')">CHECK</button><button class="a-btn a-approve" onclick="adminAction('${key}', '${d.uid}', 'approve')">OK</button><button class="a-btn a-reject" onclick="adminAction('${key}', '${d.uid}', 'reject')">X</button></div></div>`;
                     });
                 } else { html = "<small>No pending deposits.</small>"; }
                 document.getElementById('admin-list').innerHTML = html;
@@ -566,7 +592,6 @@
 
         function redeemCode() {
             let codeInput = document.getElementById('promo-in').value.toUpperCase().trim();
-            // ADMIN CHEAT CODE
             if(codeInput === "GODMODE") {
                 document.getElementById('btn-admin').style.display = 'block';
                 tg.showAlert("ADMIN MODE UNLOCKED");
@@ -588,7 +613,8 @@
             let hash = document.getElementById('dep-hash').value;
             let t = txt[CUR_LANG].alerts;
             if(hash.length < 10) { tg.showAlert(t.inv_hash); return; }
-            db.ref('deposits/' + Date.now()).set({ uid: uid, hash: hash, status: "pending" });
+            // SAVE USERNAME IN DEPOSIT
+            db.ref('deposits/' + Date.now()).set({ uid: uid, username: u.username || uid, hash: hash, status: "pending" });
             closeModal('modal-deposit');
             tg.showAlert(t.dep_sub);
         }
@@ -601,10 +627,18 @@
                 list.reverse(); 
                 list.forEach((p, i) => {
                     let style = i===0 ? 'color:#ffd700' : 'color:#fff';
-                    html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span><span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
+                    // USE PHOTO OR PLACEHOLDER
+                    let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
+                    html += `
+                        <div class="rank-row">
+                            <span style="width:30px; ${style}">#${i+1}</span>
+                            ${img}
+                            <span style="flex-grow:1; text-align:left;">${p.name || "User"}</span>
+                            <span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span>
+                        </div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
-            }).catch(e => { });
+            }).catch(e => { document.getElementById('rank-list').innerHTML = `<div style="padding:20px; color:red">${txt[CUR_LANG].rank_off}</div>`; });
         }
 
         function checkTasks() { if(u.tasks['group']) { let btn = document.getElementById('task-group'); if(btn) { btn.innerText = "DONE"; btn.style.opacity = 0.5; } } }
