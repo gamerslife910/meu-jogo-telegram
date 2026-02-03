@@ -9,6 +9,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap'); /* FONTE HACKER */
         
         body { background-color: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
@@ -29,11 +30,11 @@
         .inp { width: 90%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; text-align: center; }
         .inp:focus { border-color: #0f9; outline: none; }
 
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
-        .glitch { font-size: 40px; font-weight: bold; color: #0f9; text-shadow: 2px 2px #f0f; animation: glitch 1s infinite; letter-spacing: 5px; }
-        
-        /* LOG BOX PARA VER ERROS */
-        #debug-box { width:90%; height:100px; background:#111; border:1px solid #333; overflow-y:scroll; font-size:10px; color:yellow; text-align:left; padding:5px; margin-top:20px; }
+        /* LOADING SCREEN STYLE */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'VT323', monospace; }
+        .boot-text { color: #0f9; font-size: 16px; width: 80%; text-align: left; margin-bottom: 5px; text-shadow: 0 0 5px #0f9; }
+        .glitch { font-size: 50px; font-weight: bold; color: #fff; text-shadow: 2px 2px #0f9; animation: glitch 1s infinite; letter-spacing: 5px; margin-bottom: 20px; font-family: 'Rajdhani'; }
+        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
@@ -71,6 +72,9 @@
 
         .ctrl-btn { position: absolute; top: 10px; left: 10px; z-index: 50; display:flex; gap:5px; }
         .c-icon { background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+        
+        /* ONLINE COUNTER */
+        .online-cnt { position: absolute; top: 45px; left: 10px; z-index: 50; font-size: 10px; color: #0f9; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; border: 1px solid #333; }
 
         .day-grid { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
         .day-box { background: #222; border: 1px solid #333; padding: 5px; width: 30px; font-size: 10px; opacity: 0.5; border-radius: 4px; }
@@ -102,6 +106,8 @@
         <div class="c-icon" onclick="toggleSound()" id="btn-sound">🔊</div>
         <div class="c-icon" onclick="openSupport()">📞</div>
     </div>
+    
+    <div class="online-cnt" id="online-users">🟢 342 Online</div>
 
     <div class="lang-bar">
         <div class="l-btn active" id="btn-en" onclick="setLang('en')">EN</div>
@@ -112,10 +118,8 @@
 
     <div id="loader">
         <div class="glitch">EURODASH</div>
-        <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
-        <div id="debug-box">Logs:<br></div>
-        <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
+        <div id="boot-seq" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+        <button id="force-btn" onclick="finishLoad()">⚠️ FORCE START</button>
     </div>
 
     <div id="modal-tutorial" class="modal">
@@ -273,11 +277,6 @@
                 <button class="buy-btn" style="background:#ffd700; color:#000;" onclick="flipCoin('tails')">TAILS</button>
             </div>
         </div>
-        
-        <h2 style="color:#0f9; border-bottom:1px solid #333; margin-top:30px;" id="t-rank-tit2">TOP INVESTORS</h2>
-        <div style="background:#111; border-radius:10px; padding:10px; border:1px solid #333;" id="rank-list-games">
-            <div style="padding:20px; color:#555;" id="t-load-rank2">Loading...</div>
-        </div>
     </div>
 
     <div id="tab-friends" class="tab">
@@ -303,6 +302,13 @@
         </div>
     </div>
 
+    <div id="tab-rank" class="tab">
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-rank-tit">TOP INVESTORS</h2>
+        <div style="background:#111; border-radius:10px; padding:10px; border:1px solid #333;" id="rank-list">
+            <div style="padding:20px; color:#555;" id="t-load-rank">Loading real data...</div>
+        </div>
+    </div>
+
     <div id="tab-admin" class="tab">
         <h2 style="color:orange; border-bottom:1px solid orange;">ADMIN PANEL 👮‍♂️</h2>
         <p style="font-size:12px; color:#888;">Pending Deposits</p>
@@ -314,23 +320,10 @@
         <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
         <div class="n-btn" id="nb-games" onclick="sw('games')"><span class="n-icon">🎲</span><span>GAMES</span></div>
         <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span id="n-team">TEAM</span></div>
-        <div class="n-btn" id="nb-earn" onclick="sw('earn')"><span class="n-icon">🎯</span><span id="n-earn">EARN</span></div>
+        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span id="n-rank">RANK</span></div>
     </div>
 
     <script>
-        // GLOBAL ERROR HANDLER
-        window.onerror = function(msg, url, line) {
-            let logBox = document.getElementById('debug-box');
-            if(logBox) logBox.innerHTML += `<div style="color:red; border-bottom:1px solid #333;">ERROR: ${msg} (Line ${line})</div>`;
-            document.getElementById('force-btn').style.display = 'block';
-            return false;
-        };
-
-        function log(msg) {
-            let logBox = document.getElementById('debug-box');
-            if(logBox) logBox.innerHTML += `<div>>> ${msg}</div>`;
-        }
-
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -388,7 +381,7 @@
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
                 promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "RANK", "TEAM", "EARN"],
+                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
@@ -408,7 +401,7 @@
                 inv_desc: "Convida amigos e ganha 5% do que minerarem!", copy_link: "COPIAR LINK",
                 task_tit: "TAREFAS", join_ch: "Entrar no Canal Oficial", rew: "+€0.10 Recompensa",
                 promo_tit: "CÓDIGO SECRETO", redeem: "RESGATAR", force_play: "⚠️ JOGAR OFFLINE", db_slow: "A ligar...", db_err: "Erro: ",
-                nav: ["MINAR", "LOJA", "RANK", "EQUIPA", "GANHAR"],
+                nav: ["MINAR", "LOJA", "JOGOS", "EQUIPA", "RANK"],
                 miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural", "Núcleo Titã"],
                 alerts: {
                     copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
@@ -428,7 +421,7 @@
                 inv_desc: "Пригласи друзей и получай 5%!", copy_link: "КОПИРОВАТЬ",
                 task_tit: "ЗАДАНИЯ", join_ch: "Вступить в канал", rew: "+€0.10 Награда",
                 promo_tit: "СЕКРЕТНЫЙ КОД", redeem: "АКТИВИРОВАТЬ", force_play: "⚠️ ИГРАТЬ ОФЛАЙН", db_slow: "Подключение...", db_err: "Ошибка: ",
-                nav: ["МАЙНИНГ", "МАРКЕТ", "ТОП", "КОМАНДА", "ЗАДАНИЯ"],
+                nav: ["МАЙНИНГ", "МАРКЕТ", "ИГРЫ", "КОМАНДА", "ТОП"],
                 miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"],
                 alerts: {
                     copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
@@ -453,6 +446,31 @@
             document.getElementById('loader').style.display = 'none';
         }
 
+        // LOADING BOOT SEQUENCE
+        function startBoot() {
+            const lines = [
+                "> INITIALIZING KERNEL...",
+                "> CONNECTING TO EURO-NET...",
+                "> BYPASSING SECURITY LAYER 1...",
+                "> DECRYPTING WALLET DATA...",
+                "> ACCESS GRANTED."
+            ];
+            let container = document.getElementById('boot-seq');
+            let delay = 0;
+            lines.forEach((line, i) => {
+                setTimeout(() => {
+                    let div = document.createElement('div');
+                    div.className = 'boot-text';
+                    div.innerText = line;
+                    container.appendChild(div);
+                }, delay);
+                delay += 800; // 0.8s per line
+            });
+            setTimeout(() => {
+                if(!loaded) document.getElementById('force-btn').style.display = 'block';
+            }, 4500);
+        }
+
         let tg, uid, uName, uPhoto, uUser;
         try { 
             tg = window.Telegram.WebApp; 
@@ -464,7 +482,6 @@
         } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
 
         try {
-            log("Init Firebase...");
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
                 authDomain: "eurodash-official.firebaseapp.com",
@@ -474,51 +491,61 @@
                 messagingSenderId: "633116941203",
                 appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666"
             });
-            log("Firebase OK");
-        } catch(err) { log("Error: " + err.message); }
+        } catch(err) { console.log(err); }
 
         const db = firebase.database();
 
-        window.onload = function() {
-            log("Window Loaded");
-            document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            try {
-                document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
-                setLang('en');
-            } catch(e) { log("UI Setup Error: " + e.message); }
+        // SAVE FUNCTION (CRITICAL FIX)
+        function saveNow() {
+            if(uid) {
+                u.lastT = Date.now();
+                db.ref('users/' + uid).update(u);
+            }
+        }
 
-            setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 4000);
+        window.onload = function() {
+            startBoot(); // Start Animation
+            
+            document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
+            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
+            setLang('en');
 
             if(uid == ADMIN_ID) { document.getElementById('btn-admin').style.display = 'block'; }
 
-            log("DB Connecting...");
-            db.ref('users/' + uid).once('value').then(s => {
-                log("Data OK");
-                if(s.exists()) {
-                    let d = s.val();
-                    u = { ...u, ...d };
-                    u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
-                    if(!u.codes) u.codes = {};
-                    u.name = uName; u.photo = uPhoto; u.username = uUser;
+            // FAKE ONLINE COUNTER
+            setInterval(() => {
+                let count = Math.floor(Math.random() * (400 - 300 + 1) + 300);
+                document.getElementById('online-users').innerText = "🟢 " + count + " Online";
+            }, 4000);
 
-                    let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
-                    if(sec > 60 && u.pps > 0) {
-                        let profit = sec * u.pps;
-                        u.bal += profit;
-                        document.getElementById('off-val').innerText = profit.toFixed(4);
-                        openModal('modal-offline');
+            // FORCE WAIT 4 SECONDS FOR EFFECT
+            setTimeout(() => {
+                db.ref('users/' + uid).once('value').then(s => {
+                    if(s.exists()) {
+                        let d = s.val();
+                        u = { ...u, ...d };
+                        u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                        if(!u.codes) u.codes = {};
+                        u.name = uName; u.photo = uPhoto; u.username = uUser;
+
+                        let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
+                        if(sec > 60 && u.pps > 0) {
+                            let profit = sec * u.pps;
+                            u.bal += profit;
+                            document.getElementById('off-val').innerText = profit.toFixed(4);
+                            openModal('modal-offline');
+                        }
+                    } else { 
+                        u.name = uName; u.photo = uPhoto; u.username = uUser; 
+                        openModal('modal-tutorial');
                     }
-                } else { 
-                    u.name = uName; u.photo = uPhoto; u.username = uUser; 
-                    openModal('modal-tutorial');
-                }
-                checkDaily();
-                finishLoad();
-            }).catch(error => {
-                log("DB Error: " + error.message);
-                document.getElementById('load-status').innerText = "ERROR";
-                document.getElementById('force-btn').style.display = 'block';
-            });
+                    checkDaily();
+                    finishLoad();
+                }).catch(error => {
+                    document.getElementById('force-btn').innerText = "OFFLINE MODE";
+                    document.getElementById('force-btn').style.display = 'block';
+                });
+            }, 4000); // 4s Delay
 
             document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
             document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
@@ -530,6 +557,7 @@
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
             u.bal -= bet;
+            saveNow(); // SAVE ON BET
             let el = document.getElementById('dice-result');
             el.innerText = "ROLLING...";
             el.className = "game-res";
@@ -543,7 +571,7 @@
                     el.innerText = "LOST -€" + bet.toFixed(2); el.className = "game-res lose";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
-                up();
+                up(); saveNow(); // SAVE ON RESULT
             }, 1000);
         }
 
@@ -552,6 +580,7 @@
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
             u.bal -= bet;
+            saveNow(); // SAVE ON BET
             let el = document.getElementById('coin-result');
             el.classList.add('coin-anim');
             setTimeout(() => {
@@ -566,7 +595,7 @@
                     el.innerHTML = symbol + "<br><span class='lose'>LOSE</span>";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
-                up();
+                up(); saveNow(); // SAVE ON RESULT
             }, 1000);
         }
 
@@ -614,7 +643,7 @@
             }
         }
 
-        function claimDaily() { u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); closeModal('modal-daily'); tg.showAlert(txt[CUR_LANG].alerts.rew_rec); }
+        function claimDaily() { u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); saveNow(); closeModal('modal-daily'); tg.showAlert(txt[CUR_LANG].alerts.rew_rec); }
 
         function setLang(l) {
             CUR_LANG = l;
@@ -622,7 +651,6 @@
             document.getElementById('btn-'+l).classList.add('active');
             const t = txt[l];
             try {
-                // UI UPDATES
                 if(document.getElementById('t-welcome')) document.getElementById('t-welcome').innerText = t.welcome;
                 if(document.getElementById('t-off-earn')) document.getElementById('t-off-earn').innerText = t.off_earn;
                 if(document.getElementById('t-collect')) document.getElementById('t-collect').innerText = t.collect;
@@ -643,9 +671,7 @@
                 if(document.getElementById('t-market')) document.getElementById('t-market').innerText = t.market;
                 if(document.getElementById('t-wallet')) document.getElementById('t-wallet').innerText = t.wallet;
                 if(document.getElementById('t-rank-tit')) document.getElementById('t-rank-tit').innerText = t.rank_tit;
-                if(document.getElementById('t-rank-tit2')) document.getElementById('t-rank-tit2').innerText = t.rank_tit;
                 if(document.getElementById('t-load-rank')) document.getElementById('t-load-rank').innerText = t.load_rank;
-                if(document.getElementById('t-load-rank2')) document.getElementById('t-load-rank2').innerText = t.load_rank;
                 if(document.getElementById('t-net-tit')) document.getElementById('t-net-tit').innerText = t.net_tit;
                 if(document.getElementById('t-inv-desc')) document.getElementById('t-inv-desc').innerText = t.inv_desc;
                 if(document.getElementById('t-copy-link')) document.getElementById('t-copy-link').innerText = t.copy_link;
@@ -659,9 +685,9 @@
                 // Nav
                 if(document.getElementById('n-mine')) document.getElementById('n-mine').innerText = t.nav[0];
                 if(document.getElementById('n-shop')) document.getElementById('n-shop').innerText = t.nav[1];
-                if(document.getElementById('n-rank')) document.getElementById('n-rank').innerText = t.nav[2];
+                if(document.getElementById('n-games')) document.getElementById('n-games').innerText = t.nav[2]; // Fixed: Use Games Text
                 if(document.getElementById('n-team')) document.getElementById('n-team').innerText = t.nav[3];
-                if(document.getElementById('n-earn')) document.getElementById('n-earn').innerText = t.nav[4];
+                if(document.getElementById('n-rank')) document.getElementById('n-rank').innerText = t.nav[4];
                 
                 const newsText = {
                     en: "🚀 Welcome to EuroDash! --- 💰 John just withdrew €5.00 --- ⚡ Ana upgraded to Hacker Level --- 🏆 Pedro is now #1 Rank --- 💎 200+ Users Online",
@@ -670,7 +696,7 @@
                 };
                 document.getElementById('news-ticker').innerText = newsText[l];
                 renderShop(); loadRank();
-            } catch(e) { log("Lang Error: " + e.message); }
+            } catch(e) { }
         }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
@@ -740,7 +766,7 @@
             if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
             if(u.bal < val) { tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); return; }
             u.bal -= val;
-            up();
+            saveNow(); // SAVE ON WITHDRAW
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
             tg.showAlert(t.req_sent);
@@ -759,7 +785,7 @@
             let reward = PROMO_CODES[codeInput];
             u.bal += reward;
             u.codes[codeInput] = true;
-            up();
+            up(); saveNow(); // SAVE ON REDEEM
             tg.showAlert(t.code_ok + " +€" + reward.toFixed(2));
             document.getElementById('promo-in').value = "";
         }
@@ -785,8 +811,7 @@
                     let img = p.photo ? `<img src="${p.photo}" class="rank-img">` : `<div class="rank-img" style="display:flex;align-items:center;justify-content:center;color:#0f9;">?</div>`;
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
-                if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
-                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
+                document.getElementById('rank-list').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -796,25 +821,25 @@
             tg.openLink(CONFIG.telegram_link);
             setTimeout(() => {
                 tg.showConfirm("Did you join the channel?", (ok) => {
-                    if(ok) { u.tasks[id] = true; u.bal += reward; up(); checkTasks(); tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`); }
+                    if(ok) { u.tasks[id] = true; u.bal += reward; up(); checkTasks(); saveNow(); tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`); }
                 });
             }, 8000);
         }
 
         function up() {
-            if(document.getElementById('bal-val')) document.getElementById('bal-val').innerText = u.bal.toFixed(5);
-            if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
-            if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
-            if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
+            document.getElementById('bal-val').innerText = u.bal.toFixed(5);
+            document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
+            document.getElementById('eg').innerText = Math.floor(u.eng);
+            document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
             let pct = (u.eng / 500) * 100;
-            if(document.getElementById('eng-bar')) document.getElementById('eng-bar').style.width = pct + "%";
+            document.getElementById('eng-bar').style.width = pct + "%";
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
             else if(u.bal < 200) { l = "CYBER LORD"; w = (u.bal/200)*100; }
             else { l = "TITAN"; w = 100; }
-            if(document.getElementById('l-fill')) document.getElementById('l-fill').style.width = w+"%";
-            if(document.getElementById('l-name')) document.getElementById('l-name').innerText = l;
+            document.getElementById('l-fill').style.width = w+"%";
+            document.getElementById('l-name').innerText = l;
             if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
         }
 
@@ -842,11 +867,12 @@
                 btn.style.background = "#fff";
                 setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
-                renderShop(); up(); tg.HapticFeedback.notificationOccurred('success');
+                renderShop(); up(); saveNow(); // SAVE ON BUY
+                tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openSupport() { tg.openTelegramLink("https://t.me/EuroDash_Support"); }
+        function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); } // FIXED SUPPORT LINK
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'modal-withdraw') {
@@ -874,8 +900,9 @@
         }
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
+        // REDUCED SAVE INTERVAL TO 1 SECOND (WAS 5)
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
+        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 3000);
     </script>
 </body>
 </html>
