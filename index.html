@@ -10,8 +10,10 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
         
-        body { background-color: #050505; background-image: linear-gradient(rgba(0, 255, 153, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 153, 0.03) 1px, transparent 1px); background-size: 30px 30px; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body::after { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 40%, #000 100%); pointer-events: none; z-index: -1; }
+        body { background-color: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; text-align: center; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* MATRIX BACKGROUND */
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
 
         .tab { display: none; padding: 20px; padding-top: 60px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
         .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); }
@@ -30,8 +32,15 @@
         @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; transition: transform 0.05s; -webkit-user-drag: none; }
-        .main-img:active { transform: scale(0.96); border-color: #0f9; box-shadow: 0 0 50px rgba(0,255,153,0.6); }
+        .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
+        /* NEW CLICK ANIMATION */
+        .main-img.click-anim { animation: pulseWave 0.4s ease-out; }
+        @keyframes pulseWave {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0.8); transform: scale(0.98); }
+            50% { box-shadow: 0 0 20px 10px rgba(0, 255, 153, 0); transform: scale(1.02); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); transform: scale(1.0); }
+        }
+
         .float-text { position: absolute; color: #fff; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 5px #0f9; z-index: 20; }
         .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
@@ -52,13 +61,13 @@
 
         #force-btn { display:none; margin-top:20px; padding:10px 20px; background:red; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; z-index:99999; }
         
-        /* Language Bar */
         .lang-bar { position: absolute; top: 10px; right: 10px; z-index: 50; display: flex; gap: 5px; }
         .l-btn { background: rgba(0,0,0,0.6); color: #888; border: 1px solid #333; padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; font-weight: bold; }
         .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
     </style>
 </head>
 <body>
+    <canvas id="matrix-bg"></canvas>
 
     <div class="lang-bar">
         <div class="l-btn active" id="btn-en" onclick="setLang('en')">EN</div>
@@ -70,7 +79,7 @@
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
         <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ JOGAR (OFFLINE)</button>
+        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
     </div>
 
     <div id="modal-offline" class="modal">
@@ -186,6 +195,11 @@
             <div><b style="color:#fff" id="t-join-ch">Join Official Channel</b><br><small style="color:#0f9" id="t-rew">+€0.10 Reward</small></div>
             <button class="buy-btn" id="task-group" onclick="doTask('group', 0.10)">START</button>
         </div>
+        <div class="card" style="display:block;">
+            <b style="color:#fff" id="t-promo-tit">SECRET CODE</b><br>
+            <input type="text" id="promo-in" class="inp" placeholder="Enter Code" style="margin-bottom:5px;">
+            <button class="buy-btn" style="width:100%" onclick="redeemCode()" id="t-redeem">REDEEM</button>
+        </div>
     </div>
 
     <div class="nav">
@@ -197,14 +211,31 @@
     </div>
 
     <script>
-        const CONFIG = {
-            telegram_link: "https://t.me/EuroDashOfficial", 
-            admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", 
-            min_withdraw: 1.00,
-            fee: 0.02 
-        };
+        // --- MATRIX BACKGROUND ---
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzｦｱｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f9'; ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-        // --- TRANSLATION DATA ---
+        // --- CONFIG & DATA ---
+        const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
+        const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 }; // TUA LISTA DE CÓDIGOS
+
         let CUR_LANG = 'en';
         const txt = {
             en: {
@@ -214,15 +245,17 @@
                 dep_tit: "DEPOSIT (USDT)", dep_info: "Send USDT (TRC20) to this address:", copy: "COPY ADDRESS",
                 hash_info: "Paste Transaction Hash (TXID):", sent: "I SENT IT",
                 energy: "ENERGY", pps: "PROFIT/SEC", market: "MARKET", wallet: "WALLET",
-                rank_tit: "TOP INVESTORS", load_rank: "Loading real data...", net_tit: "NETWORK",
+                rank_tit: "TOP INVESTORS", load_rank: "Loading real data...", rank_off: "Offline (DB Error)", net_tit: "NETWORK",
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
+                promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
                 nav: ["MINE", "SHOP", "RANK", "TEAM", "EARN"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
                     insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
-                    inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!"
+                    inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!",
+                    code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!"
                 }
             },
             pt: {
@@ -232,15 +265,17 @@
                 dep_tit: "DEPOSITAR (USDT)", dep_info: "Envia USDT (TRC20) para este endereço:", copy: "COPIAR ENDEREÇO",
                 hash_info: "Cola o Hash da Transação (TXID):", sent: "JÁ ENVIEI",
                 energy: "ENERGIA", pps: "LUCRO/SEG", market: "MERCADO", wallet: "CARTEIRA",
-                rank_tit: "TOP INVESTIDORES", load_rank: "A carregar dados...", net_tit: "REDE",
+                rank_tit: "TOP INVESTIDORES", load_rank: "A carregar dados...", rank_off: "Offline (Erro DB)", net_tit: "REDE",
                 inv_desc: "Convida amigos e ganha 5% do que minerarem!", copy_link: "COPIAR LINK",
                 task_tit: "TAREFAS", join_ch: "Entrar no Canal Oficial", rew: "+€0.10 Recompensa",
+                promo_tit: "CÓDIGO SECRETO", redeem: "RESGATAR", force_play: "⚠️ JOGAR OFFLINE", db_slow: "A ligar...", db_err: "Erro: ",
                 nav: ["MINAR", "LOJA", "RANK", "EQUIPA", "GANHAR"],
                 miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural", "Núcleo Titã"],
                 alerts: {
                     copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
                     insufficient: "❌ Saldo Insuficiente! Tens apenas €", req_sent: "Pedido Enviado!",
-                    inv_hash: "Hash Inválido", dep_sub: "Depósito Enviado!", rew_rec: "Recebido!"
+                    inv_hash: "Hash Inválido", dep_sub: "Depósito Enviado!", rew_rec: "Recebido!",
+                    code_inv: "Código Inválido!", code_used: "Código já usado!", code_ok: "Código Resgatado!"
                 }
             },
             ru: {
@@ -250,15 +285,17 @@
                 dep_tit: "ДЕПОЗИТ (USDT)", dep_info: "Отправьте USDT (TRC20) на адрес:", copy: "КОПИРОВАТЬ",
                 hash_info: "Вставьте хеш транзакции (TXID):", sent: "Я ОТПРАВИЛ",
                 energy: "ЭНЕРГИЯ", pps: "ПРИБЫЛЬ/СЕК", market: "РЫНОК", wallet: "КОШЕЛЕК",
-                rank_tit: "ТОП ИНВЕСТОРОВ", load_rank: "Загрузка данных...", net_tit: "СЕТЬ",
+                rank_tit: "ТОП ИНВЕСТОРОВ", load_rank: "Загрузка данных...", rank_off: "Офлайн (Ошибка БД)", net_tit: "СЕТЬ",
                 inv_desc: "Пригласи друзей и получай 5%!", copy_link: "КОПИРОВАТЬ",
                 task_tit: "ЗАДАНИЯ", join_ch: "Вступить в канал", rew: "+€0.10 Награда",
+                promo_tit: "СЕКРЕТНЫЙ КОД", redeem: "АКТИВИРОВАТЬ", force_play: "⚠️ ИГРАТЬ ОФЛАЙН", db_slow: "Подключение...", db_err: "Ошибка: ",
                 nav: ["МАЙНИНГ", "МАРКЕТ", "ТОП", "КОМАНДА", "ЗАДАНИЯ"],
                 miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"],
                 alerts: {
                     copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
                     insufficient: "❌ Недостаточно средств! У вас только €", req_sent: "Запрос отправлен!",
-                    inv_hash: "Неверный хеш", dep_sub: "Депозит отправлен!", rew_rec: "Получено!"
+                    inv_hash: "Неверный хеш", dep_sub: "Депозит отправлен!", rew_rec: "Получено!",
+                    code_inv: "Неверный код!", code_used: "Код уже использован!", code_ok: "Код активирован!"
                 }
             }
         };
@@ -273,7 +310,8 @@
             {p:3000.00, g:0.00099000, img: "miner7.jpg"}
         ];
 
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
+        // Added 'codes' to user object to track used promo codes
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), name: "User" };
         let loaded = false;
         
         window.finishLoad = function() {
@@ -313,10 +351,9 @@
 
             setTimeout(() => {
                 if(!loaded) {
-                    console.log("DB Slow/Error. Playing anyway.");
-                    finishLoad(); 
+                    document.getElementById('force-btn').style.display = 'block';
                 }
-            }, 3000);
+            }, 3500);
 
             db.ref('users/' + uid).once('value')
                 .then(s => {
@@ -324,6 +361,7 @@
                         let d = s.val();
                         u = { ...u, ...d };
                         u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                        if(!u.codes) u.codes = {}; // Ensure codes object exists for old users
                         let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
                         if(sec > 60 && u.pps > 0) {
                             let profit = sec * u.pps;
@@ -335,8 +373,8 @@
                     finishLoad();
                 })
                 .catch(error => {
-                    document.getElementById('load-status').innerText = "Error: " + error.message;
-                    setTimeout(finishLoad, 2000); 
+                    document.getElementById('load-status').innerText = txt[CUR_LANG].db_err + error.code;
+                    document.getElementById('force-btn').style.display = 'block';
                 });
 
             document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
@@ -348,9 +386,8 @@
             CUR_LANG = l;
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+l).classList.add('active');
-
-            // Update UI Text
             const t = txt[l];
+            // Update UI Text
             document.getElementById('t-welcome').innerText = t.welcome;
             document.getElementById('t-off-earn').innerText = t.off_earn;
             document.getElementById('t-collect').innerText = t.collect;
@@ -378,15 +415,17 @@
             document.getElementById('t-task-tit').innerText = t.task_tit;
             document.getElementById('t-join-ch').innerText = t.join_ch;
             document.getElementById('t-rew').innerText = t.rew;
-
+            document.getElementById('t-promo-tit').innerText = t.promo_tit;
+            document.getElementById('t-redeem').innerText = t.redeem;
+            document.getElementById('force-btn').innerText = t.force_play;
+            document.getElementById('load-status').innerText = t.db_slow;
             // Nav
             document.getElementById('n-mine').innerText = t.nav[0];
             document.getElementById('n-shop').innerText = t.nav[1];
             document.getElementById('n-rank').innerText = t.nav[2];
             document.getElementById('n-team').innerText = t.nav[3];
             document.getElementById('n-earn').innerText = t.nav[4];
-
-            renderShop();
+            renderShop(); loadRank(); // Reload rank to apply translation
         }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
@@ -395,6 +434,12 @@
         function tap(x, y) {
             if(u.eng < 1) return;
             u.eng--;
+            // TRIGGER ANIMATION
+            let btn = document.getElementById('click-btn');
+            btn.classList.remove('click-anim');
+            void btn.offsetWidth; // Trigger reflow
+            btn.classList.add('click-anim');
+
             let gain = 0.00005;
             let critChance = 0;
             if(u.bal >= 10) critChance = 0.02;
@@ -416,11 +461,7 @@
             setTimeout(()=>el.remove(), 800);
         }
 
-        function setMax() {
-            document.getElementById('wd-amount').value = u.bal.toFixed(2);
-            calcFee();
-        }
-
+        function setMax() { document.getElementById('wd-amount').value = u.bal.toFixed(2); calcFee(); }
         function calcFee() {
             let val = parseFloat(document.getElementById('wd-amount').value) || 0;
             let final = val - (val * CONFIG.fee);
@@ -432,20 +473,27 @@
             let addr = document.getElementById('wd-addr').value;
             let val = parseFloat(document.getElementById('wd-amount').value);
             let t = txt[CUR_LANG].alerts;
-            
             if(!addr.startsWith("T")) { tg.showAlert(t.invalid_trc20); return; }
             if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
-            
-            if(u.bal < val) { 
-                tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); 
-                return; 
-            }
-
+            if(u.bal < val) { tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); return; }
             u.bal -= val;
             up();
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
             tg.showAlert(t.req_sent);
+        }
+
+        function redeemCode() {
+            let codeInput = document.getElementById('promo-in').value.toUpperCase().trim();
+            let t = txt[CUR_LANG].alerts;
+            if(!PROMO_CODES[codeInput]) { tg.showAlert(t.code_inv); return; }
+            if(u.codes[codeInput]) { tg.showAlert(t.code_used); return; }
+            let reward = PROMO_CODES[codeInput];
+            u.bal += reward;
+            u.codes[codeInput] = true;
+            up();
+            tg.showAlert(t.code_ok + " +€" + reward.toFixed(2));
+            document.getElementById('promo-in').value = "";
         }
 
         function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert(txt[CUR_LANG].alerts.copied); }
@@ -469,7 +517,7 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span><span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
-            }).catch(e => { }); // Silent fail on rank
+            }).catch(e => { document.getElementById('rank-list').innerHTML = `<div style="padding:20px; color:red">${txt[CUR_LANG].rank_off}</div>`; });
         }
 
         function checkTasks() {
