@@ -81,11 +81,13 @@
         .a-approve { background: #0f9; color: #000; }
         .a-reject { background: #f00; color: #fff; }
         
-        /* DICE GAME */
-        .dice-box { background:#111; border:1px solid #333; border-radius:10px; padding:20px; margin-bottom:10px; text-align:center; }
-        .dice-res { font-size:40px; font-weight:bold; margin:10px 0; color:#fff; min-height:50px; }
-        .dice-win { color:#0f9; text-shadow:0 0 20px #0f9; }
-        .dice-lose { color:#f00; text-shadow:0 0 20px #f00; }
+        /* DICE & COIN GAME */
+        .game-box { background:#111; border:1px solid #333; border-radius:10px; padding:20px; margin-bottom:10px; text-align:center; position:relative; overflow:hidden;}
+        .game-res { font-size:32px; font-weight:bold; margin:10px 0; color:#fff; min-height:40px; }
+        .win { color:#0f9; text-shadow:0 0 20px #0f9; }
+        .lose { color:#f00; text-shadow:0 0 20px #f00; }
+        .coin-anim { animation: spin 1s infinite linear; }
+        @keyframes spin { 0% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
     </style>
 </head>
 <body>
@@ -120,7 +122,7 @@
             <div style="text-align:left; font-size:14px; margin:20px 0; color:#ddd;">
                 1. 👆 <b>TAP</b> to generate Energy.<br><br>
                 2. 🛍️ <b>BUY</b> Miners in the Shop to earn money while you sleep.<br><br>
-                3. 🎲 <b>PLAY</b> Cyber Dice to double your cash.<br><br>
+                3. 🎲 <b>PLAY</b> Games to double your cash.<br><br>
                 4. 💰 <b>WITHDRAW</b> real money via TRC20.<br>
             </div>
             <button class="buy-btn" style="width:100%" onclick="closeModal('modal-tutorial')">LET'S GO!</button>
@@ -197,6 +199,11 @@
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
             <h3 style="color:#00ccff" id="t-dep-tit">DEPOSIT (USDT)</h3>
             <p style="font-size:12px; color:#aaa;" id="t-dep-info">Send USDT (TRC20) to this address:</p>
+            
+            <div style="background:#fff; padding:10px; display:inline-block; border-radius:10px; margin:10px 0;">
+                <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'">
+            </div>
+
             <div style="background:#222; padding:10px; font-size:10px; word-break:break-all; color:#0f9; border:1px dashed #555; user-select:text;" id="admin-wallet">...</div>
             <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()" id="t-copy">COPY ADDRESS</button>
             <hr style="border-color:#333; margin:15px 0;">
@@ -245,13 +252,24 @@
     </div>
 
     <div id="tab-games" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;">CYBER DICE 🎲</h2>
-        <div class="dice-box">
-            <p style="color:#aaa; font-size:12px;">Win 2x or Lose it all!</p>
-            <div class="dice-res" id="dice-result">?</div>
-            <input type="number" id="dice-bet" class="inp" placeholder="Bet Amount (€)" style="width:50%;">
+        <div class="game-box">
+            <h3 style="color:#0f9; margin:0;">CYBER DICE 🎲</h3>
+            <p style="color:#aaa; font-size:12px;">Roll > 55 to Win 2x</p>
+            <div class="game-res" id="dice-result">?</div>
+            <input type="number" id="dice-bet" class="inp" placeholder="Bet (€)" style="width:50%;">
             <br>
-            <button class="buy-btn" style="margin-top:10px; width:60%;" onclick="rollDice()">HACK SYSTEM (ROLL)</button>
+            <button class="buy-btn" style="margin-top:10px; width:60%;" onclick="rollDice()">ROLL</button>
+        </div>
+
+        <div class="game-box" style="border-left:3px solid #ffd700;">
+            <h3 style="color:#ffd700; margin:0;">COIN FLIP 🪙</h3>
+            <p style="color:#aaa; font-size:12px;">Heads or Tails (2x)</p>
+            <div class="game-res" id="coin-result">🟡</div>
+            <input type="number" id="coin-bet" class="inp" placeholder="Bet (€)" style="width:50%;">
+            <div style="margin-top:10px;">
+                <button class="buy-btn" style="background:#444; color:#fff;" onclick="flipCoin('heads')">HEADS</button>
+                <button class="buy-btn" style="background:#ffd700; color:#000;" onclick="flipCoin('tails')">TAILS</button>
+            </div>
         </div>
         
         <h2 style="color:#0f9; border-bottom:1px solid #333; margin-top:30px;" id="t-rank-tit">TOP INVESTORS</h2>
@@ -340,6 +358,7 @@
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
+        
         const ADMIN_ID = 253106429; 
 
         let CUR_LANG = 'en';
@@ -446,6 +465,8 @@
 
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
+            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
+            
             setLang('en');
             setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
 
@@ -486,23 +507,48 @@
             let bet = parseFloat(document.getElementById('dice-bet').value);
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
-            
             u.bal -= bet;
             let el = document.getElementById('dice-result');
             el.innerText = "ROLLING...";
-            el.className = "dice-res";
+            el.className = "game-res";
             
             setTimeout(() => {
-                let win = Math.random() > 0.55; // 45% Win Chance (House Edge)
+                let win = Math.random() > 0.55; 
                 if(win) {
                     let profit = bet * 2;
                     u.bal += profit;
                     el.innerText = "WIN! +€" + profit.toFixed(2);
-                    el.className = "dice-res dice-win";
+                    el.className = "game-res win";
                     tg.HapticFeedback.notificationOccurred('success');
                 } else {
                     el.innerText = "LOST -€" + bet.toFixed(2);
-                    el.className = "dice-res dice-lose";
+                    el.className = "game-res lose";
+                    tg.HapticFeedback.notificationOccurred('error');
+                }
+                up();
+            }, 1000);
+        }
+
+        function flipCoin(choice) {
+            let bet = parseFloat(document.getElementById('coin-bet').value);
+            if(!bet || bet <= 0) return;
+            if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
+            u.bal -= bet;
+            let el = document.getElementById('coin-result');
+            el.classList.add('coin-anim');
+            
+            setTimeout(() => {
+                el.classList.remove('coin-anim');
+                let outcome = Math.random() > 0.5 ? 'heads' : 'tails';
+                let symbol = outcome === 'heads' ? '🟡' : '🦅';
+                
+                if(choice === outcome) {
+                    let profit = bet * 2;
+                    u.bal += profit;
+                    el.innerHTML = symbol + "<br><span class='win'>WIN!</span>";
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    el.innerHTML = symbol + "<br><span class='lose'>LOSE</span>";
                     tg.HapticFeedback.notificationOccurred('error');
                 }
                 up();
@@ -777,7 +823,7 @@
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openSupport() { tg.openTelegramLink("https://t.me/EuroDash_Support"); }
+        function openSupport() { tg.openTelegramLink("https://t.me/EuroDashOfficial"); }
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'modal-withdraw') {
