@@ -16,7 +16,7 @@
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
 
         .tab { display: none; padding: 20px; padding-top: 60px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
-        .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); }
+        .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.1s; }
         .buy-btn:active { transform: scale(0.95); }
         .w-btn { background: #ff3333; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); }
         .dep-btn { background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(0,204,255,0.3); }
@@ -33,17 +33,16 @@
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
-        /* NEW CLICK ANIMATION */
-        .main-img.click-anim { animation: pulseWave 0.4s ease-out; }
-        @keyframes pulseWave {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0.8); transform: scale(0.98); }
-            50% { box-shadow: 0 0 20px 10px rgba(0, 255, 153, 0); transform: scale(1.02); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); transform: scale(1.0); }
-        }
+        .main-img.click-anim { animation: pulseWave 0.2s ease-out; }
+        @keyframes pulseWave { 0% { transform: scale(0.95); border-color:#fff; } 100% { transform: scale(1); border-color:rgba(0,255,153,0.3); } }
 
         .float-text { position: absolute; color: #fff; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 5px #0f9; z-index: 20; }
         .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+
+        /* ENERGY BAR */
+        .eng-bar-bg { width: 200px; height: 10px; background: #222; margin: 5px auto; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
+        .eng-bar-fill { height: 100%; background: #0f9; width: 100%; box-shadow: 0 0 10px #0f9; transition: width 0.2s; }
 
         .lvl-con { width: 60%; margin: 0 auto 5px auto; background: #111; height: 6px; border-radius: 3px; position: relative; border: 1px solid #333; display: inline-block; vertical-align: middle; }
         .lvl-fill { height: 100%; background: linear-gradient(90deg, #0f9, #00ffff); width: 0%; border-radius: 3px; transition: width 0.5s; box-shadow: 0 0 10px #0f9; }
@@ -51,7 +50,6 @@
 
         .card { background: rgba(10,10,10,0.8); border: 1px solid #222; border-left: 3px solid #0f9; border-radius: 10px; padding: 15px; margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .market-header { background: #111; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        
         .rank-row { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #222; }
         
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: rgba(5,5,5,0.95); border-top: 1px solid #222; padding-bottom: 20px; padding-top: 10px; z-index: 100; backdrop-filter: blur(10px); }
@@ -64,6 +62,11 @@
         .lang-bar { position: absolute; top: 10px; right: 10px; z-index: 50; display: flex; gap: 5px; }
         .l-btn { background: rgba(0,0,0,0.6); color: #888; border: 1px solid #333; padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; font-weight: bold; }
         .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
+
+        /* DAILY REWARD GRID */
+        .day-grid { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
+        .day-box { background: #222; border: 1px solid #333; padding: 5px; width: 30px; font-size: 10px; opacity: 0.5; border-radius: 4px; }
+        .day-box.active { border-color: #0f9; opacity: 1; box-shadow: 0 0 5px #0f9; background: rgba(0,255,153,0.1); }
     </style>
 </head>
 <body>
@@ -79,7 +82,25 @@
         <div class="glitch">EURODASH</div>
         <div style="color:#0f9; font-size:12px; margin-top:20px;">INITIALIZING SYSTEM...</div>
         <div style="color:#555; font-size:10px; margin-top:10px;" id="load-status">Connecting...</div>
-        <button id="force-btn" onclick="finishLoad()">⚠️ PLAY OFFLINE</button>
+        <button id="force-btn" onclick="finishLoad()">⚠️ JOGAR (OFFLINE)</button>
+    </div>
+
+    <div id="modal-daily" class="modal">
+        <div class="modal-box">
+            <h2 style="color:#ffd700;">DAILY STREAK 🔥</h2>
+            <p style="color:#aaa; font-size:12px;">Come back every day to earn more!</p>
+            <div class="day-grid">
+                <div class="day-box" id="day-1">1<br>€0.01</div>
+                <div class="day-box" id="day-2">2<br>€0.03</div>
+                <div class="day-box" id="day-3">3<br>€0.05</div>
+                <div class="day-box" id="day-4">4<br>€0.08</div>
+                <div class="day-box" id="day-5">5<br>€0.12</div>
+                <div class="day-box" id="day-6">6<br>€0.20</div>
+                <div class="day-box" id="day-7" style="color:#ffd700">7<br>€0.50</div>
+            </div>
+            <h1 style="color:#0f9; margin:15px 0;">+€<span id="daily-amt">0.00</span></h1>
+            <button class="buy-btn" onclick="claimDaily()" id="btn-claim-daily">CLAIM REWARD</button>
+        </div>
     </div>
 
     <div id="modal-offline" class="modal">
@@ -151,9 +172,16 @@
         <div class="main-img-con">
             <img src="image_3.jpg" class="main-img" id="click-btn" onerror="this.src='https://via.placeholder.com/220/000/0f9?text=TAP'">
         </div>
-        <div style="margin-top:40px; display:flex; justify-content:center; gap:30px;">
-            <div><b style="color:#0f9; font-size:20px;">⚡ <span id="eg">500</span></b><br><small style="color:#555" id="t-energy">ENERGY</small></div>
-            <div><b style="color:#0f9; font-size:20px;">🚀 <span id="pps-disp">0</span></b><br><small style="color:#555" id="t-pps">PROFIT/SEC</small></div>
+        <div style="margin-top:20px; display:flex; justify-content:center; gap:30px;">
+            <div>
+                <b style="color:#0f9; font-size:20px;">⚡ <span id="eg">500</span></b>
+                <div class="eng-bar-bg"><div class="eng-bar-fill" id="eng-bar"></div></div>
+                <small style="color:#555" id="t-energy">ENERGY</small>
+            </div>
+            <div style="margin-top:5px;">
+                <b style="color:#0f9; font-size:20px;">🚀 <span id="pps-disp">0</span></b><br>
+                <small style="color:#555" id="t-pps">PROFIT/SEC</small>
+            </div>
         </div>
     </div>
 
@@ -215,7 +243,7 @@
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzｦｱｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const fontSize = 14;
         const columns = canvas.width / fontSize;
         const drops = Array(Math.floor(columns)).fill(1);
@@ -232,9 +260,26 @@
         setInterval(drawMatrix, 50);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-        // --- CONFIG & DATA ---
+        // --- AUDIO SYNTH (BEEP) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
-        const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 }; // TUA LISTA DE CÓDIGOS
+        const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
+        const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
 
         let CUR_LANG = 'en';
         const txt = {
@@ -255,7 +300,7 @@
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
                     insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
                     inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!",
-                    code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!"
+                    code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!", daily: "Day"
                 }
             },
             pt: {
@@ -275,7 +320,7 @@
                     copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
                     insufficient: "❌ Saldo Insuficiente! Tens apenas €", req_sent: "Pedido Enviado!",
                     inv_hash: "Hash Inválido", dep_sub: "Depósito Enviado!", rew_rec: "Recebido!",
-                    code_inv: "Código Inválido!", code_used: "Código já usado!", code_ok: "Código Resgatado!"
+                    code_inv: "Código Inválido!", code_used: "Código já usado!", code_ok: "Código Resgatado!", daily: "Dia"
                 }
             },
             ru: {
@@ -295,24 +340,16 @@
                     copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
                     insufficient: "❌ Недостаточно средств! У вас только €", req_sent: "Запрос отправлен!",
                     inv_hash: "Неверный хеш", dep_sub: "Депозит отправлен!", rew_rec: "Получено!",
-                    code_inv: "Неверный код!", code_used: "Код уже использован!", code_ok: "Код активирован!"
+                    code_inv: "Неверный код!", code_used: "Код уже использован!", code_ok: "Код активирован!", daily: "День"
                 }
             }
         };
 
-        const minerStats = [
-            {p:0.05, g:0.00000012, img: "miner1.jpg"}, 
-            {p:1.00, g:0.00000096, img: "miner2.jpg"}, 
-            {p:10.00, g:0.00000720, img: "miner3.jpg"}, 
-            {p:50.00, g:0.00002800, img: "miner4.jpg"}, 
-            {p:200.00, g:0.00009200, img: "miner5.jpg"}, 
-            {p:800.00, g:0.00030000, img: "miner6.jpg"}, 
-            {p:3000.00, g:0.00099000, img: "miner7.jpg"}
-        ];
+        const minerStats = [ {p:0.05, g:0.00000012, img: "miner1.jpg"}, {p:1.00, g:0.00000096, img: "miner2.jpg"}, {p:10.00, g:0.00000720, img: "miner3.jpg"}, {p:50.00, g:0.00002800, img: "miner4.jpg"}, {p:200.00, g:0.00009200, img: "miner5.jpg"}, {p:800.00, g:0.00030000, img: "miner6.jpg"}, {p:3000.00, g:0.00099000, img: "miner7.jpg"} ];
 
-        // Added 'codes' to user object to track used promo codes
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), name: "User" };
+        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User" };
         let loaded = false;
+        let dailyRewVal = 0;
         
         window.finishLoad = function() {
             if(loaded) return;
@@ -322,14 +359,7 @@
         }
 
         let tg, uid, uName;
-        try {
-            tg = window.Telegram.WebApp;
-            tg.expand();
-            uid = tg.initDataUnsafe.user?.id || 22250;
-            uName = tg.initDataUnsafe.user?.first_name || "Miner";
-        } catch (e) {
-            uid = 22250; uName = "Test User";
-        }
+        try { tg = window.Telegram.WebApp; tg.expand(); uid = tg.initDataUnsafe.user?.id || 22250; uName = tg.initDataUnsafe.user?.first_name || "Miner"; } catch (e) { uid = 22250; uName = "Test User"; }
 
         try {
             firebase.initializeApp({
@@ -347,47 +377,72 @@
 
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            setLang('en'); // Default Language
+            setLang('en');
+            setTimeout(() => { if(!loaded) document.getElementById('force-btn').style.display = 'block'; }, 3500);
 
-            setTimeout(() => {
-                if(!loaded) {
-                    document.getElementById('force-btn').style.display = 'block';
-                }
-            }, 3500);
-
-            db.ref('users/' + uid).once('value')
-                .then(s => {
-                    if(s.exists()) {
-                        let d = s.val();
-                        u = { ...u, ...d };
-                        u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
-                        if(!u.codes) u.codes = {}; // Ensure codes object exists for old users
-                        let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
-                        if(sec > 60 && u.pps > 0) {
-                            let profit = sec * u.pps;
-                            u.bal += profit;
-                            document.getElementById('off-val').innerText = profit.toFixed(4);
-                            openModal('modal-offline');
-                        }
-                    } else { u.name = uName; }
-                    finishLoad();
-                })
-                .catch(error => {
-                    document.getElementById('load-status').innerText = txt[CUR_LANG].db_err + error.code;
-                    document.getElementById('force-btn').style.display = 'block';
-                });
+            db.ref('users/' + uid).once('value').then(s => {
+                if(s.exists()) {
+                    let d = s.val();
+                    u = { ...u, ...d };
+                    u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
+                    if(!u.codes) u.codes = {};
+                    
+                    // OFFLINE EARNINGS
+                    let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
+                    if(sec > 60 && u.pps > 0) {
+                        let profit = sec * u.pps;
+                        u.bal += profit;
+                        document.getElementById('off-val').innerText = profit.toFixed(4);
+                        openModal('modal-offline');
+                    }
+                } else { u.name = uName; }
+                checkDaily();
+                finishLoad();
+            }).catch(error => {
+                document.getElementById('load-status').innerText = txt[CUR_LANG].db_err + error.code;
+                document.getElementById('force-btn').style.display = 'block';
+            });
 
             document.getElementById('my-link').innerText = `https://t.me/EuroDash_Bot?start=${uid}`;
             document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
 
+        function checkDaily() {
+            const now = Date.now();
+            const msInDay = 86400000;
+            // If last daily was more than 24h ago
+            if(now - (u.lastDaily || 0) > msInDay) {
+                // Check if streak is broken (more than 48h)
+                if(now - (u.lastDaily || 0) > msInDay * 2) { u.streak = 0; }
+                
+                let dayIdx = u.streak % 7;
+                dailyRewVal = DAILY_REWARDS[dayIdx];
+                document.getElementById('daily-amt').innerText = dailyRewVal.toFixed(2);
+                
+                // Highlight current day
+                document.querySelectorAll('.day-box').forEach((el, i) => {
+                    el.classList.toggle('active', i === dayIdx);
+                });
+                
+                openModal('modal-daily');
+            }
+        }
+
+        function claimDaily() {
+            u.bal += dailyRewVal;
+            u.lastDaily = Date.now();
+            u.streak++;
+            up();
+            closeModal('modal-daily');
+            tg.showAlert(txt[CUR_LANG].alerts.rew_rec);
+        }
+
         function setLang(l) {
             CUR_LANG = l;
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+l).classList.add('active');
             const t = txt[l];
-            // Update UI Text
             document.getElementById('t-welcome').innerText = t.welcome;
             document.getElementById('t-off-earn').innerText = t.off_earn;
             document.getElementById('t-collect').innerText = t.collect;
@@ -419,13 +474,12 @@
             document.getElementById('t-redeem').innerText = t.redeem;
             document.getElementById('force-btn').innerText = t.force_play;
             document.getElementById('load-status').innerText = t.db_slow;
-            // Nav
             document.getElementById('n-mine').innerText = t.nav[0];
             document.getElementById('n-shop').innerText = t.nav[1];
             document.getElementById('n-rank').innerText = t.nav[2];
             document.getElementById('n-team').innerText = t.nav[3];
             document.getElementById('n-earn').innerText = t.nav[4];
-            renderShop(); loadRank(); // Reload rank to apply translation
+            renderShop(); loadRank();
         }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
@@ -434,10 +488,10 @@
         function tap(x, y) {
             if(u.eng < 1) return;
             u.eng--;
-            // TRIGGER ANIMATION
+            playBeep(); // PLAY SOUND
             let btn = document.getElementById('click-btn');
             btn.classList.remove('click-anim');
-            void btn.offsetWidth; // Trigger reflow
+            void btn.offsetWidth;
             btn.classList.add('click-anim');
 
             let gain = 0.00005;
@@ -520,22 +574,13 @@
             }).catch(e => { document.getElementById('rank-list').innerHTML = `<div style="padding:20px; color:red">${txt[CUR_LANG].rank_off}</div>`; });
         }
 
-        function checkTasks() {
-            if(u.tasks['group']) { 
-                let btn = document.getElementById('task-group');
-                if(btn) { btn.innerText = "DONE"; btn.style.opacity = 0.5; }
-            }
-        }
-
+        function checkTasks() { if(u.tasks['group']) { let btn = document.getElementById('task-group'); if(btn) { btn.innerText = "DONE"; btn.style.opacity = 0.5; } } }
         function doTask(id, reward) {
             if(u.tasks[id]) return;
             tg.openLink(CONFIG.telegram_link);
             setTimeout(() => {
                 tg.showConfirm("Did you join the channel?", (ok) => {
-                    if(ok) {
-                        u.tasks[id] = true; u.bal += reward; up(); checkTasks();
-                        tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`);
-                    }
+                    if(ok) { u.tasks[id] = true; u.bal += reward; up(); checkTasks(); tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`); }
                 });
             }, 8000);
         }
@@ -545,6 +590,9 @@
             document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             document.getElementById('eg').innerText = Math.floor(u.eng);
             document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
+            let pct = (u.eng / 500) * 100;
+            document.getElementById('eng-bar').style.width = pct + "%";
+
             let l = "NOOB", w = 0;
             if(u.bal < 10) { w = (u.bal/10)*100; }
             else if(u.bal < 50) { l = "HACKER"; w = (u.bal/50)*100; }
@@ -553,9 +601,7 @@
             document.getElementById('l-fill').style.width = w+"%";
             document.getElementById('l-name').innerText = l;
             
-            if(document.getElementById('wd-avail')) {
-                document.getElementById('wd-avail').innerText = u.bal.toFixed(2);
-            }
+            if(document.getElementById('wd-avail')) { document.getElementById('wd-avail').innerText = u.bal.toFixed(2); }
         }
 
         function renderShop() {
@@ -578,10 +624,7 @@
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
-        function openModal(id) { 
-            document.getElementById(id).style.display = 'flex'; 
-            if(id === 'modal-withdraw') up();
-        }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'modal-withdraw') up(); }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function sw(t) {
             document.querySelectorAll('.tab').forEach(e=>e.style.display='none');
