@@ -15,7 +15,7 @@
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
 
         .ticker-wrap { position: fixed; top: 40px; left: 0; width: 100%; background: rgba(0,0,0,0.8); overflow: hidden; height: 25px; line-height: 25px; z-index: 40; border-bottom: 1px solid #333; }
-        .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 25s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
+        .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
         .tab { display: none; padding: 20px; padding-top: 75px; padding-bottom: 90px; height: 85vh; overflow-y: auto; scrollbar-width: none; }
@@ -30,7 +30,6 @@
         .inp { width: 90%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; text-align: center; }
         .inp:focus { border-color: #0f9; outline: none; }
 
-        /* LOADING SCREEN */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'VT323', monospace; }
         .boot-text { color: #0f9; font-size: 16px; width: 80%; text-align: left; margin-bottom: 5px; text-shadow: 0 0 5px #0f9; }
         .glitch { font-size: 50px; font-weight: bold; color: #fff; text-shadow: 2px 2px #0f9; animation: glitch 1s infinite; letter-spacing: 5px; margin-bottom: 20px; font-family: 'Rajdhani'; }
@@ -41,19 +40,13 @@
         .main-img.click-anim { animation: pulseWave 0.15s ease-out; }
         @keyframes pulseWave { 0% { transform: scale(0.96); border-color:#fff; } 100% { transform: scale(1); border-color:rgba(0,255,153,0.3); } }
 
-        /* DYNAMIC PARTICLES */
         .float-text { position: absolute; color: #fff; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 5px #0f9; z-index: 20; }
         .crit { color: #ffd700 !important; font-size: 32px !important; text-shadow: 0 0 15px #ffaa00 !important; z-index: 25; }
         .lucky { color: #00ccff !important; font-size: 28px !important; text-shadow: 0 0 15px #00ccff !important; z-index: 30; }
-        @keyframes floatUp { 
-            0% { transform: translate(0, 0) scale(1); opacity: 1; } 
-            100% { transform: translate(var(--tx), -100px) scale(1.2); opacity: 0; } 
-        }
+        @keyframes floatUp { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), -100px) scale(1.2); opacity: 0; } }
 
         .eng-bar-bg { width: 200px; height: 10px; background: #222; margin: 5px auto; border-radius: 5px; overflow: hidden; border: 1px solid #333; position: relative; }
         .eng-bar-fill { height: 100%; background: #0f9; width: 100%; box-shadow: 0 0 10px #0f9; transition: width 0.2s; }
-        
-        /* BOOST BUTTON */
         .boost-btn { position: absolute; right: -35px; top: -8px; background: #ffd700; color: #000; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; border: 2px solid #fff; box-shadow: 0 0 10px #ffd700; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
@@ -100,6 +93,8 @@
         .lose { color:#f00; text-shadow:0 0 20px #f00; }
         .coin-anim { animation: spin 1s infinite linear; }
         @keyframes spin { 0% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
+        
+        .fallback-icon { font-size:30px; display:flex; align-items:center; justify-content:center; width:50px; height:50px; background:#222; border-radius:5px; border:1px solid #333; }
     </style>
 </head>
 <body>
@@ -305,6 +300,9 @@
             <div style="background:#000; padding:10px; color:#0f9; font-size:12px; border:1px dashed #333; margin-bottom:10px; word-break:break-all;" id="my-link">...</div>
             <button onclick="copyLink()" class="buy-btn" style="width:100%" id="t-copy-link">COPY LINK</button>
         </div>
+        <div style="text-align:center; color:#888; font-size:12px; margin-top:10px;">
+            Friends Invited: <b style="color:#fff;" id="ref-count">0</b>
+        </div>
     </div>
 
     <div id="tab-earn" class="tab">
@@ -338,7 +336,7 @@
         <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
         <div class="n-btn" id="nb-games" onclick="sw('games')"><span class="n-icon">🎲</span><span>GAMES</span></div>
         <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span id="n-team">TEAM</span></div>
-        <div class="n-btn" id="nb-earn" onclick="sw('earn')"><span class="n-icon">🎯</span><span id="n-earn">EARN</span></div>
+        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span id="n-rank">RANK</span></div>
     </div>
 
     <script>
@@ -385,6 +383,7 @@
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         const ADMIN_ID = 253106429; 
+        const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌", "🪐"]; // BACKUP ICONS
 
         let CUR_LANG = 'en';
         const txt = {
@@ -399,7 +398,7 @@
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
                 task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
                 promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "GAMES", "TEAM", "EARN"],
+                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
                 alerts: {
                     copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
@@ -469,6 +468,7 @@
             const lines = [
                 "> INITIALIZING KERNEL...",
                 "> CONNECTING TO EURO-NET...",
+                "> BYPASSING SECURITY LAYER 1...",
                 "> DECRYPTING WALLET DATA...",
                 "> ACCESS GRANTED."
             ];
@@ -534,6 +534,14 @@
                 document.getElementById('online-users').innerText = "🟢 " + count + " Online";
             }, 4000);
 
+            // GLOBAL BROADCAST LISTENER
+            db.ref('broadcast').on('value', (snap) => {
+                if(snap.exists()) {
+                    let msg = snap.val();
+                    if(msg && msg.length > 0) tg.showAlert(msg);
+                }
+            });
+
             // FORCE WAIT 4 SECONDS FOR EFFECT
             setTimeout(() => {
                 db.ref('users/' + uid).once('value').then(s => {
@@ -543,6 +551,9 @@
                         u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0,0];
                         if(!u.codes) u.codes = {};
                         u.name = uName; u.photo = uPhoto; u.username = uUser;
+
+                        // REFERRAL COUNT FIX
+                        if(d.refCount) document.getElementById('ref-count').innerText = d.refCount;
 
                         let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
                         if(sec > 60 && u.pps > 0) {
@@ -844,6 +855,7 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
+                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -881,7 +893,7 @@
                 document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => `
                     <div class="card">
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
+                            <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50';this.parentNode.innerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'">
                             <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                         </div>
                         <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
@@ -899,7 +911,7 @@
                 btn.style.background = "#fff";
                 setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
-                renderShop(); up(); saveNow(); 
+                renderShop(); up(); saveNow(); // SAVE ON BUY
                 tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
@@ -932,6 +944,7 @@
         }
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
+        // REDUCED SAVE INTERVAL TO 1 SECOND (WAS 5)
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
         setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); // SAVE EVERY 1S
     </script>
