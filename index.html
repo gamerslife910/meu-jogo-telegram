@@ -51,9 +51,20 @@
         .n-icon { font-size: 22px; margin-bottom: 2px; }
 
         #force-btn { display:none; margin-top:20px; padding:10px 20px; background:red; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; z-index:99999; }
+        
+        /* Language Bar */
+        .lang-bar { position: absolute; top: 10px; right: 10px; z-index: 50; display: flex; gap: 5px; }
+        .l-btn { background: rgba(0,0,0,0.6); color: #888; border: 1px solid #333; padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
     </style>
 </head>
 <body>
+
+    <div class="lang-bar">
+        <div class="l-btn active" id="btn-en" onclick="setLang('en')">EN</div>
+        <div class="l-btn" id="btn-pt" onclick="setLang('pt')">PT</div>
+        <div class="l-btn" id="btn-ru" onclick="setLang('ru')">RU</div>
+    </div>
 
     <div id="loader">
         <div class="glitch">EURODASH</div>
@@ -64,17 +75,17 @@
 
     <div id="modal-offline" class="modal">
         <div class="modal-box">
-            <h2 style="color:#fff;">WELCOME BACK</h2>
-            <p style="color:#aaa;">Offline Earnings:</p>
+            <h2 style="color:#fff;" id="t-welcome">WELCOME BACK</h2>
+            <p style="color:#aaa;" id="t-off-earn">Offline Earnings:</p>
             <h1 style="color:#0f9; font-size:40px;">+€<span id="off-val">0.00</span></h1>
-            <button class="buy-btn" onclick="closeModal('modal-offline')">COLLECT</button>
+            <button class="buy-btn" onclick="closeModal('modal-offline')" id="t-collect">COLLECT</button>
         </div>
     </div>
 
     <div id="modal-levels" class="modal">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-levels')">&times;</span>
-            <h3 style="color:#0f9">LEVEL SYSTEM</h3>
+            <h3 style="color:#0f9" id="t-lvl-sys">LEVEL SYSTEM</h3>
             <div style="text-align:left; font-size:14px; color:#ddd; line-height:1.6;">
                 <b style="color:#fff">1. NOOB (€0-10)</b><br>Basic mining speed.<br><br>
                 <b style="color:#00ffff">2. HACKER (€10-50)</b><br>+2% Critical Chance.<br><br>
@@ -87,37 +98,37 @@
     <div id="modal-withdraw" class="modal">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-withdraw')">&times;</span>
-            <h3 style="color:#ff3333">WITHDRAW (TRC20)</h3>
-            <p style="font-size:12px; color:#888;">Min: €1.00 | Fee: 2%</p>
+            <h3 style="color:#ff3333" id="t-wd-tit">WITHDRAW (TRC20)</h3>
+            <p style="font-size:12px; color:#888;" id="t-wd-info">Min: €1.00 | Fee: 2%</p>
             
             <div style="text-align:right; margin-bottom:5px; font-size:12px;">
-                <span style="color:#888">Disponível:</span> <span style="color:#fff">€<span id="wd-avail">0.00</span></span>
-                <span style="color:#0f9; cursor:pointer; margin-left:8px; font-weight:bold; border:1px solid #0f9; padding:0 4px; border-radius:3px;" onclick="setMax()">MÁX</span>
+                <span style="color:#888" id="t-avail">Available:</span> <span style="color:#fff">€<span id="wd-avail">0.00</span></span>
+                <span style="color:#0f9; cursor:pointer; margin-left:8px; font-weight:bold; border:1px solid #0f9; padding:0 4px; border-radius:3px;" onclick="setMax()">MAX</span>
             </div>
 
             <input type="text" id="wd-addr" class="inp" placeholder="Paste TRC20 Address">
             <input type="number" id="wd-amount" class="inp" placeholder="Amount (€)" oninput="calcFee()">
             
             <div style="font-size:13px; margin:10px 0; background:#222; padding:10px; border-radius:5px;">
-                Vais Receber: <b style="color:#fff; font-size:16px;">€<span id="wd-final">0.00</span></b>
-                <div style="color:#555; font-size:10px;">(Taxas incluídas)</div>
+                <span id="t-receive">You Receive:</span> <b style="color:#fff; font-size:16px;">€<span id="wd-final">0.00</span></b>
+                <div style="color:#555; font-size:10px;" id="t-fee-inc">(Fees included)</div>
             </div>
             
-            <button class="w-btn" onclick="submitWithdraw()">CONFIRM</button>
+            <button class="w-btn" onclick="submitWithdraw()" id="t-confirm">CONFIRM</button>
         </div>
     </div>
 
     <div id="modal-deposit" class="modal">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
-            <h3 style="color:#00ccff">DEPOSIT (USDT)</h3>
-            <p style="font-size:12px; color:#aaa;">Send USDT (TRC20) to this address:</p>
+            <h3 style="color:#00ccff" id="t-dep-tit">DEPOSIT (USDT)</h3>
+            <p style="font-size:12px; color:#aaa;" id="t-dep-info">Send USDT (TRC20) to this address:</p>
             <div style="background:#222; padding:10px; font-size:10px; word-break:break-all; color:#0f9; border:1px dashed #555; user-select:text;" id="admin-wallet">...</div>
-            <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()">COPY ADDRESS</button>
+            <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()" id="t-copy">COPY ADDRESS</button>
             <hr style="border-color:#333; margin:15px 0;">
-            <p style="font-size:12px; color:#aaa;">Paste Transaction Hash (TXID):</p>
+            <p style="font-size:12px; color:#aaa;" id="t-hash-info">Paste Transaction Hash (TXID):</p>
             <input type="text" id="dep-hash" class="inp" placeholder="Transaction Hash">
-            <button class="dep-btn" onclick="submitDeposit()">I SENT IT</button>
+            <button class="dep-btn" onclick="submitDeposit()" id="t-sent">I SENT IT</button>
         </div>
     </div>
 
@@ -132,57 +143,57 @@
             <img src="image_3.jpg" class="main-img" id="click-btn" onerror="this.src='https://via.placeholder.com/220/000/0f9?text=TAP'">
         </div>
         <div style="margin-top:40px; display:flex; justify-content:center; gap:30px;">
-            <div><b style="color:#0f9; font-size:20px;">⚡ <span id="eg">500</span></b><br><small style="color:#555">ENERGY</small></div>
-            <div><b style="color:#0f9; font-size:20px;">🚀 <span id="pps-disp">0</span></b><br><small style="color:#555">€/SEC</small></div>
+            <div><b style="color:#0f9; font-size:20px;">⚡ <span id="eg">500</span></b><br><small style="color:#555" id="t-energy">ENERGY</small></div>
+            <div><b style="color:#0f9; font-size:20px;">🚀 <span id="pps-disp">0</span></b><br><small style="color:#555" id="t-pps">PROFIT/SEC</small></div>
         </div>
     </div>
 
     <div id="tab-shop" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;">MARKET</h2>
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-market">MARKET</h2>
         <div class="market-header">
             <div style="text-align:left;">
-                <span style="font-size:12px; color:#888;">WALLET</span><br>
+                <span style="font-size:12px; color:#888;" id="t-wallet">WALLET</span><br>
                 <b style="font-size:18px;">€<span id="bal-shop">0.00</span></b>
             </div>
             <div style="display:flex; gap:5px;">
-                <button class="dep-btn" onclick="openModal('modal-deposit')">DEP</button>
-                <button class="w-btn" onclick="openModal('modal-withdraw')">W/D</button>
+                <button class="dep-btn" onclick="openModal('modal-deposit')" id="t-btn-dep">DEP</button>
+                <button class="w-btn" onclick="openModal('modal-withdraw')" id="t-btn-wd">W/D</button>
             </div>
         </div>
         <div id="shop-list"></div>
     </div>
 
     <div id="tab-rank" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;">TOP INVESTORS</h2>
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-rank-tit">TOP INVESTORS</h2>
         <div style="background:#111; border-radius:10px; padding:10px; border:1px solid #333;" id="rank-list">
-            <div style="padding:20px; color:#555;">Loading real data...</div>
+            <div style="padding:20px; color:#555;" id="t-load-rank">Loading real data...</div>
         </div>
     </div>
 
     <div id="tab-friends" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;">NETWORK</h2>
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-net-tit">NETWORK</h2>
         <div class="card" style="display:block; text-align:center;">
             <h1>💎</h1>
-            <p style="color:#aaa;">Invite friends & earn 5% of their mining!</p>
+            <p style="color:#aaa;" id="t-inv-desc">Invite friends & earn 5% of their mining!</p>
             <div style="background:#000; padding:10px; color:#0f9; font-size:12px; border:1px dashed #333; margin-bottom:10px; word-break:break-all;" id="my-link">...</div>
-            <button onclick="copyLink()" class="buy-btn" style="width:100%">COPY LINK</button>
+            <button onclick="copyLink()" class="buy-btn" style="width:100%" id="t-copy-link">COPY LINK</button>
         </div>
     </div>
 
     <div id="tab-earn" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;">TASKS</h2>
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-task-tit">TASKS</h2>
         <div class="card">
-            <div><b style="color:#fff">Join Official Channel</b><br><small style="color:#0f9">+€0.10 Reward</small></div>
+            <div><b style="color:#fff" id="t-join-ch">Join Official Channel</b><br><small style="color:#0f9" id="t-rew">+€0.10 Reward</small></div>
             <button class="buy-btn" id="task-group" onclick="doTask('group', 0.10)">START</button>
         </div>
     </div>
 
     <div class="nav">
-        <div class="n-btn active" id="nb-core" onclick="sw('core')"><span class="n-icon">⚡</span><span>MINE</span></div>
-        <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span>SHOP</span></div>
-        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span>RANK</span></div>
-        <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span>TEAM</span></div>
-        <div class="n-btn" id="nb-earn" onclick="sw('earn')"><span class="n-icon">🎯</span><span>EARN</span></div>
+        <div class="n-btn active" id="nb-core" onclick="sw('core')"><span class="n-icon">⚡</span><span id="n-mine">MINE</span></div>
+        <div class="n-btn" id="nb-shop" onclick="sw('shop')"><span class="n-icon">🛍️</span><span id="n-shop">SHOP</span></div>
+        <div class="n-btn" id="nb-rank" onclick="sw('rank')"><span class="n-icon">🏆</span><span id="n-rank">RANK</span></div>
+        <div class="n-btn" id="nb-friends" onclick="sw('friends')"><span class="n-icon">👥</span><span id="n-team">TEAM</span></div>
+        <div class="n-btn" id="nb-earn" onclick="sw('earn')"><span class="n-icon">🎯</span><span id="n-earn">EARN</span></div>
     </div>
 
     <script>
@@ -193,14 +204,73 @@
             fee: 0.02 
         };
 
-        const miners = [
-            {p:0.05, g:0.00000012, img: "miner1.jpg", n:"Micro Node"}, 
-            {p:1.00, g:0.00000096, img: "miner2.jpg", n:"Blade Rack"}, 
-            {p:10.00, g:0.00000720, img: "miner3.jpg", n:"Turbo Server"}, 
-            {p:50.00, g:0.00002800, img: "miner4.jpg", n:"Cyber Station"}, 
-            {p:200.00, g:0.00009200, img: "miner5.jpg", n:"Quantum Rig"}, 
-            {p:800.00, g:0.00030000, img: "miner6.jpg", n:"Neural Hub"}, 
-            {p:3000.00, g:0.00099000, img: "miner7.jpg", n:"Titan Core"}
+        // --- TRANSLATION DATA ---
+        let CUR_LANG = 'en';
+        const txt = {
+            en: {
+                welcome: "WELCOME BACK", off_earn: "Offline Earnings:", collect: "COLLECT",
+                lvl_sys: "LEVEL SYSTEM", wd_tit: "WITHDRAW (TRC20)", wd_info: "Min: €1.00 | Fee: 2%",
+                avail: "Available:", receive: "You Receive:", fee_inc: "(Fees included)", confirm: "CONFIRM",
+                dep_tit: "DEPOSIT (USDT)", dep_info: "Send USDT (TRC20) to this address:", copy: "COPY ADDRESS",
+                hash_info: "Paste Transaction Hash (TXID):", sent: "I SENT IT",
+                energy: "ENERGY", pps: "PROFIT/SEC", market: "MARKET", wallet: "WALLET",
+                rank_tit: "TOP INVESTORS", load_rank: "Loading real data...", net_tit: "NETWORK",
+                inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
+                task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
+                nav: ["MINE", "SHOP", "RANK", "TEAM", "EARN"],
+                miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub", "Titan Core"],
+                alerts: {
+                    copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
+                    insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
+                    inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!"
+                }
+            },
+            pt: {
+                welcome: "BEM-VINDO DE VOLTA", off_earn: "Ganhos Offline:", collect: "RECEBER",
+                lvl_sys: "SISTEMA DE NÍVEIS", wd_tit: "LEVANTAR (TRC20)", wd_info: "Min: €1.00 | Taxa: 2%",
+                avail: "Disponível:", receive: "Recebes:", fee_inc: "(Taxas incluídas)", confirm: "CONFIRMAR",
+                dep_tit: "DEPOSITAR (USDT)", dep_info: "Envia USDT (TRC20) para este endereço:", copy: "COPIAR ENDEREÇO",
+                hash_info: "Cola o Hash da Transação (TXID):", sent: "JÁ ENVIEI",
+                energy: "ENERGIA", pps: "LUCRO/SEG", market: "MERCADO", wallet: "CARTEIRA",
+                rank_tit: "TOP INVESTIDORES", load_rank: "A carregar dados...", net_tit: "REDE",
+                inv_desc: "Convida amigos e ganha 5% do que minerarem!", copy_link: "COPIAR LINK",
+                task_tit: "TAREFAS", join_ch: "Entrar no Canal Oficial", rew: "+€0.10 Recompensa",
+                nav: ["MINAR", "LOJA", "RANK", "EQUIPA", "GANHAR"],
+                miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural", "Núcleo Titã"],
+                alerts: {
+                    copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
+                    insufficient: "❌ Saldo Insuficiente! Tens apenas €", req_sent: "Pedido Enviado!",
+                    inv_hash: "Hash Inválido", dep_sub: "Depósito Enviado!", rew_rec: "Recebido!"
+                }
+            },
+            ru: {
+                welcome: "С ВОЗВРАЩЕНИЕМ", off_earn: "Офлайн доход:", collect: "ЗАБРАТЬ",
+                lvl_sys: "СИСТЕМА УРОВНЕЙ", wd_tit: "ВЫВОД (TRC20)", wd_info: "Мин: €1.00 | Ком: 2%",
+                avail: "Доступно:", receive: "Вы получите:", fee_inc: "(С комиссией)", confirm: "ПОДТВЕРДИТЬ",
+                dep_tit: "ДЕПОЗИТ (USDT)", dep_info: "Отправьте USDT (TRC20) на адрес:", copy: "КОПИРОВАТЬ",
+                hash_info: "Вставьте хеш транзакции (TXID):", sent: "Я ОТПРАВИЛ",
+                energy: "ЭНЕРГИЯ", pps: "ПРИБЫЛЬ/СЕК", market: "РЫНОК", wallet: "КОШЕЛЕК",
+                rank_tit: "ТОП ИНВЕСТОРОВ", load_rank: "Загрузка данных...", net_tit: "СЕТЬ",
+                inv_desc: "Пригласи друзей и получай 5%!", copy_link: "КОПИРОВАТЬ",
+                task_tit: "ЗАДАНИЯ", join_ch: "Вступить в канал", rew: "+€0.10 Награда",
+                nav: ["МАЙНИНГ", "МАРКЕТ", "ТОП", "КОМАНДА", "ЗАДАНИЯ"],
+                miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб", "Ядро Титана"],
+                alerts: {
+                    copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
+                    insufficient: "❌ Недостаточно средств! У вас только €", req_sent: "Запрос отправлен!",
+                    inv_hash: "Неверный хеш", dep_sub: "Депозит отправлен!", rew_rec: "Получено!"
+                }
+            }
+        };
+
+        const minerStats = [
+            {p:0.05, g:0.00000012, img: "miner1.jpg"}, 
+            {p:1.00, g:0.00000096, img: "miner2.jpg"}, 
+            {p:10.00, g:0.00000720, img: "miner3.jpg"}, 
+            {p:50.00, g:0.00002800, img: "miner4.jpg"}, 
+            {p:200.00, g:0.00009200, img: "miner5.jpg"}, 
+            {p:800.00, g:0.00030000, img: "miner6.jpg"}, 
+            {p:3000.00, g:0.00099000, img: "miner7.jpg"}
         ];
 
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0,0], tasks: {}, lastT: Date.now(), name: "User" };
@@ -223,7 +293,6 @@
             uid = 22250; uName = "Test User";
         }
 
-        // --- FIREBASE OFICIAL (V30) ---
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
@@ -240,7 +309,8 @@
 
         window.onload = function() {
             document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            
+            setLang('en'); // Default Language
+
             setTimeout(() => {
                 if(!loaded) {
                     console.log("DB Slow/Error. Playing anyway.");
@@ -274,6 +344,51 @@
             document.getElementById('click-btn').addEventListener('click', handleClick);
         };
 
+        function setLang(l) {
+            CUR_LANG = l;
+            document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-'+l).classList.add('active');
+
+            // Update UI Text
+            const t = txt[l];
+            document.getElementById('t-welcome').innerText = t.welcome;
+            document.getElementById('t-off-earn').innerText = t.off_earn;
+            document.getElementById('t-collect').innerText = t.collect;
+            document.getElementById('t-lvl-sys').innerText = t.lvl_sys;
+            document.getElementById('t-wd-tit').innerText = t.wd_tit;
+            document.getElementById('t-wd-info').innerText = t.wd_info;
+            document.getElementById('t-avail').innerText = t.avail;
+            document.getElementById('t-receive').innerText = t.receive;
+            document.getElementById('t-fee-inc').innerText = t.fee_inc;
+            document.getElementById('t-confirm').innerText = t.confirm;
+            document.getElementById('t-dep-tit').innerText = t.dep_tit;
+            document.getElementById('t-dep-info').innerText = t.dep_info;
+            document.getElementById('t-copy').innerText = t.copy;
+            document.getElementById('t-hash-info').innerText = t.hash_info;
+            document.getElementById('t-sent').innerText = t.sent;
+            document.getElementById('t-energy').innerText = t.energy;
+            document.getElementById('t-pps').innerText = t.pps;
+            document.getElementById('t-market').innerText = t.market;
+            document.getElementById('t-wallet').innerText = t.wallet;
+            document.getElementById('t-rank-tit').innerText = t.rank_tit;
+            document.getElementById('t-load-rank').innerText = t.load_rank;
+            document.getElementById('t-net-tit').innerText = t.net_tit;
+            document.getElementById('t-inv-desc').innerText = t.inv_desc;
+            document.getElementById('t-copy-link').innerText = t.copy_link;
+            document.getElementById('t-task-tit').innerText = t.task_tit;
+            document.getElementById('t-join-ch').innerText = t.join_ch;
+            document.getElementById('t-rew').innerText = t.rew;
+
+            // Nav
+            document.getElementById('n-mine').innerText = t.nav[0];
+            document.getElementById('n-shop').innerText = t.nav[1];
+            document.getElementById('n-rank').innerText = t.nav[2];
+            document.getElementById('n-team').innerText = t.nav[3];
+            document.getElementById('n-earn').innerText = t.nav[4];
+
+            renderShop();
+        }
+
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
         
@@ -301,7 +416,6 @@
             setTimeout(()=>el.remove(), 800);
         }
 
-        // --- FUNÇÕES DE LEVANTAMENTO NOVAS ---
         function setMax() {
             document.getElementById('wd-amount').value = u.bal.toFixed(2);
             calcFee();
@@ -317,13 +431,13 @@
         function submitWithdraw() {
             let addr = document.getElementById('wd-addr').value;
             let val = parseFloat(document.getElementById('wd-amount').value);
+            let t = txt[CUR_LANG].alerts;
             
-            if(!addr.startsWith("T")) { tg.showAlert("Invalid TRC20 Address!"); return; }
-            if(val < CONFIG.min_withdraw) { tg.showAlert(`Min withdraw is €${CONFIG.min_withdraw}`); return; }
+            if(!addr.startsWith("T")) { tg.showAlert(t.invalid_trc20); return; }
+            if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
             
-            // VERIFICAÇÃO DE SALDO EM PORTUGUÊS
             if(u.bal < val) { 
-                tg.showAlert(`❌ Saldo Insuficiente! Tens apenas €${u.bal.toFixed(2)}`); 
+                tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); 
                 return; 
             }
 
@@ -331,16 +445,17 @@
             up();
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
-            tg.showAlert("Pedido enviado! O dinheiro chegará em breve.");
+            tg.showAlert(t.req_sent);
         }
 
-        function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert("Address Copied!"); }
+        function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert(txt[CUR_LANG].alerts.copied); }
         function submitDeposit() {
             let hash = document.getElementById('dep-hash').value;
-            if(hash.length < 10) { tg.showAlert("Invalid Hash"); return; }
+            let t = txt[CUR_LANG].alerts;
+            if(hash.length < 10) { tg.showAlert(t.inv_hash); return; }
             db.ref('deposits/' + Date.now()).set({ uid: uid, hash: hash, status: "pending" });
             closeModal('modal-deposit');
-            tg.showAlert("Deposit Submitted!");
+            tg.showAlert(t.dep_sub);
         }
 
         function loadRank() {
@@ -354,7 +469,7 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span><span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${(p.bal||0).toFixed(2)}</span></div>`;
                 });
                 document.getElementById('rank-list').innerHTML = html;
-            }).catch(e => { document.getElementById('rank-list').innerHTML = '<div style="padding:20px; color:red">Offline</div>'; });
+            }).catch(e => { }); // Silent fail on rank
         }
 
         function checkTasks() {
@@ -371,7 +486,7 @@
                 tg.showConfirm("Did you join the channel?", (ok) => {
                     if(ok) {
                         u.tasks[id] = true; u.bal += reward; up(); checkTasks();
-                        tg.showAlert(`+€${reward} Received!`);
+                        tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`);
                     }
                 });
             }, 8000);
@@ -390,18 +505,18 @@
             document.getElementById('l-fill').style.width = w+"%";
             document.getElementById('l-name').innerText = l;
             
-            // Atualiza Saldo no Modal de Levantamento
             if(document.getElementById('wd-avail')) {
                 document.getElementById('wd-avail').innerText = u.bal.toFixed(2);
             }
         }
 
         function renderShop() {
-            document.getElementById('shop-list').innerHTML = miners.map((m,i) => `
+            let names = txt[CUR_LANG].miners;
+            document.getElementById('shop-list').innerHTML = minerStats.map((m,i) => `
                 <div class="card">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/50'">
-                        <div><b>${m.n}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
+                        <div><b>${names[i]}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                     </div>
                     <button class="buy-btn" onclick="buy(${i})">€${m.p}</button>
                 </div>
@@ -409,15 +524,15 @@
         }
 
         function buy(i) {
-            if(u.bal >= miners[i].p) {
-                u.bal -= miners[i].p; u.pps += miners[i].g; u.inv[i] = (u.inv[i]||0)+1;
+            if(u.bal >= minerStats[i].p) {
+                u.bal -= minerStats[i].p; u.pps += minerStats[i].g; u.inv[i] = (u.inv[i]||0)+1;
                 renderShop(); up(); tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
-            if(id === 'modal-withdraw') up(); // Atualiza o saldo ao abrir
+            if(id === 'modal-withdraw') up();
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function sw(t) {
@@ -426,7 +541,7 @@
             document.querySelectorAll('.n-btn').forEach(b=>b.classList.remove('active'));
             document.getElementById('nb-'+t).classList.add('active');
         }
-        function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert("Copied!"); }
+        function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
         setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { u.lastT = Date.now(); db.ref('users/'+uid).update(u); } }, 5000);
