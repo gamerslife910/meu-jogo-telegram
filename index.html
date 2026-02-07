@@ -264,7 +264,6 @@
             </p>
         </div>
     </div>
-
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
         <div style="margin-bottom:20px;">
@@ -509,13 +508,14 @@
             }
         };
 
+        // ECONOMIA ATUALIZADA - MICRO TRANSACOES
         const minerStats = [ 
-            {p:0.05, g:0.00000012, img: "miner1.jpg"}, 
-            {p:1.00, g:0.00000096, img: "miner2.jpg"}, 
-            {p:10.00, g:0.00000720, img: "miner3.jpg"}, 
-            {p:50.00, g:0.00002800, img: "miner4.jpg"}, 
-            {p:200.00, g:0.00009200, img: "miner5.jpg"}, 
-            {p:800.00, g:0.00030000, img: "miner6.jpg"}
+            {p:0.05,  g:0.00000003, img: "miner1.jpg"}, 
+            {p:0.50,  g:0.00000032, img: "miner2.jpg"}, 
+            {p:2.50,  g:0.00000170, img: "miner3.jpg"}, 
+            {p:8.00,  g:0.00000580, img: "miner4.jpg"}, 
+            {p:18.00, g:0.00001390, img: "miner5.jpg"}, 
+            {p:40.00, g:0.00003300, img: "miner6.jpg"}  
         ];
 
         let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
@@ -532,7 +532,6 @@
 
         // ======================================================
         // 1. DEFINIÇÃO DA FUNÇÃO DE ARRANQUE (BOOT)
-        // Certifique-se que esta função está ANTES do window.onload
         // ======================================================
         function startBoot() {
             const lines = [
@@ -544,7 +543,6 @@
             ];
             let container = document.getElementById('boot-seq');
             
-            // Limpa o container para evitar duplicados
             if(container) container.innerHTML = ''; 
 
             let delay = 0;
@@ -558,7 +556,6 @@
                 delay += 800;
             });
             
-            // Força o fim do loading se demorar muito
             setTimeout(() => {
                 if(!loaded && document.getElementById('force-btn')) {
                     document.getElementById('force-btn').style.display = 'block';
