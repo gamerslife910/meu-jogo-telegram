@@ -23,7 +23,7 @@
         /* SCROLL FIXO */
         .tab { display: none; position: fixed; top: 70px; left: 0; right: 0; bottom: 80px; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.1s; }
+        .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.2s; }
         .buy-btn:active { transform: scale(0.95); }
         .w-btn { background: #ff3333; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); }
         .dep-btn { background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(0,204,255,0.3); }
@@ -264,6 +264,7 @@
             </p>
         </div>
     </div>
+
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
         <div style="margin-bottom:20px;">
@@ -522,6 +523,8 @@
         let loaded = false;
         let dailyRewVal = 0;
         let lastClickTime = 0;
+        let clicksThisSecond = 0;
+        setInterval(() => { clicksThisSecond = 0; }, 1000); // RESET ANTI-CHEAT TIMER
         
         window.finishLoad = function() {
             if(loaded) return;
@@ -915,6 +918,11 @@
             
             if(u.bal >= 0.10) { document.getElementById('badge-games').style.display = 'block'; }
             else { document.getElementById('badge-games').style.display = 'none'; }
+
+            // UPDATE SHOP BUTTONS (IF SHOP IS OPEN)
+            if(document.getElementById('tab-shop').style.display === 'block') {
+                renderShop();
+            }
         }
 
         function renderShop() {
@@ -922,13 +930,23 @@
             if(document.getElementById('shop-list')) {
                 let listHtml = minerStats.map((m,i) => {
                     let itemName = names[i] || "Secret Miner"; 
+                    
+                    // SHOP LOGIC: Check affordability
+                    let canAfford = u.bal >= m.p;
+                    let btnColor = canAfford ? '#0f9' : '#555';
+                    let btnCursor = canAfford ? 'pointer' : 'not-allowed';
+                    let btnOpacity = canAfford ? '1' : '0.6';
+
                     return `
                     <div class="card">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.outerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'">
                             <div><b>${itemName}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                         </div>
-                        <button class="buy-btn" onclick="buy(${i}, event)">€${m.p}</button>
+                        <button class="buy-btn" onclick="buy(${i}, event)" 
+                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity}; transition:0.3s">
+                            €${m.p.toFixed(2)}
+                        </button>
                     </div>`;
                 }).join('');
                 
@@ -992,8 +1010,12 @@
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
         
         function tap(x, y) {
+            // ANTI-CHEAT: Limite de cliques por segundo
+            if(clicksThisSecond > 15) return; 
+            clicksThisSecond++;
+
             const now = Date.now();
-            if (now - lastClickTime < 80) return;
+            if (now - lastClickTime < 60) return;
             lastClickTime = now;
 
             if(u.eng < 1) return;
@@ -1083,8 +1105,21 @@
             document.getElementById('promo-in').value = "";
         }
 
-        setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); 
+        // SAVE OPTIMIZATION: Only save every 10 seconds to save DB usage
+        setInterval(() => { 
+            if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { 
+                saveNow(); 
+            } 
+        }, 10000); 
+
+        // UI UPDATE LOOP: Runs every 1s
+        setInterval(() => { 
+            if(loaded) { 
+                u.bal += u.pps; 
+                if(u.eng<500) u.eng+=0.5; 
+                up(); 
+            } 
+        }, 1000);
     </script>
 </body>
 </html>
