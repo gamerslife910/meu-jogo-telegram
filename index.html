@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EURODASH OFFICIAL</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
@@ -262,6 +264,7 @@
             </p>
         </div>
     </div>
+
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
         <div style="margin-bottom:20px;">
@@ -397,6 +400,7 @@
             if(logBox) logBox.innerHTML += `<div>>> ${msg}</div>`;
         }
 
+        // MATRIX BACKGROUND
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -417,6 +421,7 @@
         setInterval(drawMatrix, 50);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
+        // SOUND SYSTEM
         let soundEnabled = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function toggleSound() { 
@@ -439,6 +444,7 @@
             osc.stop(audioCtx.currentTime + 0.1);
         }
 
+        // CONFIG & DATA
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
@@ -522,6 +528,42 @@
             loaded = true;
             up(); renderShop(); checkTasks(); loadRank();
             document.getElementById('loader').style.display = 'none';
+        };
+
+        // ======================================================
+        // 1. DEFINIÇÃO DA FUNÇÃO DE ARRANQUE (BOOT)
+        // Certifique-se que esta função está ANTES do window.onload
+        // ======================================================
+        function startBoot() {
+            const lines = [
+                "> INITIALIZING KERNEL...",
+                "> CONNECTING TO EURO-NET...",
+                "> BYPASSING SECURITY LAYER 1...",
+                "> DECRYPTING WALLET DATA...",
+                "> ACCESS GRANTED."
+            ];
+            let container = document.getElementById('boot-seq');
+            
+            // Limpa o container para evitar duplicados
+            if(container) container.innerHTML = ''; 
+
+            let delay = 0;
+            lines.forEach((line, i) => {
+                setTimeout(() => {
+                    let div = document.createElement('div');
+                    div.className = 'boot-text';
+                    div.innerText = line;
+                    if(container) container.appendChild(div);
+                }, delay);
+                delay += 800;
+            });
+            
+            // Força o fim do loading se demorar muito
+            setTimeout(() => {
+                if(!loaded && document.getElementById('force-btn')) {
+                    document.getElementById('force-btn').style.display = 'block';
+                }
+            }, 4500);
         }
 
         // TELEGRAM INIT
@@ -535,6 +577,7 @@
             uUser = tg.initDataUnsafe.user?.username ? "@"+tg.initDataUnsafe.user.username : "";
         } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
 
+        // FIREBASE INIT
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
@@ -549,6 +592,7 @@
 
         const db = firebase.database();
 
+        // TICKER SYSTEM
         let tickerMessages = ["Welcome to EuroDash", "System Online"];
         
         function updateTicker(msg) {
@@ -565,14 +609,20 @@
             }
         }
 
+        // === MAIN WINDOW ONLOAD ===
         window.onload = function() {
-            startBoot();
-            document.getElementById('disp-uid').innerText = uid;
-            document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
-            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
+            startBoot(); // AGORA A FUNÇÃO JÁ EXISTE
+            
+            if(document.getElementById('disp-uid')) document.getElementById('disp-uid').innerText = uid;
+            if(document.getElementById('admin-wallet')) document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
+            if(document.getElementById('qr-code')) document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
+            
             setLang('en');
 
-            if(uid == ADMIN_ID) { document.getElementById('btn-admin').style.display = 'block'; }
+            if(uid == ADMIN_ID) { 
+                let adminBtn = document.getElementById('btn-admin');
+                if(adminBtn) adminBtn.style.display = 'block'; 
+            }
 
             // REAL ONLINE USERS
             const onlineRef = db.ref('.info/connected');
@@ -587,10 +637,10 @@
             
             db.ref('online').on('value', (snap) => {
                 let count = snap.numChildren();
-                document.getElementById('online-users').innerText = "🟢 " + count + " Online";
+                if(document.getElementById('online-users')) document.getElementById('online-users').innerText = "🟢 " + count + " Online";
             });
 
-            // REAL TICKER - WITHDRAWS
+            // REAL TICKER LISTENER - WITHDRAWS
             db.ref('withdrawals').limitToLast(1).on('child_added', snap => {
                 let val = snap.val();
                 if(val && val.val) {
@@ -598,7 +648,7 @@
                 }
             });
             
-            // REAL TICKER - NEW USERS
+            // REAL TICKER LISTENER - NEW USERS
             db.ref('users').limitToLast(1).on('child_added', snap => {
                 let val = snap.val();
                 if(val && val.name) {
@@ -614,6 +664,7 @@
                 }
             });
 
+            // LOAD USER DATA
             setTimeout(() => {
                 db.ref('users/' + uid).once('value').then(s => {
                     if(s.exists()) {
@@ -627,10 +678,11 @@
                         if(sec > 60 && u.pps > 0) {
                             let profit = sec * u.pps;
                             u.bal += profit;
-                            document.getElementById('off-val').innerText = profit.toFixed(4);
+                            if(document.getElementById('off-val')) document.getElementById('off-val').innerText = profit.toFixed(4);
                             openModal('modal-offline');
                         }
                     } else { 
+                        // NEW USER SETUP
                         u.name = uName; u.photo = uPhoto; u.username = uUser; 
                         u.inv[0] = 1; 
                         u.pps = minerStats[0].g; 
@@ -640,16 +692,23 @@
                     checkDaily();
                     finishLoad();
                 }).catch(error => {
-                    document.getElementById('force-btn').innerText = "OFFLINE MODE";
-                    document.getElementById('force-btn').style.display = 'block';
+                    if(document.getElementById('force-btn')) {
+                        document.getElementById('force-btn').innerText = "OFFLINE MODE";
+                        document.getElementById('force-btn').style.display = 'block';
+                    }
                 });
             }, 4000); 
 
-            document.getElementById('my-link').innerText = `https://t.me/EuroDashMinerBot?start=${uid}`;
-            document.getElementById('click-btn').addEventListener('touchstart', handleTouch, {passive:false});
-            document.getElementById('click-btn').addEventListener('click', handleClick);
+            if(document.getElementById('my-link')) document.getElementById('my-link').innerText = `https://t.me/EuroDashMinerBot?start=${uid}`;
+            
+            let clickBtn = document.getElementById('click-btn');
+            if(clickBtn) {
+                clickBtn.addEventListener('touchstart', handleTouch, {passive:false});
+                clickBtn.addEventListener('click', handleClick);
+            }
         };
 
+        // FUNCTIONS
         function buyRefill() {
             if(u.bal >= 0.05) {
                 u.bal -= 0.05;
@@ -931,6 +990,101 @@
         }
         
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
+
+        function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
+        function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
+        
+        function tap(x, y) {
+            const now = Date.now();
+            if (now - lastClickTime < 80) return;
+            lastClickTime = now;
+
+            if(u.eng < 1) return;
+            u.eng--;
+            playBeep();
+            
+            let btn = document.getElementById('click-btn');
+            btn.classList.remove('click-anim');
+            void btn.offsetWidth;
+            btn.classList.add('click-anim');
+
+            let gain = 0.00005;
+            let critChance = 0;
+            if(u.bal >= 10) critChance = 0.02;
+            if(u.bal >= 50) critChance = 0.05;
+            if(u.bal >= 200) critChance = 0.10;
+            let isCrit = Math.random() < critChance;
+            
+            if(isCrit) { gain *= 10; tg.HapticFeedback.notificationOccurred('success'); } 
+            else { tg.HapticFeedback.impactOccurred('light'); }
+
+            let isLucky = Math.random() < 0.002; 
+            if(isLucky) {
+                let bonus = 0.05;
+                u.bal += bonus;
+                spawnFloat(x, y, bonus, false, true); 
+                tg.HapticFeedback.notificationOccurred('warning');
+            }
+
+            u.bal += gain;
+            up(); spawnFloat(x, y, gain, isCrit, false);
+        }
+
+        function spawnFloat(x, y, val, crit, lucky) {
+            let el = document.createElement('div');
+            // Randomize Direction
+            let tx = (Math.random() - 0.5) * 100;
+            el.style.setProperty('--tx', tx + 'px');
+            
+            if(lucky) {
+                el.className = 'float-text lucky'; el.innerText = `LUCKY! +${val.toFixed(2)}`;
+            } else {
+                el.className = crit ? 'float-text crit' : 'float-text'; el.innerText = crit ? `CRITICAL +${val.toFixed(5)}` : `+${val.toFixed(5)}`;
+            }
+            el.style.left = x+'px'; el.style.top = y+'px';
+            document.body.appendChild(el);
+            setTimeout(()=>el.remove(), 800);
+        }
+
+        function setMax() { document.getElementById('wd-amount').value = u.bal.toFixed(2); calcFee(); }
+        function calcFee() {
+            let val = parseFloat(document.getElementById('wd-amount').value) || 0;
+            let final = val - (val * CONFIG.fee);
+            if(final < 0) final = 0;
+            document.getElementById('wd-final').innerText = final.toFixed(2);
+        }
+
+        function submitWithdraw() {
+            let addr = document.getElementById('wd-addr').value;
+            let val = parseFloat(document.getElementById('wd-amount').value);
+            let t = txt[CUR_LANG].alerts;
+            if(!addr.startsWith("T")) { tg.showAlert(t.invalid_trc20); return; }
+            if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
+            if(u.bal < val) { tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); return; }
+            u.bal -= val;
+            saveNow(); 
+            db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
+            closeModal('modal-withdraw');
+            tg.showAlert(t.req_sent);
+        }
+
+        function redeemCode() {
+            let codeInput = document.getElementById('promo-in').value.toUpperCase().trim();
+            if(codeInput === "GODMODE") {
+                document.getElementById('btn-admin').style.display = 'block';
+                tg.showAlert("ADMIN MODE UNLOCKED");
+                return;
+            }
+            let t = txt[CUR_LANG].alerts;
+            if(!PROMO_CODES[codeInput]) { tg.showAlert(t.code_inv); return; }
+            if(u.codes[codeInput]) { tg.showAlert(t.code_used); return; }
+            let reward = PROMO_CODES[codeInput];
+            u.bal += reward;
+            u.codes[codeInput] = true;
+            up(); saveNow(); 
+            tg.showAlert(t.code_ok + " +€" + reward.toFixed(2));
+            document.getElementById('promo-in').value = "";
+        }
 
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
         setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); 
