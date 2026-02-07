@@ -20,7 +20,6 @@
         .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* SCROLL FIXO */
         .tab { display: none; position: fixed; top: 70px; left: 0; right: 0; bottom: 80px; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.2s; position: relative; overflow: hidden; }
@@ -103,18 +102,9 @@
         .fallback-icon { font-size:30px; display:flex; align-items:center; justify-content:center; width:50px; height:50px; background:#222; border-radius:5px; border:1px solid #333; color: #fff; flex-shrink: 0; }
         
         #debug-box { display:none; }
-        
-        /* ESPAÇO EXTRA NO FUNDO DA LISTA */
         .spacer { height: 250px; width: 100%; text-align:center; padding-top:20px; color:#333; font-size:10px; }
 
-        /* === NOTIFICAÇÕES (TOASTS) === */
-        #toast-box { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .toast { background: rgba(10,10,10,0.95); border: 1px solid #0f9; color: #fff; padding: 12px 20px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8); animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 13px; font-weight: bold; width: fit-content; max-width: 90%; backdrop-filter: blur(5px); }
-        .toast.error { border-color: #ff3333; color: #ffcccc; box-shadow: 0 5px 20px rgba(255,0,0,0.2); }
-        @keyframes slideDown { from { transform: translateY(-50px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
-
-        /* TREMOR DE ECRÃ (SCREEN SHAKE) */
+        /* === JUICE EFFECTS === */
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
           10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -123,60 +113,51 @@
           40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* BARRA DE OVERCLOCK (TURBO) */
-        .turbo-con { 
-            width: 80%; margin: 10px auto; background: #111; height: 15px; 
-            border-radius: 10px; border: 1px solid #333; position: relative; overflow: hidden;
-        }
-        .turbo-fill { 
-            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00); 
-            width: 0%; transition: width 0.1s linear; 
-        }
-        .turbo-text {
-            position: absolute; width: 100%; top: 0; left: 0; line-height: 15px;
-            font-size: 10px; color: #000; font-weight: bold; display: none;
-        }
+        .turbo-con { width: 80%; margin: 10px auto; background: #111; height: 15px; border-radius: 10px; border: 1px solid #333; position: relative; overflow: hidden; }
+        .turbo-fill { height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00); width: 0%; transition: width 0.1s linear; }
+        .turbo-text { position: absolute; width: 100%; top: 0; left: 0; line-height: 15px; font-size: 10px; color: #000; font-weight: bold; display: none; }
         .active-turbo .turbo-fill { width: 100% !important; animation: drain 10s linear forwards; }
         @keyframes drain { from { width: 100%; } to { width: 0%; } }
 
-        /* PARTICULAS AO CLICAR */
-        .particle {
-            position: absolute; pointer-events: none; width: 6px; height: 6px; border-radius: 50%;
-            background: #0f9; box-shadow: 0 0 5px #0f9;
-            animation: pop 0.6s ease-out forwards; z-index: 99;
-        }
-        @keyframes pop {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-        }
+        .particle { position: absolute; pointer-events: none; width: 6px; height: 6px; border-radius: 50%; background: #0f9; box-shadow: 0 0 5px #0f9; animation: pop 0.6s ease-out forwards; z-index: 99; }
+        @keyframes pop { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
 
-        /* GOLDEN EURO */
-        .golden-euro {
-            position: fixed; width: 60px; height: 60px; z-index: 200; font-size: 40px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            animation: floatMove 8s linear forwards; user-select: none;
-        }
-        @keyframes floatMove {
-            0% { left: -100px; transform: rotate(0deg); }
-            100% { left: 110%; transform: rotate(360deg); }
-        }
+        .golden-euro { position: fixed; width: 60px; height: 60px; z-index: 200; font-size: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: floatMove 8s linear forwards; user-select: none; }
+        @keyframes floatMove { 0% { left: -100px; transform: rotate(0deg); } 100% { left: 110%; transform: rotate(360deg); } }
 
-        /* === LOJA ETIQUETAS E RODA === */
         .badge-tag { position: absolute; top: -10px; right: -5px; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; animation: pulseTag 2s infinite; color: #000; box-shadow: 0 0 5px currentColor; }
         .tag-best { background: #ffd700; color: #000; }
         .tag-hot { background: #ff3333; color: #fff; }
         @keyframes pulseTag { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* RODA DA SORTE */
-        .wheel-con { position: relative; width: 200px; height: 200px; margin: 20px auto; }
-        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #fff; box-sizing: border-box; background: conic-gradient(red 0deg 60deg, orange 60deg 120deg, yellow 120deg 180deg, lime 180deg 240deg, cyan 240deg 300deg, violet 300deg 360deg); transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        /* === NEW WHEEL & SHOP UI === */
+        #toast-box { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .toast { background: rgba(10,10,10,0.95); border: 1px solid #0f9; color: #fff; padding: 12px 20px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8); animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 13px; font-weight: bold; width: fit-content; max-width: 90%; backdrop-filter: blur(5px); }
+        .toast.error { border-color: #ff3333; color: #ffcccc; box-shadow: 0 5px 20px rgba(255,0,0,0.2); }
+        @keyframes slideDown { from { transform: translateY(-50px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+        .wheel-con { position: relative; width: 220px; height: 220px; margin: 20px auto; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #fff; box-sizing: border-box; background: conic-gradient(#f00 0deg 60deg, #ff8c00 60deg 120deg, #ffd700 120deg 180deg, #0f9 180deg 240deg, #00bfff 240deg 300deg, #9400d3 300deg 360deg); transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); box-shadow: 0 0 20px rgba(255,255,255,0.2); position: relative; }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 20px solid #fff; z-index: 10; filter: drop-shadow(0 0 5px #000); }
-        .spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; cursor: pointer; border: 2px solid #000; box-shadow: 0 0 15px rgba(255,255,255,0.5); font-size: 10px; z-index: 5; }
+        .spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; cursor: pointer; border: 4px solid #000; box-shadow: 0 0 15px rgba(255,255,255,0.5); font-size: 12px; z-index: 5; }
+        
+        .wheel-icon { position: absolute; top: 50%; left: 50%; font-size: 24px; transform-origin: 0 0; }
+        /* Positioning icons roughly in the center of slices */
+        .wi-1 { transform: rotate(30deg) translate(0, -70px) rotate(-30deg) translate(-50%, -50%); } /* Red */
+        .wi-2 { transform: rotate(90deg) translate(0, -70px) rotate(-90deg) translate(-50%, -50%); } /* Orange */
+        .wi-3 { transform: rotate(150deg) translate(0, -70px) rotate(-150deg) translate(-50%, -50%); } /* Yellow */
+        .wi-4 { transform: rotate(210deg) translate(0, -70px) rotate(-210deg) translate(-50%, -50%); } /* Green */
+        .wi-5 { transform: rotate(270deg) translate(0, -70px) rotate(-270deg) translate(-50%, -50%); } /* Blue */
+        .wi-6 { transform: rotate(330deg) translate(0, -70px) rotate(-330deg) translate(-50%, -50%); } /* Purple */
+
+        .shop-nav { display: flex; margin-bottom: 15px; gap: 10px; }
+        .shop-tab { flex: 1; padding: 10px; background: #222; border: 1px solid #333; border-radius: 5px; color: #888; font-weight: bold; cursor: pointer; }
+        .shop-tab.active { background: #0f9; color: #000; border-color: #0f9; }
     </style>
 </head>
 <body>
     <canvas id="matrix-bg"></canvas>
-
     <div id="toast-box"></div>
 
     <div class="ticker-wrap">
@@ -184,7 +165,6 @@
     </div>
 
     <div class="settings-icon" onclick="openModal('modal-settings')">⚙️</div>
-    
     <div class="online-cnt" id="online-users">🟢 1 Online</div>
 
     <div class="lang-bar">
@@ -250,7 +230,7 @@
     <div id="modal-refill" class="modal">
         <div class="modal-box">
             <h2 style="color:#0f9">⚡ ENERGY BOOST</h2>
-            <p style="color:#aaa;">Refill 500 Energy instantly?</p>
+            <p style="color:#aaa;">Refill Energy instantly?</p>
             <h1 style="color:#fff;">Price: <span style="color:#ffd700">€0.05</span></h1>
             <button class="buy-btn" onclick="buyRefill()">BUY REFILL</button>
             <br><br>
@@ -367,7 +347,7 @@
     </div>
 
     <div id="tab-shop" class="tab">
-        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-market">MARKET <small style="color:#555; font-size:10px;">(6 Items)</small></h2>
+        <h2 style="color:#0f9; border-bottom:1px solid #333;" id="t-market">MARKET</h2>
         <div class="market-header">
             <div style="text-align:left;">
                 <span style="font-size:12px; color:#888;" id="t-wallet">WALLET</span><br>
@@ -378,6 +358,12 @@
                 <button class="w-btn" onclick="openModal('modal-withdraw')" id="t-btn-wd">W/D</button>
             </div>
         </div>
+        
+        <div class="shop-nav">
+            <div class="shop-tab active" id="st-miners" onclick="toggleShop('miners')">MINERS 💻</div>
+            <div class="shop-tab" id="st-boosters" onclick="toggleShop('boosters')">BOOSTERS 🚀</div>
+        </div>
+
         <div id="shop-list"></div>
     </div>
 
@@ -388,7 +374,14 @@
             
             <div class="wheel-con">
                 <div class="wheel-pointer"></div>
-                <div class="wheel" id="lucky-wheel"></div>
+                <div class="wheel" id="lucky-wheel">
+                    <div class="wheel-icon wi-1">😢</div>
+                    <div class="wheel-icon wi-2">💰</div>
+                    <div class="wheel-icon wi-3">⚡</div>
+                    <div class="wheel-icon wi-4">💎</div>
+                    <div class="wheel-icon wi-5">😢</div>
+                    <div class="wheel-icon wi-6">🤑</div>
+                </div>
                 <div class="spin-btn" onclick="spinWheel()">SPIN</div>
             </div>
             
@@ -610,11 +603,20 @@
             {p:40.00, g:0.00003300, img: "miner6.jpg"}  
         ];
 
-        let u = { bal: 0, pps: 0, eng: 500, inv: [0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
+        // BOOSTER STATS (NOVA SECÇÃO)
+        const boosterStats = [
+            {name: "Multitap Lv.2", p: 1.00, type: "tap", val: 2, icon: "💪"},
+            {name: "Max Energy 1000", p: 0.50, type: "eng", val: 500, icon: "🔋"},
+            {name: "Multitap Lv.3", p: 5.00, type: "tap", val: 3, icon: "🔥"},
+            {name: "Max Energy 2000", p: 2.00, type: "eng", val: 1000, icon: "⚡"}
+        ];
+
+        let u = { bal: 0, pps: 0, eng: 500, maxEng: 500, multitap: 1, inv: [0,0,0,0,0,0], tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
         let loaded = false;
         let dailyRewVal = 0;
         let lastClickTime = 0;
         let clicksThisSecond = 0;
+        let activeShopTab = 'miners';
         setInterval(() => { clicksThisSecond = 0; }, 1000); // RESET ANTI-CHEAT TIMER
         
         // VARS DO OVERCLOCK
@@ -788,7 +790,9 @@
                         u = { ...u, ...d };
                         u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0];
                         if(!u.codes) u.codes = {};
-                        if(!u.lastSpin) u.lastSpin = 0; // Initialize spin time
+                        if(!u.multitap) u.multitap = 1;
+                        if(!u.maxEng) u.maxEng = 500;
+                        if(!u.lastSpin) u.lastSpin = 0;
                         u.name = uName; u.photo = uPhoto; u.username = uUser;
 
                         // CALCULO DE GANHOS OFFLINE COM LIMITE DE 3H
@@ -806,7 +810,6 @@
                         u.name = uName; u.photo = uPhoto; u.username = uUser; 
                         u.inv[0] = 1; 
                         u.pps = minerStats[0].g; 
-                        u.lastSpin = 0;
                         saveNow(); 
                         openModal('modal-tutorial');
                     }
@@ -833,7 +836,7 @@
         function buyRefill() {
             if(u.bal >= 0.05) {
                 u.bal -= 0.05;
-                u.eng = 500;
+                u.eng = u.maxEng || 500; // FILL TO MAX
                 saveNow(); up();
                 closeModal('modal-refill');
                 showNotify("Energy Refilled! ⚡");
@@ -842,7 +845,7 @@
             }
         }
 
-        // === LUCKY WHEEL ===
+        // === LUCKY WHEEL IMPROVED ===
         function spinWheel() {
             if(isSpinning) return;
             const now = Date.now();
@@ -864,26 +867,25 @@
             let deg = Math.floor(5000 + Math.random() * 5000); // Spin lots
             wheel.style.transform = `rotate(${deg}deg)`;
 
-            // Calculate Reward based on angle (Simplified)
-            // 6 segments
+            // Calculate Reward based on angle
             setTimeout(() => {
                 isSpinning = false;
                 let outcome = Math.random();
                 let reward = 0;
-                let msg = "Better luck next time!";
+                let msg = "";
                 
                 // Probabilities
-                if(outcome < 0.5) { reward = 0; msg = "Missed! 😢"; }
-                else if(outcome < 0.8) { reward = 0.10; msg = "Won €0.10!"; }
-                else if(outcome < 0.95) { u.eng = 500; msg = "Full Energy!"; } // Energy reward
-                else { reward = 1.00; msg = "JACKPOT! €1.00 🤑"; }
-
-                if(reward > 0) {
-                    u.bal += reward;
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else {
+                if(outcome < 0.5) { 
+                    // LOSS -> NOW GIVES ENERGY (Consolation)
+                    u.eng = u.maxEng; 
+                    msg = "Refilled Energy! ⚡";
                     tg.HapticFeedback.notificationOccurred('warning');
                 }
+                else if(outcome < 0.8) { reward = 0.10; msg = "Won €0.10!"; tg.HapticFeedback.notificationOccurred('success'); }
+                else if(outcome < 0.95) { reward = 0.50; msg = "Big Win! €0.50"; tg.HapticFeedback.notificationOccurred('success'); } 
+                else { reward = 1.00; msg = "JACKPOT! €1.00 🤑"; tg.HapticFeedback.notificationOccurred('success'); }
+
+                if(reward > 0) u.bal += reward;
                 
                 showNotify(msg);
                 saveNow();
@@ -1082,7 +1084,9 @@
             if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
             if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
-            let pct = (u.eng / 500) * 100;
+            
+            let maxEng = u.maxEng || 500;
+            let pct = (u.eng / maxEng) * 100;
             if(document.getElementById('eng-bar')) document.getElementById('eng-bar').style.width = pct + "%";
             
             // SMART NOTIFICATIONS
@@ -1098,7 +1102,6 @@
             }
 
             // === DYNAMIC PC IMAGE LOGIC (VISUAL PROGRESSION) ===
-            // Change main image based on best miner owned
             let bestMinerIdx = -1;
             for(let i = minerStats.length - 1; i >= 0; i--) {
                 if(u.inv[i] > 0) { bestMinerIdx = i; break; }
@@ -1106,7 +1109,6 @@
             if(bestMinerIdx >= 0) {
                 let currentImg = document.getElementById('click-btn').getAttribute('src');
                 let newImg = minerStats[bestMinerIdx].img;
-                // Only update if different to avoid flickering
                 if(currentImg !== newImg) {
                     document.getElementById('click-btn').src = newImg;
                 }
@@ -1119,19 +1121,29 @@
             else matrixColor = '#ffd700'; // Gold (Titan)
         }
 
+        // === SHOP LOGIC (MINERS & BOOSTERS) ===
+        function toggleShop(type) {
+            activeShopTab = type;
+            document.querySelectorAll('.shop-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('st-'+type).classList.add('active');
+            renderShop();
+        }
+
         function renderShop() {
-            let names = txt[CUR_LANG].miners;
-            if(document.getElementById('shop-list')) {
-                let listHtml = minerStats.map((m,i) => {
+            if(!document.getElementById('shop-list')) return;
+            
+            let html = "";
+            
+            if(activeShopTab === 'miners') {
+                // RENDER MINERS
+                let names = txt[CUR_LANG].miners;
+                html = minerStats.map((m,i) => {
                     let itemName = names[i] || "Secret Miner"; 
-                    
-                    // SHOP LOGIC: Check affordability
                     let canAfford = u.bal >= m.p;
                     let btnColor = canAfford ? '#0f9' : '#555';
                     let btnCursor = canAfford ? 'pointer' : 'not-allowed';
                     let btnOpacity = canAfford ? '1' : '0.6';
-
-                    // TAGS
+                    
                     let tag = '';
                     if(i === 2) tag = `<div class="badge-tag tag-best">BEST VALUE</div>`;
                     if(i === 3) tag = `<div class="badge-tag tag-hot">POPULAR</div>`;
@@ -1143,29 +1155,66 @@
                             <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.outerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'">
                             <div><b>${itemName}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
                         </div>
-                        <button class="buy-btn" onclick="buy(${i}, event)" 
-                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity}; transition:0.3s">
+                        <button class="buy-btn" onclick="buyMiner(${i}, event)" 
+                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity};">
                             €${m.p.toFixed(2)}
                         </button>
                     </div>`;
                 }).join('');
-                
-                listHtml += '<div class="spacer">--- END OF MARKET ---</div>';
-                document.getElementById('shop-list').innerHTML = listHtml;
+            } else {
+                // RENDER BOOSTERS
+                html = boosterStats.map((b, i) => {
+                    let canAfford = u.bal >= b.p;
+                    let btnColor = canAfford ? '#ffd700' : '#555';
+                    let btnCursor = canAfford ? 'pointer' : 'not-allowed';
+                    let btnOpacity = canAfford ? '1' : '0.6';
+                    let purchased = false;
+                    
+                    // Check if already maxed (simple check logic)
+                    if(b.type === 'tap' && u.multitap >= b.val) purchased = true;
+                    if(b.type === 'eng' && (u.maxEng || 500) >= b.val) purchased = true;
+
+                    let btnText = purchased ? "OWNED" : `€${b.p.toFixed(2)}`;
+                    let action = purchased ? "" : `onclick="buyBooster(${i})"`;
+                    if(purchased) { btnColor = "#333"; btnOpacity = "0.5"; }
+
+                    return `
+                    <div class="card" style="border-left: 3px solid #ffd700;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="fallback-icon" style="color:#ffd700; border-color:#ffd700;">${b.icon}</div>
+                            <div><b>${b.name}</b><br><small style="color:#888">Permanent Upgrade</small></div>
+                        </div>
+                        <button class="buy-btn" ${action}
+                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity}; color:#000;">
+                            ${btnText}
+                        </button>
+                    </div>`;
+                }).join('');
             }
+            
+            html += '<div class="spacer">--- END OF MARKET ---</div>';
+            document.getElementById('shop-list').innerHTML = html;
         }
 
-        function buy(i, e) {
+        function buyMiner(i, e) {
             if(u.bal >= minerStats[i].p) {
                 u.bal -= minerStats[i].p; u.pps += minerStats[i].g; u.inv[i] = (u.inv[i]||0)+1;
-                let btn = e.target;
-                let oldText = btn.innerText;
-                btn.innerText = "👍";
-                btn.style.background = "#fff";
-                setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
                 renderShop(); up(); saveNow(); 
-                showNotify("Purchased Successfully!");
+                showNotify("Miner Purchased!");
+                tg.HapticFeedback.notificationOccurred('success');
+            } else showNotify("Not enough funds!", "error");
+        }
+
+        function buyBooster(i) {
+            let b = boosterStats[i];
+            if(u.bal >= b.p) {
+                u.bal -= b.p;
+                if(b.type === 'tap') u.multitap = b.val;
+                if(b.type === 'eng') u.maxEng = b.val;
+                renderShop(); up(); saveNow();
+                showNotify("Upgrade Successful! 🚀");
+                tg.HapticFeedback.notificationOccurred('success');
             } else showNotify("Not enough funds!", "error");
         }
 
@@ -1201,6 +1250,10 @@
             document.getElementById('tab-'+t).style.display='block';
             document.querySelectorAll('.n-btn').forEach(b=>b.classList.remove('active'));
             if(t !== 'admin') document.getElementById('nb-'+t).classList.add('active');
+            
+            // IF SWITCHING TO SHOP, RENDER
+            if(t === 'shop') renderShop();
+            
             tg.HapticFeedback.impactOccurred('light');
         }
         
@@ -1227,7 +1280,8 @@
             void btn.offsetWidth;
             btn.classList.add('click-anim');
 
-            let gain = 0.00005;
+            // BASE GAIN * MULTITAP LEVEL
+            let gain = 0.00005 * (u.multitap || 1);
             
             // === LÓGICA TURBO/OVERCLOCK ===
             if(isTurbo) {
@@ -1409,7 +1463,8 @@
         setInterval(() => { 
             if(loaded) { 
                 u.bal += u.pps; 
-                if(u.eng<500) u.eng+=0.5; 
+                let max = u.maxEng || 500;
+                if(u.eng < max) u.eng += 0.5; 
                 up(); 
             } 
         }, 1000);
