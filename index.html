@@ -132,6 +132,28 @@
         }
         .active-turbo .turbo-fill { width: 100% !important; animation: drain 10s linear forwards; }
         @keyframes drain { from { width: 100%; } to { width: 0%; } }
+
+        /* PARTICULAS AO CLICAR */
+        .particle {
+            position: absolute; pointer-events: none; width: 6px; height: 6px; border-radius: 50%;
+            background: #0f9; box-shadow: 0 0 5px #0f9;
+            animation: pop 0.6s ease-out forwards; z-index: 99;
+        }
+        @keyframes pop {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* GOLDEN EURO */
+        .golden-euro {
+            position: fixed; width: 60px; height: 60px; z-index: 200; font-size: 40px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            animation: floatMove 8s linear forwards; user-select: none;
+        }
+        @keyframes floatMove {
+            0% { left: -100px; transform: rotate(0deg); }
+            100% { left: 110%; transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -221,6 +243,7 @@
             <h2 style="color:#fff;" id="t-welcome">WELCOME BACK</h2>
             <p style="color:#aaa;" id="t-off-earn">Offline Earnings:</p>
             <h1 style="color:#0f9; font-size:40px;">+€<span id="off-val">0.00</span></h1>
+            <p style="color:#555; font-size:10px;">(Max offline time: 3 Hours)</p>
             <button class="buy-btn" onclick="closeModal('modal-offline')" id="t-collect">COLLECT</button>
         </div>
     </div>
@@ -482,6 +505,7 @@
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         const ADMIN_ID = 253106429; 
         const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌"]; 
+        const MAX_OFFLINE_SEC = 3 * 3600; // 3 Horas de limite offline
 
         let CUR_LANG = 'en';
         const txt = {
@@ -710,7 +734,10 @@
                         if(!u.codes) u.codes = {};
                         u.name = uName; u.photo = uPhoto; u.username = uUser;
 
+                        // CALCULO DE GANHOS OFFLINE COM LIMITE DE 3H
                         let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
+                        if(sec > MAX_OFFLINE_SEC) sec = MAX_OFFLINE_SEC; // Limite de 3h
+
                         if(sec > 60 && u.pps > 0) {
                             let profit = sec * u.pps;
                             u.bal += profit;
@@ -1094,6 +1121,9 @@
                 tg.HapticFeedback.impactOccurred('light'); 
             }
 
+            // PARTICULAS
+            createParticles(x, y);
+
             let isLucky = Math.random() < 0.002; 
             if(isLucky) {
                 let bonus = 0.05;
@@ -1131,6 +1161,22 @@
             }
         }, 200);
 
+        // FUNÇÃO PARTICULAS
+        function createParticles(x, y) {
+            for(let i=0; i<5; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle';
+                let tx = (Math.random() - 0.5) * 100 + 'px';
+                let ty = (Math.random() - 0.5) * 100 + 'px';
+                p.style.setProperty('--tx', tx);
+                p.style.setProperty('--ty', ty);
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 600);
+            }
+        }
+
         function spawnFloat(x, y, val, crit, lucky) {
             let el = document.createElement('div');
             // Randomize Direction
@@ -1148,6 +1194,31 @@
             document.body.appendChild(el);
             setTimeout(()=>el.remove(), 800);
         }
+
+        // GOLDEN EURO EVENT
+        function spawnGoldenEuro() {
+            if(document.querySelector('.golden-euro')) return; // Já existe um
+            let coin = document.createElement('div');
+            coin.className = 'golden-euro';
+            coin.innerText = '🟡';
+            coin.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            
+            coin.onclick = function() {
+                u.bal += 0.10; // Bónus de 10 cêntimos
+                tg.HapticFeedback.notificationOccurred('success');
+                spawnFloat(parseInt(coin.style.left)||100, parseInt(coin.style.top)||100, 0.10, false, true);
+                coin.remove();
+                saveNow();
+            };
+            
+            document.body.appendChild(coin);
+            setTimeout(() => { if(coin.parentNode) coin.remove(); }, 8000);
+        }
+
+        // Tenta spawnar um Golden Euro a cada 20 segundos (10% de chance)
+        setInterval(() => {
+            if(loaded && Math.random() < 0.1) spawnGoldenEuro();
+        }, 20000);
 
         function setMax() { document.getElementById('wd-amount').value = u.bal.toFixed(2); calcFee(); }
         function calcFee() {
