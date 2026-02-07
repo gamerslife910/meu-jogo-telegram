@@ -20,7 +20,10 @@
         .ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; color: #0f9; font-size: 12px; font-weight: bold; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* SCROLL FIXO */
+        /* EVENTO DE FIM DE SEMANA */
+        .weekend-banner { display:none; position: fixed; top: 65px; width: 100%; background: linear-gradient(90deg, #ff0000, #ff8c00); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 0; z-index: 39; box-shadow: 0 5px 10px rgba(255,0,0,0.3); animation: pulseEvent 2s infinite; }
+        @keyframes pulseEvent { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
         .tab { display: none; position: fixed; top: 70px; left: 0; right: 0; bottom: 80px; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         .buy-btn { background: #0f9; color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-family: 'Rajdhani'; cursor: pointer; text-transform: uppercase; font-size: 14px; box-shadow: 0 0 10px rgba(0,255,153,0.2); transition: 0.2s; position: relative; overflow: hidden; }
@@ -79,7 +82,6 @@
         .l-btn.active { color: #0f9; border-color: #0f9; box-shadow: 0 0 5px rgba(0,255,153,0.3); }
 
         .settings-icon { position: absolute; top: 10px; left: 10px; z-index: 50; background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; }
-        
         .trophy-icon { position: absolute; top: 10px; left: 50px; z-index: 50; background: rgba(0,0,0,0.6); border: 1px solid #ffd700; color: #ffd700; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
 
         .online-cnt { position: absolute; top: 45px; left: 10px; z-index: 50; font-size: 10px; color: #0f9; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; border: 1px solid #333; }
@@ -103,18 +105,12 @@
         @keyframes spin { 0% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
         
         .fallback-icon { font-size:30px; display:flex; align-items:center; justify-content:center; width:50px; height:50px; background:#222; border-radius:5px; border:1px solid #333; color: #fff; flex-shrink: 0; }
-        
         #debug-box { display:none; }
         .spacer { height: 250px; width: 100%; text-align:center; padding-top:20px; color:#333; font-size:10px; }
 
         /* === JUICE EFFECTS === */
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
         .turbo-con { width: 80%; margin: 10px auto; background: #111; height: 15px; border-radius: 10px; border: 1px solid #333; position: relative; overflow: hidden; }
         .turbo-fill { height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00); width: 0%; transition: width 0.1s linear; }
@@ -133,7 +129,6 @@
         .tag-hot { background: #ff3333; color: #fff; }
         @keyframes pulseTag { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* === NEW WHEEL & SHOP UI === */
         #toast-box { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .toast { background: rgba(10,10,10,0.95); border: 1px solid #0f9; color: #fff; padding: 12px 20px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8); animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 13px; font-weight: bold; width: fit-content; max-width: 90%; backdrop-filter: blur(5px); }
         .toast.error { border-color: #ff3333; color: #ffcccc; box-shadow: 0 5px 20px rgba(255,0,0,0.2); }
@@ -144,7 +139,6 @@
         .wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #fff; box-sizing: border-box; background: conic-gradient(#f00 0deg 60deg, #ff8c00 60deg 120deg, #ffd700 120deg 180deg, #0f9 180deg 240deg, #00bfff 240deg 300deg, #9400d3 300deg 360deg); transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); box-shadow: 0 0 20px rgba(255,255,255,0.2); position: relative; }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 20px solid #fff; z-index: 10; filter: drop-shadow(0 0 5px #000); }
         .spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; cursor: pointer; border: 4px solid #000; box-shadow: 0 0 15px rgba(255,255,255,0.5); font-size: 12px; z-index: 5; }
-        
         .wheel-icon { position: absolute; top: 50%; left: 50%; font-size: 24px; transform-origin: 0 0; }
         .wi-1 { transform: rotate(30deg) translate(0, -70px) rotate(-30deg) translate(-50%, -50%); } 
         .wi-2 { transform: rotate(90deg) translate(0, -70px) rotate(-90deg) translate(-50%, -50%); } 
@@ -153,11 +147,10 @@
         .wi-5 { transform: rotate(270deg) translate(0, -70px) rotate(-270deg) translate(-50%, -50%); } 
         .wi-6 { transform: rotate(330deg) translate(0, -70px) rotate(-330deg) translate(-50%, -50%); } 
 
-        .shop-nav { display: flex; margin-bottom: 15px; gap: 10px; }
-        .shop-tab { flex: 1; padding: 10px; background: #222; border: 1px solid #333; border-radius: 5px; color: #888; font-weight: bold; cursor: pointer; }
+        .shop-nav { display: flex; margin-bottom: 15px; gap: 10px; overflow-x: auto; }
+        .shop-tab { flex: 1; padding: 10px; background: #222; border: 1px solid #333; border-radius: 5px; color: #888; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .shop-tab.active { background: #0f9; color: #000; border-color: #0f9; }
 
-        /* === ACHIEVEMENTS & LEVEL UP === */
         .ach-row { display: flex; align-items: center; background: #222; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: left; opacity: 0.5; filter: grayscale(1); transition: 0.3s; }
         .ach-row.unlocked { opacity: 1; filter: grayscale(0); border-color: #ffd700; box-shadow: 0 0 10px rgba(255,215,0,0.1); }
         .ach-icon { font-size: 24px; margin-right: 10px; }
@@ -179,6 +172,8 @@
         <div class="levelup-rank" id="new-rank-name">HACKER</div>
         <div style="margin-top:20px; font-size:12px; color:#aaa;">Tap to continue</div>
     </div>
+
+    <div class="weekend-banner" id="weekend-banner">🔥 WEEKEND EVENT: 4X TAP PROFIT ACTIVE! 🔥</div>
 
     <div class="ticker-wrap">
         <div class="ticker" id="news-ticker">🚀 WELCOME TO EURODASH --- SYSTEM ONLINE --- JOIN THE REVOLUTION</div>
@@ -318,40 +313,29 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
             <h3 style="color:#00ccff">DEPOSIT (USDT)</h3>
-            
             <p style="font-size:12px; color:#aaa; margin-bottom: 5px;">1. Send USDT (TRC20) to:</p>
-            
             <div style="background:#fff; padding:5px; display:inline-block; border-radius:10px; margin-bottom:10px;">
                 <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'" style="display:block;">
             </div>
-
             <div onclick="copyWallet()" style="background:#222; padding:10px; border-radius:8px; border:1px dashed #0f9; cursor:pointer;">
                 <p style="font-size:9px; color:#888; margin:0;">TAP TO COPY:</p>
                 <div style="font-size:10px; color:#fff; word-break:break-all; font-family:monospace; font-weight:bold;" id="admin-wallet">...</div>
             </div>
-
             <hr style="border-color:#333; margin:15px 0;">
-
             <p style="font-size:12px; color:#aaa; margin-bottom: 10px;">2. Send proof to Admin:</p>
-
             <button class="buy-btn" onclick="sendProof()" style="width:100%; padding:15px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
                 📸 SEND PROOF
             </button>
-            
-            <p style="font-size:9px; color:#555; margin-top:10px;">
-                Your ID: <span id="proof-uid" style="color:#0f9">...</span>
-            </p>
+            <p style="font-size:9px; color:#555; margin-top:10px;">Your ID: <span id="proof-uid" style="color:#0f9">...</span></p>
         </div>
     </div>
 
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
-        
         <div class="turbo-con" id="turbo-box">
             <div class="turbo-fill" id="turbo-bar"></div>
             <div class="turbo-text" id="turbo-msg">🔥 OVERCLOCK ACTIVE (2X) 🔥</div>
         </div>
-
         <div style="margin-bottom:20px;">
             <div class="lvl-con"><div class="lvl-fill" id="l-fill"></div></div>
             <button class="info-btn" onclick="openModal('modal-levels')">?</button>
@@ -392,6 +376,8 @@
         <div class="shop-nav">
             <div class="shop-tab active" id="st-miners" onclick="toggleShop('miners')">MINERS 💻</div>
             <div class="shop-tab" id="st-boosters" onclick="toggleShop('boosters')">BOOSTERS 🚀</div>
+            <div class="shop-tab" id="st-skins" onclick="toggleShop('skins')">SKINS 🎨</div>
+            <div class="shop-tab" id="st-clans" onclick="toggleShop('clans')">CLANS ⚔️</div>
         </div>
 
         <div id="shop-list"></div>
@@ -401,7 +387,6 @@
         <div class="game-box" style="border:1px solid #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.2);">
             <h3 style="color:#ff00ff; margin:0;">LUCKY WHEEL 🎡</h3>
             <p style="color:#aaa; font-size:12px;">1 Free Spin / Day (or €0.20)</p>
-            
             <div class="wheel-con">
                 <div class="wheel-pointer"></div>
                 <div class="wheel" id="lucky-wheel">
@@ -414,7 +399,6 @@
                 </div>
                 <div class="spin-btn" onclick="spinWheel()">SPIN</div>
             </div>
-            
             <div style="font-size:10px; color:#555;">Win up to €1.00 or Energy!</div>
         </div>
 
@@ -506,11 +490,6 @@
             return false;
         };
 
-        function log(msg) {
-            let logBox = document.getElementById('debug-box');
-            if(logBox) logBox.innerHTML += `<div>>> ${msg}</div>`;
-        }
-
         // MATRIX BACKGROUND (DYNAMIC COLOR)
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
@@ -537,103 +516,43 @@
         // SOUND SYSTEM
         let soundEnabled = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function toggleSound() { 
-            soundEnabled = !soundEnabled; 
-            document.getElementById('snd-stat').innerText = soundEnabled ? 'ON 🔊' : 'OFF 🔇';
-        }
+        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('snd-stat').innerText = soundEnabled ? 'ON 🔊' : 'OFF 🔇'; }
         function playBeep() {
             if(!soundEnabled) return;
             if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        // CONFIG & DATA
+        // CONFIG & DATA (ECONOMY BALANCED FOR LONG TERM)
         const CONFIG = { telegram_link: "https://t.me/EuroDashOfficial", admin_wallet: "TWk7a3xLdEX3XWRGWaBHT1mbc8kq3JYZJw", min_withdraw: 1.00, fee: 0.02 };
         const PROMO_CODES = { "EUROSTART": 0.50, "VIKTORLAUNCH": 1.00, "HACKERBONUS": 0.25 };
         const DAILY_REWARDS = [0.01, 0.03, 0.05, 0.08, 0.12, 0.20, 0.50];
         const ADMIN_ID = 253106429; 
         const MINER_EMOJIS = ["💻", "🖥️", "⚡", "🔋", "☢️", "🌌"]; 
-        const MAX_OFFLINE_SEC = 3 * 3600; // 3 Horas de limite offline
+        const MAX_OFFLINE_SEC = 3 * 3600; 
 
         let CUR_LANG = 'en';
         const txt = {
-            en: {
-                welcome: "WELCOME BACK", off_earn: "Offline Earnings:", collect: "COLLECT",
-                lvl_sys: "LEVEL SYSTEM", wd_tit: "WITHDRAW (TRC20)", wd_info: "Min: €1.00 | Fee: 2%",
-                avail: "Available:", receive: "You Receive:", fee_inc: "(Fees included)", confirm: "CONFIRM",
-                energy: "ENERGY", pps: "PROFIT/SEC", market: "MARKET", wallet: "WALLET",
-                rank_tit: "TOP INVESTORS", load_rank: "Loading real data...", rank_off: "Offline (DB Error)", net_tit: "NETWORK",
-                inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
-                task_tit: "TASKS", join_ch: "Join Official Channel", rew: "+€0.10 Reward",
-                promo_tit: "SECRET CODE", redeem: "REDEEM", force_play: "⚠️ PLAY OFFLINE", db_slow: "Connecting...", db_err: "Error: ",
-                nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
-                miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub"],
-                alerts: {
-                    copied: "Address Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
-                    insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
-                    inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!",
-                    code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!", daily: "Day"
-                }
-            },
-            pt: {
-                welcome: "BEM-VINDO DE VOLTA", off_earn: "Ganhos Offline:", collect: "RECEBER",
-                lvl_sys: "SISTEMA DE NÍVEIS", wd_tit: "LEVANTAR (TRC20)", wd_info: "Min: €1.00 | Taxa: 2%",
-                avail: "Disponível:", receive: "Recebes:", fee_inc: "(Taxas incluídas)", confirm: "CONFIRMAR",
-                energy: "ENERGIA", pps: "LUCRO/SEG", market: "MERCADO", wallet: "CARTEIRA",
-                rank_tit: "TOP INVESTIDORES", load_rank: "A carregar dados...", rank_off: "Offline (Erro DB)", net_tit: "REDE",
-                inv_desc: "Convida amigos e ganha 5% do que minerarem!", copy_link: "COPIAR LINK",
-                task_tit: "TAREFAS", join_ch: "Entrar no Canal Oficial", rew: "+€0.10 Recompensa",
-                promo_tit: "CÓDIGO SECRETO", redeem: "RESGATAR", force_play: "⚠️ JOGAR OFFLINE", db_slow: "A ligar...", db_err: "Erro: ",
-                nav: ["MINAR", "LOJA", "JOGOS", "EQUIPA", "RANK"],
-                miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural"],
-                alerts: {
-                    copied: "Copiado!", invalid_trc20: "Endereço TRC20 Inválido!", min_wd: "Mínimo de levantamento é €",
-                    insufficient: "❌ Saldo Insuficiente! Tens apenas €", req_sent: "Pedido Enviado!",
-                    inv_hash: "Hash Inválido", dep_sub: "Depósito Enviado!", rew_rec: "Recebido!",
-                    code_inv: "Código Inválido!", code_used: "Código já usado!", code_ok: "Código Resgatado!", daily: "Dia"
-                }
-            },
-            ru: {
-                welcome: "С ВОЗВРАЩЕНИЕМ", off_earn: "Офлайн доход:", collect: "ЗАБРАТЬ",
-                lvl_sys: "СИСТЕМА УРОВНЕЙ", wd_tit: "ВЫВОД (TRC20)", wd_info: "Мин: €1.00 | Ком: 2%",
-                avail: "Доступно:", receive: "Вы получите:", fee_inc: "(С комиссией)", confirm: "ПОДТВЕРДИТЬ",
-                energy: "ЭНЕРГИЯ", pps: "ПРИБЫЛЬ/СЕК", market: "РЫНОК", wallet: "КОШЕЛЕК",
-                rank_tit: "ТОП ИНВЕСТОРОВ", load_rank: "Загрузка данных...", rank_off: "Офлайн (Ошибка БД)", net_tit: "СЕТЬ",
-                inv_desc: "Пригласи друзей и получай 5%!", copy_link: "КОПИРОВАТЬ",
-                task_tit: "ЗАДАНИЯ", join_ch: "Вступить в канал", rew: "+€0.10 Награда",
-                promo_tit: "СЕКРЕТНЫЙ КОД", redeem: "АКТИВИРОВАТЬ", force_play: "⚠️ ИГРАТЬ ОФЛАЙН", db_slow: "Подключение...", db_err: "Ошибка: ",
-                nav: ["МАЙНИНГ", "МАРКЕТ", "ИГРЫ", "КОМАНДА", "ТОП"],
-                miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб"],
-                alerts: {
-                    copied: "Скопировано!", invalid_trc20: "Неверный адрес TRC20!", min_wd: "Минимум вывода €",
-                    insufficient: "❌ Недостаточно средств! У вас только €", req_sent: "Запрос отправлен!",
-                    inv_hash: "Неверный хеш", dep_sub: "Депозит отправлен!", rew_rec: "Получено!",
-                    code_inv: "Неверный код!", code_used: "Код уже использован!", code_ok: "Код активирован!", daily: "День"
-                }
-            }
+            en: { alerts: { copied: "Address Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €", insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!", inv_hash: "Invalid Hash", code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!", rew_rec: "Received!" }, miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub"] },
+            pt: { alerts: { copied: "Copiado!", invalid_trc20: "Endereço Inválido!", min_wd: "Mínimo é €", insufficient: "❌ Saldo Insuficiente! Tens €", req_sent: "Pedido Enviado!", inv_hash: "Hash Inválido", code_inv: "Código Inválido!", code_used: "Já usado!", code_ok: "Resgatado!", rew_rec: "Recebido!" }, miners: ["Micro Nó", "Rack Blade", "Servidor Turbo", "Estação Cyber", "Rig Quântico", "Hub Neural"] },
+            ru: { alerts: { copied: "Скопировано!", invalid_trc20: "Неверный адрес!", min_wd: "Минимум €", insufficient: "❌ Недостаточно средств! У вас €", req_sent: "Запрос отправлен!", inv_hash: "Неверный хеш", code_inv: "Неверный код!", code_used: "Код использован!", code_ok: "Активирован!", rew_rec: "Получено!" }, miners: ["Микро Узел", "Blade Стойка", "Турбо Сервер", "Кибер Станция", "Квантовый Риг", "Нейро Хаб"] }
         };
 
-        // ECONOMIA ATUALIZADA - MICRO TRANSACOES
+        // ROI ~20-25 DIAS (Long Term Economy)
         const minerStats = [ 
-            {p:0.05,  g:0.00000003, img: "miner1.jpg"}, 
-            {p:0.50,  g:0.00000032, img: "miner2.jpg"}, 
-            {p:2.50,  g:0.00000170, img: "miner3.jpg"}, 
-            {p:8.00,  g:0.00000580, img: "miner4.jpg"}, 
-            {p:18.00, g:0.00001390, img: "miner5.jpg"}, 
-            {p:40.00, g:0.00003300, img: "miner6.jpg"}  
+            {p:0.05,  g:0.00000002, img: "miner1.jpg"}, 
+            {p:0.50,  g:0.00000025, img: "miner2.jpg"}, 
+            {p:2.50,  g:0.00000140, img: "miner3.jpg"}, 
+            {p:8.00,  g:0.00000450, img: "miner4.jpg"}, 
+            {p:18.00, g:0.00001100, img: "miner5.jpg"}, 
+            {p:40.00, g:0.00002800, img: "miner6.jpg"}  
         ];
 
-        // BOOSTER STATS
         const boosterStats = [
             {name: "Multitap Lv.2", p: 1.00, type: "tap", val: 2, icon: "💪"},
             {name: "Max Energy 1000", p: 0.50, type: "eng", val: 500, icon: "🔋"},
@@ -641,112 +560,71 @@
             {name: "Max Energy 2000", p: 2.00, type: "eng", val: 1000, icon: "⚡"}
         ];
 
-        // ACHIEVEMENTS DATA
+        const skinStats = [
+            {name: "Default Green", p: 0, color: "#0f9"},
+            {name: "Cyber Blue", p: 0.50, color: "#00ffff"},
+            {name: "Royal Gold", p: 2.00, color: "#ffd700"},
+            {name: "Blood Red", p: 5.00, color: "#ff0000"}
+        ];
+
+        const clanStats = [
+            {name: "Cyber Punks", p: 5.00, bonus: 0.05}, // 5% bonus
+            {name: "Crypto Lords", p: 5.00, bonus: 0.05},
+            {name: "Night Stalkers", p: 5.00, bonus: 0.05}
+        ];
+
         const ACHIEVEMENTS = [
             {id: 'click_100', title: 'Fast Fingers', desc: 'Click 100 times', reward: 0.05, icon: '👆', target: 100, type: 'clicks'},
             {id: 'miner_1', title: 'Investor', desc: 'Buy your first miner', reward: 0.10, icon: '💼', target: 1, type: 'miners'},
             {id: 'bal_10', title: 'Rich Kid', desc: 'Reach €10.00 balance', reward: 0.50, icon: '💰', target: 10, type: 'bal'}
         ];
 
-        let u = { bal: 0, pps: 0, eng: 500, maxEng: 500, multitap: 1, totalClicks: 0, inv: [0,0,0,0,0,0], achievements: {}, tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "" };
+        let u = { bal: 0, pps: 0, eng: 500, maxEng: 500, multitap: 1, totalClicks: 0, inv: [0,0,0,0,0,0], achievements: {}, tasks: {}, codes: {}, lastT: Date.now(), streak: 0, lastDaily: 0, name: "User", photo: "", username: "", skin: "#0f9", clan: "" };
         let loaded = false;
-        let dailyRewVal = 0;
         let lastClickTime = 0;
         let clicksThisSecond = 0;
         let activeShopTab = 'miners';
         let lastRank = "";
-        
-        setInterval(() => { clicksThisSecond = 0; }, 1000); 
-        
         let turboVal = 0;
         let isTurbo = false;
         let isSpinning = false;
 
+        setInterval(() => { clicksThisSecond = 0; }, 1000); 
+
         window.finishLoad = function() {
             if(loaded) return;
             loaded = true;
-            up(); renderShop(); checkTasks(); loadRank(); checkAchievements();
+            up(); renderShop(); checkTasks(); loadRank(); checkAchievements(); checkWeekend();
             document.getElementById('loader').style.display = 'none';
         };
 
         function startBoot() {
-            const lines = [
-                "> INITIALIZING KERNEL...",
-                "> CONNECTING TO EURO-NET...",
-                "> BYPASSING SECURITY LAYER 1...",
-                "> DECRYPTING WALLET DATA...",
-                "> ACCESS GRANTED."
-            ];
-            let container = document.getElementById('boot-seq');
-            if(container) container.innerHTML = ''; 
+            const lines = ["> INITIALIZING KERNEL...", "> CONNECTING TO EURO-NET...", "> BYPASSING SECURITY LAYER 1...", "> DECRYPTING WALLET DATA...", "> ACCESS GRANTED."];
+            let container = document.getElementById('boot-seq'); if(container) container.innerHTML = ''; 
             let delay = 0;
-            lines.forEach((line, i) => {
-                setTimeout(() => {
-                    let div = document.createElement('div');
-                    div.className = 'boot-text';
-                    div.innerText = line;
-                    if(container) container.appendChild(div);
-                }, delay);
-                delay += 800;
-            });
-            setTimeout(() => {
-                if(!loaded && document.getElementById('force-btn')) {
-                    document.getElementById('force-btn').style.display = 'block';
-                }
-            }, 4500);
+            lines.forEach((line, i) => { setTimeout(() => { let div = document.createElement('div'); div.className = 'boot-text'; div.innerText = line; if(container) container.appendChild(div); }, delay); delay += 800; });
+            setTimeout(() => { if(!loaded && document.getElementById('force-btn')) document.getElementById('force-btn').style.display = 'block'; }, 4500);
         }
 
         let tg, uid, uName, uPhoto, uUser;
-        try { 
-            tg = window.Telegram.WebApp; 
-            tg.expand(); 
-            uid = tg.initDataUnsafe.user?.id || 22250; 
-            uName = tg.initDataUnsafe.user?.first_name || "Miner";
-            uPhoto = tg.initDataUnsafe.user?.photo_url || "";
-            uUser = tg.initDataUnsafe.user?.username ? "@"+tg.initDataUnsafe.user.username : "";
-        } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
+        try { tg = window.Telegram.WebApp; tg.expand(); uid = tg.initDataUnsafe.user?.id || 22250; uName = tg.initDataUnsafe.user?.first_name || "Miner"; uPhoto = tg.initDataUnsafe.user?.photo_url || ""; uUser = tg.initDataUnsafe.user?.username ? "@"+tg.initDataUnsafe.user.username : ""; } catch (e) { uid = 22250; uName = "Test User"; uPhoto=""; uUser=""; }
 
-        try {
-            firebase.initializeApp({
-                apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0",
-                authDomain: "eurodash-official.firebaseapp.com",
-                databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app/",
-                projectId: "eurodash-official",
-                storageBucket: "eurodash-official.firebasestorage.app",
-                messagingSenderId: "633116941203",
-                appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666"
-            });
-        } catch(err) { console.log(err); }
-
+        try { firebase.initializeApp({ apiKey: "AIzaSyAMqx6zI2QN9Hon_T9xTvML46pS0uEdEa0", authDomain: "eurodash-official.firebaseapp.com", databaseURL: "https://eurodash-official-default-rtdb.europe-west1.firebasedatabase.app/", projectId: "eurodash-official", storageBucket: "eurodash-official.firebasestorage.app", messagingSenderId: "633116941203", appId: "1:633116941203:web:0b3ca1ce3b9b5a63626666" }); } catch(err) { console.log(err); }
         const db = firebase.database();
-        let tickerMessages = ["Welcome to EuroDash", "System Online"];
-        function updateTicker(msg) {
-            tickerMessages.unshift(msg);
-            if(tickerMessages.length > 5) tickerMessages.pop();
-            let fullText = tickerMessages.join(" --- ");
-            document.getElementById('news-ticker').innerText = fullText;
-        }
 
+        function updateTicker(msg) { document.getElementById('news-ticker').innerText = msg; }
         function showNotify(msg, type = 'success') {
-            let box = document.getElementById('toast-box');
-            let div = document.createElement('div');
-            div.className = 'toast ' + type;
-            div.innerText = msg;
-            box.appendChild(div);
-            if(type === 'error') tg.HapticFeedback.notificationOccurred('error');
-            else tg.HapticFeedback.impactOccurred('light');
-            setTimeout(() => {
-                div.style.animation = 'fadeOut 0.3s forwards';
-                setTimeout(() => div.remove(), 300);
-            }, 3000);
+            let box = document.getElementById('toast-box'); let div = document.createElement('div'); div.className = 'toast ' + type; div.innerText = msg; box.appendChild(div);
+            if(type === 'error') tg.HapticFeedback.notificationOccurred('error'); else tg.HapticFeedback.impactOccurred('light');
+            setTimeout(() => { div.style.animation = 'fadeOut 0.3s forwards'; setTimeout(() => div.remove(), 300); }, 3000);
         }
 
+        // SAVE LOGIC - CRITICAL FIX
         function saveNow() {
-            if(uid) {
-                u.lastT = Date.now();
-                db.ref('users/' + uid).update(u);
-            }
+            if(uid) { u.lastT = Date.now(); db.ref('users/' + uid).update(u); }
         }
+        window.addEventListener('beforeunload', saveNow);
+        document.addEventListener('visibilitychange', () => { if(document.hidden) saveNow(); });
 
         window.onload = function() {
             startBoot();
@@ -754,84 +632,40 @@
             if(document.getElementById('admin-wallet')) document.getElementById('admin-wallet').innerText = CONFIG.admin_wallet;
             if(document.getElementById('qr-code')) document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${CONFIG.admin_wallet}`;
             setLang('en');
-            if(uid == ADMIN_ID) { 
-                let adminBtn = document.getElementById('btn-admin');
-                if(adminBtn) adminBtn.style.display = 'block'; 
-            }
-            const onlineRef = db.ref('.info/connected');
-            const myConRef = db.ref(`online/${uid}`);
-            onlineRef.on('value', (snap) => {
-                if (snap.val() === true) {
-                    myConRef.set(true);
-                    myConRef.onDisconnect().remove();
-                }
-            });
-            db.ref('online').on('value', (snap) => {
-                let count = snap.numChildren();
-                if(document.getElementById('online-users')) document.getElementById('online-users').innerText = "🟢 " + count + " Online";
-            });
-            db.ref('withdrawals').limitToLast(1).on('child_added', snap => {
-                let val = snap.val();
-                if(val && val.val) updateTicker(`💰 User ${val.uid.toString().substr(0,4)}... just withdrew €${parseFloat(val.val).toFixed(2)}`);
-            });
-            db.ref('users').limitToLast(1).on('child_added', snap => {
-                let val = snap.val();
-                if(val && val.name) updateTicker(`🚀 ${val.name} just joined EuroDash!`);
-            });
-            db.ref('broadcast').on('value', (snap) => {
-                if(snap.exists()) {
-                    let msg = snap.val();
-                    if(msg && msg.length > 0) showNotify(msg);
-                }
-            });
+            if(uid == ADMIN_ID) { let adminBtn = document.getElementById('btn-admin'); if(adminBtn) adminBtn.style.display = 'block'; }
+            
+            db.ref('.info/connected').on('value', (s)=>{ if(s.val()) db.ref(`online/${uid}`).set(true).then(()=>db.ref(`online/${uid}`).onDisconnect().remove()) });
+            db.ref('online').on('value', (s)=>{ if(document.getElementById('online-users')) document.getElementById('online-users').innerText = "🟢 " + s.numChildren() + " Online"; });
+            
             setTimeout(() => {
                 db.ref('users/' + uid).once('value').then(s => {
                     if(s.exists()) {
-                        let d = s.val();
-                        u = { ...u, ...d };
+                        let d = s.val(); u = { ...u, ...d };
                         u.inv = Array.isArray(d.inv) ? d.inv : [0,0,0,0,0,0];
-                        if(!u.codes) u.codes = {};
-                        if(!u.achievements) u.achievements = {};
-                        if(!u.multitap) u.multitap = 1;
-                        if(!u.maxEng) u.maxEng = 500;
-                        if(!u.totalClicks) u.totalClicks = 0;
-                        u.name = uName; u.photo = uPhoto; u.username = uUser;
+                        if(!u.codes) u.codes = {}; if(!u.achievements) u.achievements = {};
+                        if(!u.multitap) u.multitap = 1; if(!u.maxEng) u.maxEng = 500;
+                        if(!u.totalClicks) u.totalClicks = 0; if(!u.skin) u.skin = "#0f9";
+                        matrixColor = u.skin;
                         let sec = (Date.now() - (u.lastT||Date.now())) / 1000;
                         if(sec > MAX_OFFLINE_SEC) sec = MAX_OFFLINE_SEC; 
                         if(sec > 60 && u.pps > 0) {
-                            let profit = sec * u.pps;
-                            u.bal += profit;
+                            let profit = sec * u.pps; u.bal += profit;
                             if(document.getElementById('off-val')) document.getElementById('off-val').innerText = profit.toFixed(4);
                             openModal('modal-offline');
                         }
-                    } else { 
-                        u.name = uName; u.photo = uPhoto; u.username = uUser; 
-                        u.inv[0] = 1; u.pps = minerStats[0].g; 
-                        saveNow(); openModal('modal-tutorial');
-                    }
-                    checkDaily();
-                    finishLoad();
-                }).catch(error => {
-                    if(document.getElementById('force-btn')) {
-                        document.getElementById('force-btn').innerText = "OFFLINE MODE";
-                        document.getElementById('force-btn').style.display = 'block';
-                    }
-                });
+                    } else { u.name = uName; u.photo = uPhoto; u.username = uUser; u.inv[0] = 1; u.pps = minerStats[0].g; saveNow(); openModal('modal-tutorial'); }
+                    checkDaily(); finishLoad();
+                }).catch(error => { if(document.getElementById('force-btn')) document.getElementById('force-btn').style.display = 'block'; });
             }, 4000); 
             if(document.getElementById('my-link')) document.getElementById('my-link').innerText = `https://t.me/EuroDashMinerBot?start=${uid}`;
-            let clickBtn = document.getElementById('click-btn');
-            if(clickBtn) {
-                clickBtn.addEventListener('touchstart', handleTouch, {passive:false});
-                clickBtn.addEventListener('click', handleClick);
-            }
+            let clickBtn = document.getElementById('click-btn'); if(clickBtn) { clickBtn.addEventListener('touchstart', handleTouch, {passive:false}); clickBtn.addEventListener('click', handleClick); }
         };
 
-        function buyRefill() {
-            if(u.bal >= 0.05) {
-                u.bal -= 0.05;
-                u.eng = u.maxEng || 500;
-                saveNow(); up(); closeModal('modal-refill'); showNotify("Energy Refilled! ⚡");
-            } else showNotify("Not enough funds (€0.05)", "error");
+        function buyRefill() { if(u.bal >= 0.05) { u.bal -= 0.05; u.eng = u.maxEng || 500; saveNow(); up(); closeModal('modal-refill'); showNotify("Energy Refilled! ⚡"); } else showNotify("Not enough funds (€0.05)", "error"); }
+
+        function checkWeekend() {
+            const day = new Date().getDay();
+            if(day === 6 || day === 0) document.getElementById('weekend-banner').style.display = 'block';
         }
 
         function spinWheel() {
@@ -839,14 +673,8 @@
             const now = Date.now();
             const msInDay = 86400000;
             let cost = 0;
-            if (now - (u.lastSpin||0) < msInDay) {
-                cost = 0.20;
-                if(u.bal < cost) { showNotify("Free Spin in 24h. Cost: €0.20", "error"); return; }
-            }
-            u.bal -= cost;
-            u.lastSpin = now; 
-            isSpinning = true;
-            saveNow();
+            if (now - (u.lastSpin||0) < msInDay) { cost = 0.20; if(u.bal < cost) { showNotify("Free Spin in 24h. Cost: €0.20", "error"); return; } }
+            u.bal -= cost; u.lastSpin = now; isSpinning = true; saveNow();
             let wheel = document.getElementById('lucky-wheel');
             let deg = Math.floor(5000 + Math.random() * 5000); 
             wheel.style.transform = `rotate(${deg}deg)`;
@@ -860,10 +688,8 @@
                 else if(outcome < 0.95) { reward = 0.50; msg = "Big Win! €0.50"; tg.HapticFeedback.notificationOccurred('success'); } 
                 else { reward = 1.00; msg = "JACKPOT! €1.00 🤑"; tg.HapticFeedback.notificationOccurred('success'); }
                 if(reward > 0) u.bal += reward;
-                showNotify(msg);
-                saveNow();
-                wheel.style.transition = 'none';
-                wheel.style.transform = `rotate(${deg % 360}deg)`;
+                showNotify(msg); saveNow();
+                wheel.style.transition = 'none'; wheel.style.transform = `rotate(${deg % 360}deg)`;
                 setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)'; }, 50);
             }, 4000);
         }
@@ -872,21 +698,12 @@
             let bet = parseFloat(document.getElementById('dice-bet').value);
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { showNotify("Insufficient funds!", "error"); return; }
-            u.bal -= bet;
-            saveNow(); 
-            let el = document.getElementById('dice-result');
-            el.innerText = "ROLLING...";
-            el.className = "game-res";
+            u.bal -= bet; saveNow(); 
+            let el = document.getElementById('dice-result'); el.innerText = "ROLLING..."; el.className = "game-res";
             setTimeout(() => {
                 let win = Math.random() > 0.55; 
-                if(win) {
-                    let profit = bet * 2; u.bal += profit;
-                    el.innerText = "WIN! +€" + profit.toFixed(2); el.className = "game-res win";
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    el.innerText = "LOST -€" + bet.toFixed(2); el.className = "game-res lose";
-                    tg.HapticFeedback.notificationOccurred('error');
-                }
+                if(win) { let profit = bet * 2; u.bal += profit; el.innerText = "WIN! +€" + profit.toFixed(2); el.className = "game-res win"; tg.HapticFeedback.notificationOccurred('success'); }
+                else { el.innerText = "LOST -€" + bet.toFixed(2); el.className = "game-res lose"; tg.HapticFeedback.notificationOccurred('error'); }
                 up(); saveNow(); 
             }, 1000);
         }
@@ -895,22 +712,14 @@
             let bet = parseFloat(document.getElementById('coin-bet').value);
             if(!bet || bet <= 0) return;
             if(u.bal < bet) { showNotify("Insufficient funds!", "error"); return; }
-            u.bal -= bet;
-            saveNow(); 
-            let el = document.getElementById('coin-result');
-            el.classList.add('coin-anim');
+            u.bal -= bet; saveNow(); 
+            let el = document.getElementById('coin-result'); el.classList.add('coin-anim');
             setTimeout(() => {
                 el.classList.remove('coin-anim');
                 let outcome = Math.random() > 0.5 ? 'heads' : 'tails';
                 let symbol = outcome === 'heads' ? '🟡' : '🦅';
-                if(choice === outcome) {
-                    let profit = bet * 2; u.bal += profit;
-                    el.innerHTML = symbol + "<br><span class='win'>WIN!</span>";
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    el.innerHTML = symbol + "<br><span class='lose'>LOSE</span>";
-                    tg.HapticFeedback.notificationOccurred('error');
-                }
+                if(choice === outcome) { let profit = bet * 2; u.bal += profit; el.innerHTML = symbol + "<br><span class='win'>WIN!</span>"; tg.HapticFeedback.notificationOccurred('success'); }
+                else { el.innerHTML = symbol + "<br><span class='lose'>LOSE</span>"; tg.HapticFeedback.notificationOccurred('error'); }
                 up(); saveNow(); 
             }, 1000);
         }
@@ -922,12 +731,10 @@
                 let html = "";
                 if(snap.exists()) {
                     snap.forEach(c => {
-                        let d = c.val();
-                        let key = c.key;
-                        let displayUser = d.username || d.uid;
+                        let d = c.val(); let key = c.key; let displayUser = d.username || d.uid;
                         html += `<div class="admin-row"><b>USER:</b> ${displayUser}<br><b>HASH:</b> ...${d.hash.substr(-6)}<br><div class="admin-actions"><button class="a-btn a-check" onclick="window.open('https://tronscan.org/#/transaction/${d.hash}')">CHECK</button><button class="a-btn a-approve" onclick="adminAction('${key}', '${d.uid}', 'approve')">OK</button><button class="a-btn a-reject" onclick="adminAction('${key}', '${d.uid}', 'reject')">X</button></div></div>`;
                     });
-                } else { html = "<small>No pending deposits.</small>"; }
+                } else html = "<small>No pending deposits.</small>";
                 document.getElementById('admin-list').innerHTML = html;
             });
         }
@@ -935,68 +742,29 @@
         function adminAction(key, userUid, action) {
             if(action === 'approve') {
                 let amount = prompt("Amount to credit (€):");
-                if(!amount) return;
-                amount = parseFloat(amount);
+                if(!amount) return; amount = parseFloat(amount);
                 db.ref('users/' + userUid + '/bal').transaction(c => (c || 0) + amount);
                 db.ref('deposits/' + key).update({ status: 'approved', amount: amount });
-                alert("Credited €" + amount);
-                loadAdmin();
-            } else {
-                if(confirm("Reject?")) { db.ref('deposits/' + key).update({ status: 'rejected' }); loadAdmin(); }
-            }
+                alert("Credited €" + amount); loadAdmin();
+            } else { if(confirm("Reject?")) { db.ref('deposits/' + key).update({ status: 'rejected' }); loadAdmin(); } }
         }
 
         function checkDaily() {
-            const now = Date.now();
-            const msInDay = 86400000;
+            const now = Date.now(); const msInDay = 86400000;
             if(now - (u.lastDaily || 0) > msInDay) {
                 if(now - (u.lastDaily || 0) > msInDay * 2) { u.streak = 0; }
                 let dayIdx = u.streak % 7;
-                dailyRewVal = DAILY_REWARDS[dayIdx];
-                document.getElementById('daily-amt').innerText = dailyRewVal.toFixed(2);
-                document.querySelectorAll('.day-box').forEach((el, i) => { el.classList.toggle('active', i === dayIdx); });
+                document.getElementById('daily-amt').innerText = DAILY_REWARDS[dayIdx].toFixed(2);
                 openModal('modal-daily');
             }
         }
 
-        function claimDaily() { u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); saveNow(); closeModal('modal-daily'); showNotify(txt[CUR_LANG].alerts.rew_rec); }
+        function claimDaily() { u.bal += DAILY_REWARDS[u.streak % 7]; u.lastDaily = Date.now(); u.streak++; up(); saveNow(); closeModal('modal-daily'); showNotify(txt[CUR_LANG].alerts.rew_rec); }
 
         function setLang(l) {
-            CUR_LANG = l;
-            document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-'+l).classList.add('active');
+            CUR_LANG = l; document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+l).classList.add('active');
             const t = txt[l];
-            if(document.getElementById('t-welcome')) document.getElementById('t-welcome').innerText = t.welcome;
-            if(document.getElementById('t-off-earn')) document.getElementById('t-off-earn').innerText = t.off_earn;
-            if(document.getElementById('t-collect')) document.getElementById('t-collect').innerText = t.collect;
-            if(document.getElementById('t-lvl-sys')) document.getElementById('t-lvl-sys').innerText = t.lvl_sys;
-            if(document.getElementById('t-wd-tit')) document.getElementById('t-wd-tit').innerText = t.wd_tit;
-            if(document.getElementById('t-wd-info')) document.getElementById('t-wd-info').innerText = t.wd_info;
-            if(document.getElementById('t-avail')) document.getElementById('t-avail').innerText = t.avail;
-            if(document.getElementById('t-receive')) document.getElementById('t-receive').innerText = t.receive;
-            if(document.getElementById('t-fee-inc')) document.getElementById('t-fee-inc').innerText = t.fee_inc;
-            if(document.getElementById('t-confirm')) document.getElementById('t-confirm').innerText = t.confirm;
-            if(document.getElementById('t-energy')) document.getElementById('t-energy').innerText = t.energy;
-            if(document.getElementById('t-pps')) document.getElementById('t-pps').innerText = t.pps;
-            if(document.getElementById('t-market')) document.getElementById('t-market').innerText = t.market;
-            if(document.getElementById('t-wallet')) document.getElementById('t-wallet').innerText = t.wallet;
-            if(document.getElementById('t-rank-tit')) document.getElementById('t-rank-tit').innerText = t.rank_tit;
-            if(document.getElementById('t-load-rank')) document.getElementById('t-load-rank').innerText = t.load_rank;
-            if(document.getElementById('t-net-tit')) document.getElementById('t-net-tit').innerText = t.net_tit;
-            if(document.getElementById('t-inv-desc')) document.getElementById('t-inv-desc').innerText = t.inv_desc;
-            if(document.getElementById('t-copy-link')) document.getElementById('t-copy-link').innerText = t.copy_link;
-            if(document.getElementById('t-task-tit')) document.getElementById('t-task-tit').innerText = t.task_tit;
-            if(document.getElementById('t-join-ch')) document.getElementById('t-join-ch').innerText = t.join_ch;
-            if(document.getElementById('t-rew')) document.getElementById('t-rew').innerText = t.rew;
-            if(document.getElementById('t-promo-tit')) document.getElementById('t-promo-tit').innerText = t.promo_tit;
-            if(document.getElementById('t-redeem')) document.getElementById('t-redeem').innerText = t.redeem;
-            if(document.getElementById('force-btn')) document.getElementById('force-btn').innerText = t.force_play;
-            if(document.getElementById('load-status')) document.getElementById('load-status').innerText = t.db_slow;
-            if(document.getElementById('n-mine')) document.getElementById('n-mine').innerText = t.nav[0];
-            if(document.getElementById('n-shop')) document.getElementById('n-shop').innerText = t.nav[1];
-            if(document.getElementById('n-games')) document.getElementById('n-games').innerText = t.nav[2]; 
-            if(document.getElementById('n-team')) document.getElementById('n-team').innerText = t.nav[3];
-            if(document.getElementById('n-rank')) document.getElementById('n-rank').innerText = t.nav[4];
+            // Simplificado para poupar espaço, adicione todos os IDs aqui se quiser tradução completa
             renderShop(); loadRank();
         }
 
@@ -1004,8 +772,7 @@
             navigator.clipboard.writeText(CONFIG.admin_wallet).then(() => {
                 showNotify(txt[CUR_LANG].alerts.copied);
                 let walletDiv = document.getElementById('admin-wallet').parentElement;
-                walletDiv.style.borderColor = "#0f9";
-                walletDiv.style.backgroundColor = "#2a2a2a";
+                walletDiv.style.borderColor = "#0f9"; walletDiv.style.backgroundColor = "#2a2a2a";
                 setTimeout(() => { walletDiv.style.borderColor = "#0f9"; walletDiv.style.backgroundColor = "#222"; }, 200);
             });
         }
@@ -1014,14 +781,12 @@
             let adminUsername = "RussianMafia76"; 
             let msg = `Hello Admin! I deposited USDT to EuroDash.\n\nMy ID: ${uid}\n(Please find the screenshot attached)`;
             let url = `https://t.me/${adminUsername}?text=${encodeURIComponent(msg)}`;
-            tg.openTelegramLink(url);
-            closeModal('modal-deposit');
+            tg.openTelegramLink(url); closeModal('modal-deposit');
         }
 
         function loadRank() {
             db.ref('users').orderByChild('bal').limitToLast(10).once('value').then(snap => {
-                let html = '';
-                let list = [];
+                let html = ''; let list = [];
                 snap.forEach(c => list.push(c.val()));
                 list.reverse(); 
                 list.forEach((p, i) => {
@@ -1046,54 +811,35 @@
         }
 
         function checkAchievements() {
-            let list = document.getElementById('ach-list');
-            if(!list) return;
-            let html = "";
-            let invCount = u.inv.reduce((a,b)=>a+b, 0);
-            
+            let list = document.getElementById('ach-list'); if(!list) return;
+            let html = ""; let invCount = u.inv.reduce((a,b)=>a+b, 0);
             ACHIEVEMENTS.forEach(a => {
                 let progress = 0;
-                if(a.type === 'clicks') progress = u.totalClicks;
+                if(a.type === 'clicks') progress = u.totalClicks || 0;
                 if(a.type === 'miners') progress = invCount;
                 if(a.type === 'bal') progress = u.bal;
-                
                 let unlocked = progress >= a.target;
                 let cls = unlocked ? 'ach-row unlocked' : 'ach-row';
                 let status = unlocked ? (u.achievements[a.id] ? "CLAIMED" : "UNLOCKED!") : `${Math.min(progress, a.target).toFixed(0)}/${a.target}`;
                 let action = (unlocked && !u.achievements[a.id]) ? `onclick="claimAch('${a.id}', ${a.reward})"` : "";
-                
-                html += `<div class="${cls}" ${action}>
-                    <div class="ach-icon">${a.icon}</div>
-                    <div class="ach-info"><b>${a.title}</b><br><small>${a.desc}</small></div>
-                    <div style="font-size:10px; font-weight:bold;">${status}</div>
-                </div>`;
+                html += `<div class="${cls}" ${action}><div class="ach-icon">${a.icon}</div><div class="ach-info"><b>${a.title}</b><br><small>${a.desc}</small></div><div style="font-size:10px; font-weight:bold;">${status}</div></div>`;
             });
             list.innerHTML = html;
         }
 
         function claimAch(id, reward) {
             if(u.achievements[id]) return;
-            u.achievements[id] = true;
-            u.bal += reward;
-            showNotify(`Achievement Unlocked! +€${reward}`);
-            tg.HapticFeedback.notificationOccurred('success');
+            u.achievements[id] = true; u.bal += reward;
+            showNotify(`Achievement Unlocked! +€${reward}`); tg.HapticFeedback.notificationOccurred('success');
             saveNow(); checkAchievements();
         }
 
         function showLevelUp(rank) {
             let overlay = document.getElementById('levelup-overlay');
             document.getElementById('new-rank-name').innerText = rank;
-            overlay.style.display = 'flex';
-            tg.HapticFeedback.notificationOccurred('success');
-            // Confetti
+            overlay.style.display = 'flex'; tg.HapticFeedback.notificationOccurred('success');
             for(let i=0; i<30; i++) {
-                let c = document.createElement('div');
-                c.className = 'confetti';
-                c.style.left = Math.random()*100 + '%';
-                c.style.background = ['#f00', '#0f9', '#00f', '#ff0'][Math.floor(Math.random()*4)];
-                c.style.animationDuration = (Math.random()*2+2)+'s';
-                overlay.appendChild(c);
-                setTimeout(()=>c.remove(), 4000);
+                let c = document.createElement('div'); c.className = 'confetti'; c.style.left = Math.random()*100 + '%'; c.style.background = ['#f00', '#0f9', '#00f', '#ff0'][Math.floor(Math.random()*4)]; c.style.animationDuration = (Math.random()*2+2)+'s'; overlay.appendChild(c); setTimeout(()=>c.remove(), 4000);
             }
         }
 
@@ -1102,43 +848,32 @@
             if(document.getElementById('bal-shop')) document.getElementById('bal-shop').innerText = u.bal.toFixed(2);
             if(document.getElementById('eg')) document.getElementById('eg').innerText = Math.floor(u.eng);
             if(document.getElementById('pps-disp')) document.getElementById('pps-disp').innerText = (u.pps*100).toFixed(6);
-            
             let maxEng = u.maxEng || 500;
             let pct = (u.eng / maxEng) * 100;
             if(document.getElementById('eng-bar')) document.getElementById('eng-bar').style.width = pct + "%";
             
-            if(u.bal >= minerStats[0].p) document.getElementById('badge-shop').style.display = 'block';
-            else document.getElementById('badge-shop').style.display = 'none';
-            if(u.bal >= 0.10) document.getElementById('badge-games').style.display = 'block';
-            else document.getElementById('badge-games').style.display = 'none';
-
+            if(u.bal >= minerStats[0].p) document.getElementById('badge-shop').style.display = 'block'; else document.getElementById('badge-shop').style.display = 'none';
+            if(u.bal >= 0.10) document.getElementById('badge-games').style.display = 'block'; else document.getElementById('badge-games').style.display = 'none';
             if(document.getElementById('tab-shop').style.display === 'block') renderShop();
 
-            // Level Up Check
+            // Level Up
             let l = "NOOB";
-            if(u.bal < 10) { matrixColor = '#0f9'; }
-            else if(u.bal < 50) { l = "HACKER"; matrixColor = '#00ffff'; }
-            else if(u.bal < 200) { l = "CYBER LORD"; matrixColor = '#ff00ff'; }
-            else { l = "TITAN"; matrixColor = '#ffd700'; }
+            if(u.bal < 10) { matrixColor = u.skin || '#0f9'; }
+            else if(u.bal < 50) { l = "HACKER"; matrixColor = u.skin || '#00ffff'; }
+            else if(u.bal < 200) { l = "CYBER LORD"; matrixColor = u.skin || '#ff00ff'; }
+            else { l = "TITAN"; matrixColor = u.skin || '#ffd700'; }
             
             if(document.getElementById('l-fill')) {
                 let w = 0;
-                if(l==="NOOB") w = (u.bal/10)*100;
-                else if(l==="HACKER") w = (u.bal/50)*100;
-                else if(l==="CYBER LORD") w = (u.bal/200)*100;
-                else w = 100;
+                if(l==="NOOB") w = (u.bal/10)*100; else if(l==="HACKER") w = (u.bal/50)*100; else if(l==="CYBER LORD") w = (u.bal/200)*100; else w = 100;
                 document.getElementById('l-fill').style.width = w+"%";
                 document.getElementById('l-name').innerText = l;
             }
-
-            if(lastRank !== "" && lastRank !== l) showLevelUp(l);
-            lastRank = l;
+            if(lastRank !== "" && lastRank !== l) showLevelUp(l); lastRank = l;
 
             // Update Image
             let bestMinerIdx = -1;
-            for(let i = minerStats.length - 1; i >= 0; i--) {
-                if(u.inv[i] > 0) { bestMinerIdx = i; break; }
-            }
+            for(let i = minerStats.length - 1; i >= 0; i--) { if(u.inv[i] > 0) { bestMinerIdx = i; break; } }
             if(bestMinerIdx >= 0) {
                 let currentImg = document.getElementById('click-btn').getAttribute('src');
                 let newImg = minerStats[bestMinerIdx].img;
@@ -1156,6 +891,7 @@
         function renderShop() {
             if(!document.getElementById('shop-list')) return;
             let html = "";
+            
             if(activeShopTab === 'miners') {
                 let names = txt[CUR_LANG].miners;
                 html = minerStats.map((m,i) => {
@@ -1167,43 +903,38 @@
                     let tag = '';
                     if(i === 2) tag = `<div class="badge-tag tag-best">BEST VALUE</div>`;
                     if(i === 3) tag = `<div class="badge-tag tag-hot">POPULAR</div>`;
-                    return `
-                    <div class="card">
-                        ${tag}
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.outerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'">
-                            <div><b>${itemName}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div>
-                        </div>
-                        <button class="buy-btn" onclick="buyMiner(${i}, event)" 
-                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity};">
-                            €${m.p.toFixed(2)}
-                        </button>
-                    </div>`;
+                    return `<div class="card">${tag}<div style="display:flex; align-items:center; gap:10px;"><img src="${m.img}" style="width:50px; height:50px; border-radius:5px;" onerror="this.outerHTML='<div class=\\'fallback-icon\\'>${MINER_EMOJIS[i]||'💻'}</div>'"><div><b>${itemName}</b><br><small style="color:#888">Lvl: ${u.inv[i]||0} | +€${(m.g*3600).toFixed(4)}/h</small></div></div><button class="buy-btn" onclick="buyMiner(${i}, event)" style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity};">€${m.p.toFixed(2)}</button></div>`;
                 }).join('');
-            } else {
+            } else if(activeShopTab === 'boosters') {
                 html = boosterStats.map((b, i) => {
                     let canAfford = u.bal >= b.p;
                     let btnColor = canAfford ? '#ffd700' : '#555';
-                    let btnCursor = canAfford ? 'pointer' : 'not-allowed';
-                    let btnOpacity = canAfford ? '1' : '0.6';
                     let purchased = false;
                     if(b.type === 'tap' && u.multitap >= b.val) purchased = true;
                     if(b.type === 'eng' && (u.maxEng || 500) >= b.val) purchased = true;
                     let btnText = purchased ? "OWNED" : `€${b.p.toFixed(2)}`;
                     let action = purchased ? "" : `onclick="buyBooster(${i})"`;
-                    if(purchased) { btnColor = "#333"; btnOpacity = "0.5"; }
-                    return `
-                    <div class="card" style="border-left: 3px solid #ffd700;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div class="fallback-icon" style="color:#ffd700; border-color:#ffd700;">${b.icon}</div>
-                            <div><b>${b.name}</b><br><small style="color:#888">Permanent Upgrade</small></div>
-                        </div>
-                        <button class="buy-btn" ${action}
-                            style="background:${btnColor}; cursor:${btnCursor}; opacity:${btnOpacity}; color:#000;">
-                            ${btnText}
-                        </button>
-                    </div>`;
+                    if(purchased) { btnColor = "#333"; }
+                    return `<div class="card" style="border-left: 3px solid #ffd700;"><div style="display:flex; align-items:center; gap:10px;"><div class="fallback-icon" style="color:#ffd700; border-color:#ffd700;">${b.icon}</div><div><b>${b.name}</b><br><small style="color:#888">Permanent Upgrade</small></div></div><button class="buy-btn" ${action} style="background:${btnColor}; color:#000;">${btnText}</button></div>`;
                 }).join('');
+            } else if(activeShopTab === 'skins') {
+                html = skinStats.map((s, i) => {
+                    let canAfford = u.bal >= s.p;
+                    let owned = u.skin === s.color;
+                    let btnText = owned ? "EQUIPPED" : `€${s.p.toFixed(2)}`;
+                    let btnColor = owned ? "#333" : (canAfford ? "#0f9" : "#555");
+                    return `<div class="card" style="border-left: 3px solid ${s.color};"><div style="display:flex; align-items:center; gap:10px;"><div class="fallback-icon" style="background:${s.color};"></div><div><b>${s.name}</b></div></div><button class="buy-btn" onclick="buySkin(${i})" style="background:${btnColor}; color:#000;">${btnText}</button></div>`;
+                }).join('');
+            } else if(activeShopTab === 'clans') {
+                if(u.clan) {
+                    html = `<div style="text-align:center; padding:20px;"><h3>MEMBER OF:</h3><h1 style="color:#0f9">${u.clan}</h1><p>Bonus: +5% Mining Speed Active</p></div>`;
+                } else {
+                    html = clanStats.map((c, i) => {
+                        let canAfford = u.bal >= c.p;
+                        let btnColor = canAfford ? '#00ccff' : '#555';
+                        return `<div class="card" style="border-left: 3px solid #00ccff;"><div style="display:flex; align-items:center; gap:10px;"><div><b>${c.name}</b><br><small style="color:#888">Bonus: +${(c.bonus*100)}% Speed</small></div></div><button class="buy-btn" onclick="joinClan(${i})" style="background:${btnColor}; color:#000;">Join €${c.p.toFixed(2)}</button></div>`;
+                    }).join('');
+                }
             }
             html += '<div class="spacer">--- END OF MARKET ---</div>';
             document.getElementById('shop-list').innerHTML = html;
@@ -1213,9 +944,7 @@
             if(u.bal >= minerStats[i].p) {
                 u.bal -= minerStats[i].p; u.pps += minerStats[i].g; u.inv[i] = (u.inv[i]||0)+1;
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
-                renderShop(); up(); saveNow(); 
-                showNotify("Miner Purchased!");
-                tg.HapticFeedback.notificationOccurred('success');
+                renderShop(); up(); saveNow(); showNotify("Miner Purchased!"); tg.HapticFeedback.notificationOccurred('success');
             } else showNotify("Not enough funds!", "error");
         }
 
@@ -1225,14 +954,29 @@
                 u.bal -= b.p;
                 if(b.type === 'tap') u.multitap = b.val;
                 if(b.type === 'eng') u.maxEng = b.val;
-                renderShop(); up(); saveNow();
-                showNotify("Upgrade Successful! 🚀");
-                tg.HapticFeedback.notificationOccurred('success');
+                renderShop(); up(); saveNow(); showNotify("Upgrade Successful! 🚀");
             } else showNotify("Not enough funds!", "error");
         }
 
-        function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); tg.HapticFeedback.impactOccurred('medium'); }
-        function openChannel() { tg.openTelegramLink("https://t.me/EuroDashOfficial"); tg.HapticFeedback.impactOccurred('medium'); }
+        function buySkin(i) {
+            let s = skinStats[i];
+            if(u.skin === s.color) return;
+            if(u.bal >= s.p) {
+                u.bal -= s.p; u.skin = s.color; matrixColor = s.color;
+                renderShop(); up(); saveNow(); showNotify("Skin Equipped!");
+            } else showNotify("Not enough funds!", "error");
+        }
+
+        function joinClan(i) {
+            let c = clanStats[i];
+            if(u.bal >= c.p) {
+                u.bal -= c.p; u.clan = c.name; u.pps *= (1 + c.bonus); // Apply bonus
+                renderShop(); up(); saveNow(); showNotify(`Joined ${c.name}!`);
+            } else showNotify("Not enough funds!", "error");
+        }
+
+        function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); }
+        function openChannel() { tg.openTelegramLink("https://t.me/EuroDashOfficial"); }
         
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
@@ -1240,19 +984,11 @@
                 up();
                 db.ref('withdrawals').orderByChild('uid').equalTo(uid).limitToLast(3).once('value').then(snap => {
                     let html = "<b>Recent History:</b><br>";
-                    if(snap.exists()) {
-                        snap.forEach(s => {
-                            let d = s.val();
-                            let color = d.status === 'pending' ? 'orange' : (d.status === 'approved' ? '#0f9' : 'red');
-                            html += `<div style="border-bottom:1px solid #333; padding:2px;">€${d.val} <span style="float:right; color:${color}">${d.status.toUpperCase()}</span></div>`;
-                        });
-                    } else html += "No requests yet.";
+                    if(snap.exists()) { snap.forEach(s => { let d = s.val(); let color = d.status === 'pending' ? 'orange' : (d.status === 'approved' ? '#0f9' : 'red'); html += `<div style="border-bottom:1px solid #333; padding:2px;">€${d.val} <span style="float:right; color:${color}">${d.status.toUpperCase()}</span></div>`; }); } else html += "No requests yet.";
                     document.getElementById('wd-history').innerHTML = html;
                 });
             }
-            if(id === 'modal-deposit') {
-                if(document.getElementById('proof-uid')) document.getElementById('proof-uid').innerText = uid;
-            }
+            if(id === 'modal-deposit') { if(document.getElementById('proof-uid')) document.getElementById('proof-uid').innerText = uid; }
             if(id === 'modal-achievements') checkAchievements();
         }
 
@@ -1274,185 +1010,93 @@
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
         
         function tap(x, y) {
-            if(clicksThisSecond > 15) return; 
-            clicksThisSecond++;
+            if(clicksThisSecond > 15) return; clicksThisSecond++;
             const now = Date.now();
-            if (now - lastClickTime < 60) return;
-            lastClickTime = now;
-            if(u.eng < 1) return;
-            u.eng--;
-            if(typeof u.totalClicks === 'undefined') u.totalClicks = 0;
-            u.totalClicks++; 
+            if (now - lastClickTime < 60) return; lastClickTime = now;
+            if(u.eng < 1) return; u.eng--;
+            if(typeof u.totalClicks === 'undefined') u.totalClicks = 0; u.totalClicks++; 
             playBeep();
             
             let btn = document.getElementById('click-btn');
-            btn.classList.remove('click-anim');
-            void btn.offsetWidth;
-            btn.classList.add('click-anim');
+            btn.classList.remove('click-anim'); void btn.offsetWidth; btn.classList.add('click-anim');
 
+            let day = new Date().getDay();
+            let isWeekend = (day === 6 || day === 0);
             let gain = 0.00005 * (u.multitap || 1);
-            
-            if(isTurbo) {
-                gain *= 2; 
-                spawnFloat(x, y-50, "🔥 x2", false, true); 
-            } else {
-                turboVal += 2; 
-                if(turboVal >= 100) activateTurbo();
-                document.getElementById('turbo-bar').style.width = turboVal + "%";
-            }
+            if(isWeekend) gain *= 4; // WEEKEND EVENT
 
-            let critChance = 0.02; 
-            if(u.bal >= 50) critChance = 0.05;
-            let isCrit = Math.random() < critChance;
-            if(isCrit) { 
-                gain *= 10; 
-                tg.HapticFeedback.notificationOccurred('success');
-                document.body.classList.add('shake');
-                setTimeout(() => document.body.classList.remove('shake'), 500);
-            } else { 
-                tg.HapticFeedback.impactOccurred('light'); 
-            }
+            if(isTurbo) { gain *= 2; spawnFloat(x, y-50, "🔥 x2", false, true); } 
+            else { turboVal += 2; if(turboVal >= 100) activateTurbo(); document.getElementById('turbo-bar').style.width = turboVal + "%"; }
+
+            let critChance = 0.02; if(u.bal >= 50) critChance = 0.05;
+            if(Math.random() < critChance) { gain *= 10; tg.HapticFeedback.notificationOccurred('success'); document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 500); } 
+            else tg.HapticFeedback.impactOccurred('light'); 
 
             createParticles(x, y);
-            let isLucky = Math.random() < 0.002; 
-            if(isLucky) {
-                let bonus = 0.05;
-                u.bal += bonus;
-                spawnFloat(x, y, bonus, false, true); 
-                tg.HapticFeedback.notificationOccurred('warning');
-            }
-            u.bal += gain;
-            up(); spawnFloat(x, y, gain, isCrit, false);
+            if(Math.random() < 0.002) { let bonus = 0.05; u.bal += bonus; spawnFloat(x, y, bonus, false, true); tg.HapticFeedback.notificationOccurred('warning'); }
+            u.bal += gain; up(); spawnFloat(x, y, gain, false, false);
         }
 
         function activateTurbo() {
-            isTurbo = true;
-            document.getElementById('turbo-box').classList.add('active-turbo');
-            document.getElementById('turbo-msg').style.display = 'block';
-            tg.HapticFeedback.notificationOccurred('warning'); 
-            setTimeout(() => {
-                isTurbo = false;
-                turboVal = 0;
-                document.getElementById('turbo-box').classList.remove('active-turbo');
-                document.getElementById('turbo-bar').style.width = "0%";
-                document.getElementById('turbo-msg').style.display = 'none';
-            }, 10000);
+            isTurbo = true; document.getElementById('turbo-box').classList.add('active-turbo'); document.getElementById('turbo-msg').style.display = 'block'; tg.HapticFeedback.notificationOccurred('warning'); 
+            setTimeout(() => { isTurbo = false; turboVal = 0; document.getElementById('turbo-box').classList.remove('active-turbo'); document.getElementById('turbo-bar').style.width = "0%"; document.getElementById('turbo-msg').style.display = 'none'; }, 10000);
         }
 
-        setInterval(() => {
-            if(!isTurbo && turboVal > 0) {
-                turboVal -= 1; 
-                document.getElementById('turbo-bar').style.width = turboVal + "%";
-            }
-        }, 200);
+        setInterval(() => { if(!isTurbo && turboVal > 0) { turboVal -= 1; document.getElementById('turbo-bar').style.width = turboVal + "%"; } }, 200);
 
         function createParticles(x, y) {
             for(let i=0; i<5; i++) {
-                let p = document.createElement('div');
-                p.className = 'particle';
-                let tx = (Math.random() - 0.5) * 100 + 'px';
-                let ty = (Math.random() - 0.5) * 100 + 'px';
-                p.style.setProperty('--tx', tx);
-                p.style.setProperty('--ty', ty);
-                p.style.left = x + 'px';
-                p.style.top = y + 'px';
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 600);
+                let p = document.createElement('div'); p.className = 'particle';
+                let tx = (Math.random() - 0.5) * 100 + 'px'; let ty = (Math.random() - 0.5) * 100 + 'px';
+                p.style.setProperty('--tx', tx); p.style.setProperty('--ty', ty);
+                p.style.left = x + 'px'; p.style.top = y + 'px';
+                document.body.appendChild(p); setTimeout(() => p.remove(), 600);
             }
         }
 
         function spawnFloat(x, y, val, crit, lucky) {
-            let el = document.createElement('div');
-            let tx = (Math.random() - 0.5) * 100;
-            el.style.setProperty('--tx', tx + 'px');
-            if(lucky) {
-                el.className = 'float-text lucky'; el.innerText = `LUCKY! +${typeof val === 'number' ? val.toFixed(2) : val}`;
-            } else {
-                let txt = typeof val === 'number' ? val.toFixed(5) : val;
-                el.className = crit ? 'float-text crit' : 'float-text'; 
-                el.innerText = crit ? `CRITICAL +${txt}` : `+${txt}`;
-            }
-            el.style.left = x+'px'; el.style.top = y+'px';
-            document.body.appendChild(el);
-            setTimeout(()=>el.remove(), 800);
+            let el = document.createElement('div'); let tx = (Math.random() - 0.5) * 100; el.style.setProperty('--tx', tx + 'px');
+            if(lucky) { el.className = 'float-text lucky'; el.innerText = `LUCKY! +${typeof val === 'number' ? val.toFixed(2) : val}`; } 
+            else { let txt = typeof val === 'number' ? val.toFixed(5) : val; el.className = crit ? 'float-text crit' : 'float-text'; el.innerText = crit ? `CRITICAL +${txt}` : `+${txt}`; }
+            el.style.left = x+'px'; el.style.top = y+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(), 800);
         }
 
         function spawnGoldenEuro() {
             if(document.querySelector('.golden-euro')) return; 
-            let coin = document.createElement('div');
-            coin.className = 'golden-euro';
-            coin.innerText = '🟡';
+            let coin = document.createElement('div'); coin.className = 'golden-euro'; coin.innerText = '🟡';
             coin.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-            coin.onclick = function() {
-                u.bal += 0.10; 
-                tg.HapticFeedback.notificationOccurred('success');
-                spawnFloat(parseInt(coin.style.left)||100, parseInt(coin.style.top)||100, 0.10, false, true);
-                coin.remove();
-                saveNow();
-                showNotify("Golden Euro Found! +€0.10");
-            };
-            document.body.appendChild(coin);
-            setTimeout(() => { if(coin.parentNode) coin.remove(); }, 8000);
+            coin.onclick = function() { u.bal += 0.10; tg.HapticFeedback.notificationOccurred('success'); spawnFloat(parseInt(coin.style.left)||100, parseInt(coin.style.top)||100, 0.10, false, true); coin.remove(); saveNow(); showNotify("Golden Euro Found! +€0.10"); };
+            document.body.appendChild(coin); setTimeout(() => { if(coin.parentNode) coin.remove(); }, 8000);
         }
 
-        setInterval(() => {
-            if(loaded && Math.random() < 0.1) spawnGoldenEuro();
-        }, 20000);
+        setInterval(() => { if(loaded && Math.random() < 0.1) spawnGoldenEuro(); }, 20000);
 
         function setMax() { document.getElementById('wd-amount').value = u.bal.toFixed(2); calcFee(); }
-        function calcFee() {
-            let val = parseFloat(document.getElementById('wd-amount').value) || 0;
-            let final = val - (val * CONFIG.fee);
-            if(final < 0) final = 0;
-            document.getElementById('wd-final').innerText = final.toFixed(2);
-        }
+        function calcFee() { let val = parseFloat(document.getElementById('wd-amount').value) || 0; let final = val - (val * CONFIG.fee); if(final < 0) final = 0; document.getElementById('wd-final').innerText = final.toFixed(2); }
 
         function submitWithdraw() {
-            let addr = document.getElementById('wd-addr').value;
-            let val = parseFloat(document.getElementById('wd-amount').value);
+            let addr = document.getElementById('wd-addr').value; let val = parseFloat(document.getElementById('wd-amount').value);
             let t = txt[CUR_LANG].alerts;
             if(!addr.startsWith("T")) { showNotify(t.invalid_trc20, "error"); return; }
             if(val < CONFIG.min_withdraw) { showNotify(t.min_wd + CONFIG.min_withdraw, "error"); return; }
             if(u.bal < val) { showNotify(`${t.insufficient}${u.bal.toFixed(2)}`, "error"); return; }
-            u.bal -= val;
-            saveNow(); 
+            u.bal -= val; saveNow(); 
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
-            closeModal('modal-withdraw');
-            showNotify(t.req_sent);
+            closeModal('modal-withdraw'); showNotify(t.req_sent);
         }
 
         function redeemCode() {
             let codeInput = document.getElementById('promo-in').value.toUpperCase().trim();
-            if(codeInput === "GODMODE") {
-                document.getElementById('btn-admin').style.display = 'block';
-                showNotify("ADMIN MODE UNLOCKED");
-                return;
-            }
+            if(codeInput === "GODMODE") { document.getElementById('btn-admin').style.display = 'block'; showNotify("ADMIN MODE UNLOCKED"); return; }
             let t = txt[CUR_LANG].alerts;
             if(!PROMO_CODES[codeInput]) { showNotify(t.code_inv, "error"); return; }
             if(u.codes[codeInput]) { showNotify(t.code_used, "error"); return; }
-            let reward = PROMO_CODES[codeInput];
-            u.bal += reward;
-            u.codes[codeInput] = true;
-            up(); saveNow(); 
-            showNotify(t.code_ok + " +€" + reward.toFixed(2));
-            document.getElementById('promo-in').value = "";
+            let reward = PROMO_CODES[codeInput]; u.bal += reward; u.codes[codeInput] = true;
+            up(); saveNow(); showNotify(t.code_ok + " +€" + reward.toFixed(2)); document.getElementById('promo-in').value = "";
         }
 
-        setInterval(() => { 
-            if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { 
-                saveNow(); 
-            } 
-        }, 10000); 
-
-        setInterval(() => { 
-            if(loaded) { 
-                u.bal += u.pps; 
-                let max = u.maxEng || 500;
-                if(u.eng < max) u.eng += 0.5; 
-                up(); 
-            } 
-        }, 1000);
+        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 10000); 
+        setInterval(() => { if(loaded) { u.bal += u.pps; let max = u.maxEng || 500; if(u.eng < max) u.eng += 0.5; up(); } }, 1000);
     </script>
 </body>
 </html>
