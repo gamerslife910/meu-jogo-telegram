@@ -106,6 +106,32 @@
         
         /* ESPAÇO EXTRA NO FUNDO DA LISTA */
         .spacer { height: 250px; width: 100%; text-align:center; padding-top:20px; color:#333; font-size:10px; }
+
+        /* === NOVAS FUNCIONALIDADES VISUAIS (JUICE) === */
+        /* TREMOR DE ECRÃ (SCREEN SHAKE) */
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* BARRA DE OVERCLOCK (TURBO) */
+        .turbo-con { 
+            width: 80%; margin: 10px auto; background: #111; height: 15px; 
+            border-radius: 10px; border: 1px solid #333; position: relative; overflow: hidden;
+        }
+        .turbo-fill { 
+            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00); 
+            width: 0%; transition: width 0.1s linear; 
+        }
+        .turbo-text {
+            position: absolute; width: 100%; top: 0; left: 0; line-height: 15px;
+            font-size: 10px; color: #000; font-weight: bold; display: none;
+        }
+        .active-turbo .turbo-fill { width: 100% !important; animation: drain 10s linear forwards; }
+        @keyframes drain { from { width: 100%; } to { width: 0%; } }
     </style>
 </head>
 <body>
@@ -267,6 +293,12 @@
 
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
+        
+        <div class="turbo-con" id="turbo-box">
+            <div class="turbo-fill" id="turbo-bar"></div>
+            <div class="turbo-text" id="turbo-msg">🔥 OVERCLOCK ACTIVE (2X) 🔥</div>
+        </div>
+
         <div style="margin-bottom:20px;">
             <div class="lvl-con"><div class="lvl-fill" id="l-fill"></div></div>
             <button class="info-btn" onclick="openModal('modal-levels')">?</button>
@@ -526,6 +558,10 @@
         let clicksThisSecond = 0;
         setInterval(() => { clicksThisSecond = 0; }, 1000); // RESET ANTI-CHEAT TIMER
         
+        // VARS DO OVERCLOCK
+        let turboVal = 0;
+        let isTurbo = false;
+
         window.finishLoad = function() {
             if(loaded) return;
             loaded = true;
@@ -1028,14 +1064,35 @@
             btn.classList.add('click-anim');
 
             let gain = 0.00005;
-            let critChance = 0;
-            if(u.bal >= 10) critChance = 0.02;
+            
+            // === LÓGICA TURBO/OVERCLOCK ===
+            if(isTurbo) {
+                gain *= 2; 
+                spawnFloat(x, y-50, "🔥 x2", false, true); 
+            } else {
+                turboVal += 2; 
+                if(turboVal >= 100) {
+                    activateTurbo();
+                }
+                document.getElementById('turbo-bar').style.width = turboVal + "%";
+            }
+
+            // CRÍTICO & SCREEN SHAKE
+            let critChance = 0.02; // Base
             if(u.bal >= 50) critChance = 0.05;
-            if(u.bal >= 200) critChance = 0.10;
+            
             let isCrit = Math.random() < critChance;
             
-            if(isCrit) { gain *= 10; tg.HapticFeedback.notificationOccurred('success'); } 
-            else { tg.HapticFeedback.impactOccurred('light'); }
+            if(isCrit) { 
+                gain *= 10; 
+                tg.HapticFeedback.notificationOccurred('success');
+                
+                // ADICIONA O TREMOR NO ECRÃ
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 500);
+            } else { 
+                tg.HapticFeedback.impactOccurred('light'); 
+            }
 
             let isLucky = Math.random() < 0.002; 
             if(isLucky) {
@@ -1049,6 +1106,31 @@
             up(); spawnFloat(x, y, gain, isCrit, false);
         }
 
+        // FUNÇÃO PARA ATIVAR O MODO TURBO
+        function activateTurbo() {
+            isTurbo = true;
+            document.getElementById('turbo-box').classList.add('active-turbo');
+            document.getElementById('turbo-msg').style.display = 'block';
+            tg.HapticFeedback.notificationOccurred('warning'); 
+            
+            // Desativa após 10 segundos
+            setTimeout(() => {
+                isTurbo = false;
+                turboVal = 0;
+                document.getElementById('turbo-box').classList.remove('active-turbo');
+                document.getElementById('turbo-bar').style.width = "0%";
+                document.getElementById('turbo-msg').style.display = 'none';
+            }, 10000);
+        }
+
+        // REDUZ A BARRA SE O JOGADOR PARAR DE CLICAR (Decay)
+        setInterval(() => {
+            if(!isTurbo && turboVal > 0) {
+                turboVal -= 1; // Perde 1% de turbo a cada instante se parar
+                document.getElementById('turbo-bar').style.width = turboVal + "%";
+            }
+        }, 200);
+
         function spawnFloat(x, y, val, crit, lucky) {
             let el = document.createElement('div');
             // Randomize Direction
@@ -1056,9 +1138,11 @@
             el.style.setProperty('--tx', tx + 'px');
             
             if(lucky) {
-                el.className = 'float-text lucky'; el.innerText = `LUCKY! +${val.toFixed(2)}`;
+                el.className = 'float-text lucky'; el.innerText = `LUCKY! +${typeof val === 'number' ? val.toFixed(2) : val}`;
             } else {
-                el.className = crit ? 'float-text crit' : 'float-text'; el.innerText = crit ? `CRITICAL +${val.toFixed(5)}` : `+${val.toFixed(5)}`;
+                let txt = typeof val === 'number' ? val.toFixed(5) : val;
+                el.className = crit ? 'float-text crit' : 'float-text'; 
+                el.innerText = crit ? `CRITICAL +${txt}` : `+${txt}`;
             }
             el.style.left = x+'px'; el.style.top = y+'px';
             document.body.appendChild(el);
