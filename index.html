@@ -246,20 +246,32 @@
     <div id="modal-deposit" class="modal">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('modal-deposit')">&times;</span>
-            <h3 style="color:#00ccff" id="t-dep-tit">DEPOSIT (USDT)</h3>
-            <p style="font-size:12px; color:#aaa;" id="t-dep-info">Send USDT (TRC20) to this address:</p>
-            <div style="background:#fff; padding:10px; display:inline-block; border-radius:10px; margin:10px 0;">
-                <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'">
+            <h3 style="color:#00ccff">DEPOSIT (USDT)</h3>
+            
+            <p style="font-size:12px; color:#aaa; margin-bottom: 5px;">1. Send USDT (TRC20) to:</p>
+            
+            <div style="background:#fff; padding:5px; display:inline-block; border-radius:10px; margin-bottom:10px;">
+                <img id="qr-code" src="" width="120" height="120" onerror="this.style.display='none'" style="display:block;">
             </div>
-            <div style="background:#222; padding:10px; font-size:10px; word-break:break-all; color:#0f9; border:1px dashed #555; user-select:text;" id="admin-wallet">...</div>
-            <button class="buy-btn" style="margin-top:5px; font-size:10px;" onclick="copyWallet()" id="t-copy">COPY ADDRESS</button>
+
+            <div onclick="copyWallet()" style="background:#222; padding:10px; border-radius:8px; border:1px dashed #0f9; cursor:pointer;">
+                <p style="font-size:9px; color:#888; margin:0;">TAP TO COPY:</p>
+                <div style="font-size:10px; color:#fff; word-break:break-all; font-family:monospace; font-weight:bold;" id="admin-wallet">...</div>
+            </div>
+
             <hr style="border-color:#333; margin:15px 0;">
-            <p style="font-size:12px; color:#aaa;" id="t-hash-info">Paste Transaction Hash (TXID):</p>
-            <input type="text" id="dep-hash" class="inp" placeholder="Transaction Hash">
-            <button class="dep-btn" onclick="submitDeposit()" id="t-sent">I SENT IT</button>
+
+            <p style="font-size:12px; color:#aaa; margin-bottom: 10px;">2. Send proof to Admin:</p>
+
+            <button class="buy-btn" onclick="sendProof()" style="width:100%; padding:15px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                📸 SEND PROOF
+            </button>
+            
+            <p style="font-size:9px; color:#555; margin-top:10px;">
+                Your ID: <span id="proof-uid" style="color:#0f9">...</span>
+            </p>
         </div>
     </div>
-
     <div id="tab-core" class="tab" style="display:block;">
         <div id="balance" style="font-size:52px; font-weight:700; margin-top:20px;">€<span id="bal-val">0.00000</span></div>
         <div style="margin-bottom:20px;">
@@ -449,8 +461,6 @@
                 welcome: "WELCOME BACK", off_earn: "Offline Earnings:", collect: "COLLECT",
                 lvl_sys: "LEVEL SYSTEM", wd_tit: "WITHDRAW (TRC20)", wd_info: "Min: €1.00 | Fee: 2%",
                 avail: "Available:", receive: "You Receive:", fee_inc: "(Fees included)", confirm: "CONFIRM",
-                dep_tit: "DEPOSIT (USDT)", dep_info: "Send USDT (TRC20) to this address:", copy: "COPY ADDRESS",
-                hash_info: "Paste Transaction Hash (TXID):", sent: "I SENT IT",
                 energy: "ENERGY", pps: "PROFIT/SEC", market: "MARKET", wallet: "WALLET",
                 rank_tit: "TOP INVESTORS", load_rank: "Loading real data...", rank_off: "Offline (DB Error)", net_tit: "NETWORK",
                 inv_desc: "Invite friends & earn 5% of their mining!", copy_link: "COPY LINK",
@@ -459,7 +469,7 @@
                 nav: ["MINE", "SHOP", "GAMES", "TEAM", "RANK"],
                 miners: ["Micro Node", "Blade Rack", "Turbo Server", "Cyber Station", "Quantum Rig", "Neural Hub"],
                 alerts: {
-                    copied: "Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
+                    copied: "Address Copied!", invalid_trc20: "Invalid TRC20 Address!", min_wd: "Min withdraw is €",
                     insufficient: "❌ Insufficient Balance! You only have €", req_sent: "Request Sent!",
                     inv_hash: "Invalid Hash", dep_sub: "Deposit Submitted!", rew_rec: "Received!",
                     code_inv: "Invalid Code!", code_used: "Code already used!", code_ok: "Code Redeemed!", daily: "Day"
@@ -469,8 +479,6 @@
                 welcome: "BEM-VINDO DE VOLTA", off_earn: "Ganhos Offline:", collect: "RECEBER",
                 lvl_sys: "SISTEMA DE NÍVEIS", wd_tit: "LEVANTAR (TRC20)", wd_info: "Min: €1.00 | Taxa: 2%",
                 avail: "Disponível:", receive: "Recebes:", fee_inc: "(Taxas incluídas)", confirm: "CONFIRMAR",
-                dep_tit: "DEPOSITAR (USDT)", dep_info: "Envia USDT (TRC20) para este endereço:", copy: "COPIAR ENDEREÇO",
-                hash_info: "Cola o Hash da Transação (TXID):", sent: "JÁ ENVIEI",
                 energy: "ENERGIA", pps: "LUCRO/SEG", market: "MERCADO", wallet: "CARTEIRA",
                 rank_tit: "TOP INVESTIDORES", load_rank: "A carregar dados...", rank_off: "Offline (Erro DB)", net_tit: "REDE",
                 inv_desc: "Convida amigos e ganha 5% do que minerarem!", copy_link: "COPIAR LINK",
@@ -489,8 +497,6 @@
                 welcome: "С ВОЗВРАЩЕНИЕМ", off_earn: "Офлайн доход:", collect: "ЗАБРАТЬ",
                 lvl_sys: "СИСТЕМА УРОВНЕЙ", wd_tit: "ВЫВОД (TRC20)", wd_info: "Мин: €1.00 | Ком: 2%",
                 avail: "Доступно:", receive: "Вы получите:", fee_inc: "(С комиссией)", confirm: "ПОДТВЕРДИТЬ",
-                dep_tit: "ДЕПОЗИТ (USDT)", dep_info: "Отправьте USDT (TRC20) на адрес:", copy: "КОПИРОВАТЬ",
-                hash_info: "Вставьте хеш транзакции (TXID):", sent: "Я ОТПРАВИЛ",
                 energy: "ЭНЕРГИЯ", pps: "ПРИБЫЛЬ/СЕК", market: "РЫНОК", wallet: "КОШЕЛЕК",
                 rank_tit: "ТОП ИНВЕСТОРОВ", load_rank: "Загрузка данных...", rank_off: "Офлайн (Ошибка БД)", net_tit: "СЕТЬ",
                 inv_desc: "Пригласи друзей и получай 5%!", copy_link: "КОПИРОВАТЬ",
@@ -766,11 +772,7 @@
                 if(document.getElementById('t-receive')) document.getElementById('t-receive').innerText = t.receive;
                 if(document.getElementById('t-fee-inc')) document.getElementById('t-fee-inc').innerText = t.fee_inc;
                 if(document.getElementById('t-confirm')) document.getElementById('t-confirm').innerText = t.confirm;
-                if(document.getElementById('t-dep-tit')) document.getElementById('t-dep-tit').innerText = t.dep_tit;
-                if(document.getElementById('t-dep-info')) document.getElementById('t-dep-info').innerText = t.dep_info;
-                if(document.getElementById('t-copy')) document.getElementById('t-copy').innerText = t.copy;
-                if(document.getElementById('t-hash-info')) document.getElementById('t-hash-info').innerText = t.hash_info;
-                if(document.getElementById('t-sent')) document.getElementById('t-sent').innerText = t.sent;
+                // Removed old deposit texts since we hardcoded English in the new modal
                 if(document.getElementById('t-energy')) document.getElementById('t-energy').innerText = t.energy;
                 if(document.getElementById('t-pps')) document.getElementById('t-pps').innerText = t.pps;
                 if(document.getElementById('t-market')) document.getElementById('t-market').innerText = t.market;
@@ -790,7 +792,7 @@
                 // Nav
                 if(document.getElementById('n-mine')) document.getElementById('n-mine').innerText = t.nav[0];
                 if(document.getElementById('n-shop')) document.getElementById('n-shop').innerText = t.nav[1];
-                if(document.getElementById('n-games')) document.getElementById('n-games').innerText = t.nav[2]; // Fixed: Use Games Text
+                if(document.getElementById('n-games')) document.getElementById('n-games').innerText = t.nav[2]; 
                 if(document.getElementById('n-team')) document.getElementById('n-team').innerText = t.nav[3];
                 if(document.getElementById('n-rank')) document.getElementById('n-rank').innerText = t.nav[4];
                 
@@ -899,14 +901,28 @@
             document.getElementById('promo-in').value = "";
         }
 
-        function copyWallet() { navigator.clipboard.writeText(CONFIG.admin_wallet); tg.showAlert(txt[CUR_LANG].alerts.copied); }
-        function submitDeposit() {
-            let hash = document.getElementById('dep-hash').value;
-            let t = txt[CUR_LANG].alerts;
-            if(hash.length < 10) { tg.showAlert(t.inv_hash); return; }
-            db.ref('deposits/' + Date.now()).set({ uid: uid, username: u.username || uid, hash: hash, status: "pending" });
+        // ===== NOVA FUNCAO DE COPIAR (COM FEEDBACK VISUAL) =====
+        function copyWallet() {
+            navigator.clipboard.writeText(CONFIG.admin_wallet).then(() => {
+                tg.showAlert(txt[CUR_LANG].alerts.copied);
+                // Feedback visual na div da carteira
+                let walletDiv = document.getElementById('admin-wallet').parentElement;
+                walletDiv.style.borderColor = "#0f9";
+                walletDiv.style.backgroundColor = "#2a2a2a";
+                setTimeout(() => {
+                    walletDiv.style.borderColor = "#0f9"; // mantém verde ou volta ao original
+                    walletDiv.style.backgroundColor = "#222";
+                }, 200);
+            });
+        }
+
+        // ===== NOVA FUNCAO DE ENVIAR COMPROVATIVO =====
+        function sendProof() {
+            let adminUsername = "RussianMafia76"; // O teu username do Telegram
+            let msg = `Hello Admin! I deposited USDT to EuroDash.\n\nMy ID: ${uid}\n(Please find the screenshot attached)`;
+            let url = `https://t.me/${adminUsername}?text=${encodeURIComponent(msg)}`;
+            tg.openTelegramLink(url);
             closeModal('modal-deposit');
-            tg.showAlert(t.dep_sub);
         }
 
         function loadRank() {
@@ -922,7 +938,6 @@
                     html += `<div class="rank-row"><span style="width:30px; ${style}">#${i+1}</span>${img}<span style="flex-grow:1; text-align:left;">${p.name || "User"}</span><span style="color:#0f9; font-weight:bold;">€${money}</span></div>`;
                 });
                 if(document.getElementById('rank-list')) document.getElementById('rank-list').innerHTML = html;
-                if(document.getElementById('rank-list-games')) document.getElementById('rank-list-games').innerHTML = html;
             }).catch(e => { });
         }
 
@@ -964,9 +979,8 @@
         function renderShop() {
             let names = txt[CUR_LANG].miners;
             if(document.getElementById('shop-list')) {
-                // FIXED RENDER LOOP: NOW HANDLES MISSING NAMES GRACEFULLY
                 let listHtml = minerStats.map((m,i) => {
-                    let itemName = names[i] || "Secret Miner"; // Fallback name
+                    let itemName = names[i] || "Secret Miner"; 
                     return `
                     <div class="card">
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -977,7 +991,6 @@
                     </div>`;
                 }).join('');
                 
-                // ADD SPACER TO FIX SCROLL ISSUE
                 listHtml += '<div class="spacer">--- END OF MARKET ---</div>';
                 document.getElementById('shop-list').innerHTML = listHtml;
             }
@@ -992,13 +1005,14 @@
                 btn.style.background = "#fff";
                 setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
-                renderShop(); up(); saveNow(); // SAVE ON BUY
+                renderShop(); up(); saveNow(); 
                 tg.HapticFeedback.notificationOccurred('success');
             } else tg.HapticFeedback.notificationOccurred('error');
         }
 
         function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); tg.HapticFeedback.impactOccurred('medium'); }
         function openChannel() { tg.openTelegramLink("https://t.me/EuroDashOfficial"); tg.HapticFeedback.impactOccurred('medium'); }
+        
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'modal-withdraw') {
@@ -1015,23 +1029,27 @@
                     document.getElementById('wd-history').innerHTML = html;
                 });
             }
+            // ===== ATUALIZAR ID NO MODAL DE DEPOSITO =====
+            if(id === 'modal-deposit') {
+                if(document.getElementById('proof-uid')) document.getElementById('proof-uid').innerText = uid;
+            }
         }
+
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
         function sw(t) {
             if(t === 'admin') loadAdmin();
             document.querySelectorAll('.tab').forEach(e=>e.style.display='none');
             document.getElementById('tab-'+t).style.display='block';
             document.querySelectorAll('.n-btn').forEach(b=>b.classList.remove('active'));
             if(t !== 'admin') document.getElementById('nb-'+t).classList.add('active');
-            
-            // HAPTIC FEEDBACK ON TAB SWITCH
             tg.HapticFeedback.impactOccurred('light');
         }
+        
         function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
 
-        // REDUCED SAVE INTERVAL TO 1 SECOND (WAS 5)
         setInterval(() => { if(loaded) { u.bal += u.pps; if(u.eng<500) u.eng+=0.5; up(); } }, 1000);
-        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); // SAVE EVERY 1S
+        setInterval(() => { if(loaded && uid && !document.getElementById('rank-list').innerText.includes('Offline')) { saveNow(); } }, 1000); 
     </script>
 </body>
 </html>
