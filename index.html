@@ -41,7 +41,7 @@
         @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
 
         .main-img-con { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; }
+        .main-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,255,153,0.3); box-shadow: 0 0 30px rgba(0,255,153,0.2); cursor: pointer; z-index: 10; -webkit-user-drag: none; transition: transform 0.1s; }
         .main-img.click-anim { animation: pulseWave 0.15s ease-out; }
         @keyframes pulseWave { 0% { transform: scale(0.96); border-color:#fff; } 100% { transform: scale(1); border-color:rgba(0,255,153,0.3); } }
 
@@ -107,7 +107,13 @@
         /* ESPAÇO EXTRA NO FUNDO DA LISTA */
         .spacer { height: 250px; width: 100%; text-align:center; padding-top:20px; color:#333; font-size:10px; }
 
-        /* === NOVAS FUNCIONALIDADES VISUAIS (JUICE) === */
+        /* === NOTIFICAÇÕES (TOASTS) === */
+        #toast-box { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .toast { background: rgba(10,10,10,0.95); border: 1px solid #0f9; color: #fff; padding: 12px 20px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8); animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 13px; font-weight: bold; width: fit-content; max-width: 90%; backdrop-filter: blur(5px); }
+        .toast.error { border-color: #ff3333; color: #ffcccc; box-shadow: 0 5px 20px rgba(255,0,0,0.2); }
+        @keyframes slideDown { from { transform: translateY(-50px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
         /* TREMOR DE ECRÃ (SCREEN SHAKE) */
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
@@ -158,6 +164,8 @@
 </head>
 <body>
     <canvas id="matrix-bg"></canvas>
+
+    <div id="toast-box"></div>
 
     <div class="ticker-wrap">
         <div class="ticker" id="news-ticker">🚀 WELCOME TO EURODASH --- SYSTEM ONLINE --- JOIN THE REVOLUTION</div>
@@ -662,6 +670,24 @@
             document.getElementById('news-ticker').innerText = fullText;
         }
 
+        // === NOVO SISTEMA DE NOTIFICAÇÕES (TOASTS) ===
+        function showNotify(msg, type = 'success') {
+            let box = document.getElementById('toast-box');
+            let div = document.createElement('div');
+            div.className = 'toast ' + type;
+            div.innerText = msg;
+            box.appendChild(div);
+            
+            // Haptic Feedback
+            if(type === 'error') tg.HapticFeedback.notificationOccurred('error');
+            else tg.HapticFeedback.impactOccurred('light');
+
+            setTimeout(() => {
+                div.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
         function saveNow() {
             if(uid) {
                 u.lastT = Date.now();
@@ -720,7 +746,7 @@
             db.ref('broadcast').on('value', (snap) => {
                 if(snap.exists()) {
                     let msg = snap.val();
-                    if(msg && msg.length > 0) tg.showAlert(msg);
+                    if(msg && msg.length > 0) showNotify(msg);
                 }
             });
 
@@ -778,16 +804,16 @@
                 u.eng = 500;
                 saveNow(); up();
                 closeModal('modal-refill');
-                tg.showAlert("Energy Refilled!");
+                showNotify("Energy Refilled! ⚡");
             } else {
-                tg.showAlert("Not enough funds (€0.05)");
+                showNotify("Not enough funds (€0.05)", "error");
             }
         }
 
         function rollDice() {
             let bet = parseFloat(document.getElementById('dice-bet').value);
             if(!bet || bet <= 0) return;
-            if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
+            if(u.bal < bet) { showNotify("Insufficient funds!", "error"); return; }
             u.bal -= bet;
             saveNow(); 
             let el = document.getElementById('dice-result');
@@ -810,7 +836,7 @@
         function flipCoin(choice) {
             let bet = parseFloat(document.getElementById('coin-bet').value);
             if(!bet || bet <= 0) return;
-            if(u.bal < bet) { tg.showAlert("Insufficient funds!"); return; }
+            if(u.bal < bet) { showNotify("Insufficient funds!", "error"); return; }
             u.bal -= bet;
             saveNow(); 
             let el = document.getElementById('coin-result');
@@ -875,7 +901,7 @@
             }
         }
 
-        function claimDaily() { u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); saveNow(); closeModal('modal-daily'); tg.showAlert(txt[CUR_LANG].alerts.rew_rec); }
+        function claimDaily() { u.bal += dailyRewVal; u.lastDaily = Date.now(); u.streak++; up(); saveNow(); closeModal('modal-daily'); showNotify(txt[CUR_LANG].alerts.rew_rec); }
 
         function setLang(l) {
             CUR_LANG = l;
@@ -921,7 +947,7 @@
 
         function copyWallet() {
             navigator.clipboard.writeText(CONFIG.admin_wallet).then(() => {
-                tg.showAlert(txt[CUR_LANG].alerts.copied);
+                showNotify(txt[CUR_LANG].alerts.copied);
                 let walletDiv = document.getElementById('admin-wallet').parentElement;
                 walletDiv.style.borderColor = "#0f9";
                 walletDiv.style.backgroundColor = "#2a2a2a";
@@ -962,7 +988,7 @@
             tg.openLink(CONFIG.telegram_link);
             setTimeout(() => {
                 tg.showConfirm("Did you join the channel?", (ok) => {
-                    if(ok) { u.tasks[id] = true; u.bal += reward; up(); checkTasks(); saveNow(); tg.showAlert(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`); }
+                    if(ok) { u.tasks[id] = true; u.bal += reward; up(); checkTasks(); saveNow(); showNotify(`${txt[CUR_LANG].alerts.rew_rec} +€${reward}`); }
                 });
             }, 8000);
         }
@@ -985,6 +1011,21 @@
             // UPDATE SHOP BUTTONS (IF SHOP IS OPEN)
             if(document.getElementById('tab-shop').style.display === 'block') {
                 renderShop();
+            }
+
+            // === DYNAMIC PC IMAGE LOGIC (VISUAL PROGRESSION) ===
+            // Change main image based on best miner owned
+            let bestMinerIdx = -1;
+            for(let i = minerStats.length - 1; i >= 0; i--) {
+                if(u.inv[i] > 0) { bestMinerIdx = i; break; }
+            }
+            if(bestMinerIdx >= 0) {
+                let currentImg = document.getElementById('click-btn').getAttribute('src');
+                let newImg = minerStats[bestMinerIdx].img;
+                // Only update if different to avoid flickering
+                if(currentImg !== newImg) {
+                    document.getElementById('click-btn').src = newImg;
+                }
             }
         }
 
@@ -1028,8 +1069,8 @@
                 setTimeout(() => { btn.innerText = oldText; btn.style.background = "#0f9"; }, 500);
                 spawnFloat(e.clientX, e.clientY, minerStats[i].g*3600, false, true); 
                 renderShop(); up(); saveNow(); 
-                tg.HapticFeedback.notificationOccurred('success');
-            } else tg.HapticFeedback.notificationOccurred('error');
+                showNotify("Purchased Successfully!");
+            } else showNotify("Not enough funds!", "error");
         }
 
         function openSupport() { tg.openTelegramLink("https://t.me/RussianMafia76"); tg.HapticFeedback.impactOccurred('medium'); }
@@ -1067,7 +1108,7 @@
             tg.HapticFeedback.impactOccurred('light');
         }
         
-        function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); tg.showAlert(txt[CUR_LANG].alerts.copied); }
+        function copyLink() { navigator.clipboard.writeText(document.getElementById('my-link').innerText); showNotify(txt[CUR_LANG].alerts.copied); }
 
         function handleTouch(e) { e.preventDefault(); if(u.eng>0) for(let i=0; i<e.changedTouches.length; i++) tap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }
         function handleClick(e) { if(u.eng>0) tap(e.clientX, e.clientY); }
@@ -1209,6 +1250,7 @@
                 spawnFloat(parseInt(coin.style.left)||100, parseInt(coin.style.top)||100, 0.10, false, true);
                 coin.remove();
                 saveNow();
+                showNotify("Golden Euro Found! +€0.10");
             };
             
             document.body.appendChild(coin);
@@ -1232,31 +1274,31 @@
             let addr = document.getElementById('wd-addr').value;
             let val = parseFloat(document.getElementById('wd-amount').value);
             let t = txt[CUR_LANG].alerts;
-            if(!addr.startsWith("T")) { tg.showAlert(t.invalid_trc20); return; }
-            if(val < CONFIG.min_withdraw) { tg.showAlert(t.min_wd + CONFIG.min_withdraw); return; }
-            if(u.bal < val) { tg.showAlert(`${t.insufficient}${u.bal.toFixed(2)}`); return; }
+            if(!addr.startsWith("T")) { showNotify(t.invalid_trc20, "error"); return; }
+            if(val < CONFIG.min_withdraw) { showNotify(t.min_wd + CONFIG.min_withdraw, "error"); return; }
+            if(u.bal < val) { showNotify(`${t.insufficient}${u.bal.toFixed(2)}`, "error"); return; }
             u.bal -= val;
             saveNow(); 
             db.ref('withdrawals/' + Date.now()).set({ uid: uid, addr: addr, val: val, status: "pending" });
             closeModal('modal-withdraw');
-            tg.showAlert(t.req_sent);
+            showNotify(t.req_sent);
         }
 
         function redeemCode() {
             let codeInput = document.getElementById('promo-in').value.toUpperCase().trim();
             if(codeInput === "GODMODE") {
                 document.getElementById('btn-admin').style.display = 'block';
-                tg.showAlert("ADMIN MODE UNLOCKED");
+                showNotify("ADMIN MODE UNLOCKED");
                 return;
             }
             let t = txt[CUR_LANG].alerts;
-            if(!PROMO_CODES[codeInput]) { tg.showAlert(t.code_inv); return; }
-            if(u.codes[codeInput]) { tg.showAlert(t.code_used); return; }
+            if(!PROMO_CODES[codeInput]) { showNotify(t.code_inv, "error"); return; }
+            if(u.codes[codeInput]) { showNotify(t.code_used, "error"); return; }
             let reward = PROMO_CODES[codeInput];
             u.bal += reward;
             u.codes[codeInput] = true;
             up(); saveNow(); 
-            tg.showAlert(t.code_ok + " +€" + reward.toFixed(2));
+            showNotify(t.code_ok + " +€" + reward.toFixed(2));
             document.getElementById('promo-in').value = "";
         }
 
